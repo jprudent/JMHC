@@ -1,0 +1,7 @@
+target
+.cache
+.worksheet/bin/
+bin
+lib_managed
+*.swp
+*.sc
