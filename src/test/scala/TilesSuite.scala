@@ -1,9 +1,8 @@
-package org.liprudent.majiang
+package org.liprudent.majiang.tiles
 
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.liprudent.majiang.Tiles._
 
 @RunWith(classOf[JUnitRunner])
 class TilesSuite extends FunSuite {
@@ -31,31 +30,101 @@ class TilesSuite extends FunSuite {
       assert(!c1.sameFamily(b1))
       
       val sorted =     List(b3,b2,s1,c1,s1,c2,b2).sorted
-      println(sorted)
       assert(sorted == List(b2,b2,b3,c1,c2,s1,s1),sorted)
+    }
+  }
+
+  test("Hand creation") {
+    new Hand1 {
+      val expected = List((b1,2),(b2,4),(b3,1))
+
+      val lst = List(b1,b2,b3,b1,b2,b2,b2)
+      val actual = Hand(lst).hand
+
+      assert(actual == expected, actual + " instead of " + expected)
+    }
+  }
+
+  test("Split by family") {
+    new Hand1 {
+      val hand1 = Hand(List(b2,c1,b1,s1,c2))
+
+      val families: List[List[TileOccurence]] = hand1.splitByFamily
+      assert(families == List(List((b1,1),(b2,1)), List((c1,1),(c2,1)), List((s1,1))),families)
+
+    }
+  }
+
+  test("remove when multiple") {
+    new Hand1 {
+      val hand = Hand(List(b1,b2,b3,b1,b2,b2,b2))
+      val actual = hand.remove(b1)
+      val expected = Hand(List(/*X*/b2,b3,b1,b2,b2,b2))
+      assert(actual == expected, actual +"instead of \n" + expected)
+    }
+  }
+
+  test("remove when single") {
+    new Hand1 {
+      val hand = Hand(List(b1,b2,b3,b1,b2,b2,b2))
+      val actual = hand.remove(b3)
+      val expected = Hand(List(b1,b2,/*X*/b1,b2,b2,b2))
+      assert(actual == expected, actual +"instead of \n" + expected)
+    }
+  }
+
+  test("remove inner when single") {
+    new Hand1 {
+      val hand = Hand(Nil,2)
+      val tiles = List((b1,1), (b2,4), (b3,1))
+      val actual = hand.remove(b1,tiles)
+      val expected = List((b2,4), (b3,1))
+      assert(actual == expected, actual +"instead of \n" + expected)
+    }
+  }
+
+  test("remove several") {
+    new Hand1 {
+      val hand = Hand(Nil,0xF00)
+      val tiles = List((b1,1), (b2,4), (b3,1))
+      val actual = hand.remove(List(b1,b3),tiles)
+      val expected = List((b2,4))
+      assert(actual == expected, actual +"instead of \n" + expected)
+    }
+  }
+
+  test("Find suits") {
+    new Hand1 {
+      val hand1 = Hand(List(b1,b2,b3,b1,b2,b2,b2))
+      val actual: List[Suit] = hand1.findSuits(hand1.hand)
+      val expected = List(List(b1,b2,b3),List(b1,b2), List(b2), List(b2))
+
+      assert(actual == expected, actual)
+
+
     }
   }
 
   test("Chows finding") {
     new Hand1 {
-      val hand1 = List(b1,b2,b3,b4)
-      val chows1 = findChows(hand1)
+      val hand1 = Hand(List(b1,b2,b3,b4))
+      val chows1 = hand1.findChows
       assert(chows1 == List(Chow(b1,b2,b3),Chow(b2,b3,b4)),chows1)
 
-      val hand2 = List(b1,b2,b3,b1,b2)
-      val chows2 = findChows(hand2)
+      val hand2 = Hand(List(b1,b2,b3,b1,b2))
+      val chows2 = hand2.findChows
       assert(chows2 == List(Chow(b1,b2,b3)),chows2)
     }
   }
 
   test("Pungs finding") {
     new Hand1 {
-      val hand1 = List(b1,b3,b1,b4,b5,b4,b4,b1)
-      val pungs1 = findPungs(hand1)
+      val hand1 = Hand(List(b1,b3,b1,b4,b5,b4,b4,b1))
+      val pungs1 = hand1.findPungs
       assert(pungs1 == List(Pung(b1),Pung(b4)),pungs1)
 
-      val hand2 = List(b1,b2,b3,b1)
-      val pungs2 = findPungs(hand2)
+      val hand2 = Hand(List(b1,b2,b3,b1))
+      val pungs2 = hand2.findPungs
       assert(pungs2 == List(),pungs2)
     }
   }
