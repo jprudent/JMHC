@@ -8,30 +8,82 @@ package object tiles {
 
   sealed abstract class Family {
     def name: String
+
+    def validValue(v: Int): Boolean
+
+    def order: Int
   }
 
   object Family {
     implicit val ord = new Ordering[Family] {
-      def compare(f1: Family, f2: Family) = f1.name.compareTo(f2.name)
+      def compare(f1: Family, f2: Family) = {
+        f1.order.compareTo(f2.order)
+      }
     }
   }
 
-  case object Bamboo extends Family {
+  sealed abstract class SuitFamily extends Family {
+    override def validValue(value: Int) = value >= 1 && value <= 9
+  }
+
+  case object Bamboo extends SuitFamily {
     override val name = "Bamboo"
+    override val order = 0;
   }
 
-  case object Stone extends Family {
+  case object Stone extends SuitFamily {
     override val name = "Stone"
+    override val order = 2;
   }
 
-  case object Character extends Family {
+  case object Character extends SuitFamily {
     override val name = "Character"
+    override val order = 1;
   }
 
-  class Tile(val family: Family, val value: Int) {
+  sealed abstract class HonorFamily extends Family {
+    override def validValue(value: Int) = value == 0xF00
+  }
+
+  case object EastWind extends HonorFamily {
+    override val name = "East Wind"
+    override val order = 3;
+  }
+
+  case object WestWind extends HonorFamily {
+    override val name = "West Wind"
+    override val order = 5;
+  }
+
+  case object NorthWind extends HonorFamily {
+    override val name = "North Wind"
+    override val order = 4;
+  }
+
+  case object SouthWind extends HonorFamily {
+    override val name = "South Wind"
+    override val order = 6;
+  }
+
+  case object RedDragon extends HonorFamily {
+    override val name = "Red Dragon"
+    override val order = 7;
+  }
+
+  case object GreenDragon extends HonorFamily {
+    override val name = "Green Dragon"
+    override val order = 8;
+  }
+
+  case object WhiteDragon extends HonorFamily {
+    override val name = "White Dragon"
+    override val order = 9;
+  }
+
+  class Tile private(val family: Family, val value: Int) {
 
     // a tile value should be between 1 and 9
-    require(value >= 1 && value <= 9)
+    require(family.validValue(value))
 
     /**
      * return true if family is same
@@ -51,7 +103,9 @@ package object tiles {
 
   object Tile {
 
-    def apply(family: Family, value: Int) = new Tile(family, value)
+    def apply(family: SuitFamily, value: Int) = new Tile(family, value)
+
+    def apply(family: HonorFamily) = new Tile(family, 0xF00)
 
     implicit val ord = new Ordering[Tile] {
 
@@ -66,32 +120,100 @@ package object tiles {
 
     }
 
+    val b1 = Tile(Bamboo, 1)
+    val b2 = Tile(Bamboo, 2)
+    val b3 = Tile(Bamboo, 3)
+    val b4 = Tile(Bamboo, 4)
+    val b5 = Tile(Bamboo, 5)
+    val b6 = Tile(Bamboo, 6)
+    val b7 = Tile(Bamboo, 7)
+    val b8 = Tile(Bamboo, 8)
+    val b9 = Tile(Bamboo, 9)
+    val c1 = Tile(Character, 1)
+    val c2 = Tile(Character, 2)
+    val c3 = Tile(Character, 3)
+    val c4 = Tile(Character, 4)
+    val c5 = Tile(Character, 5)
+    val c6 = Tile(Character, 6)
+    val c7 = Tile(Character, 7)
+    val c8 = Tile(Character, 8)
+    val c9 = Tile(Character, 9)
+    val s1 = Tile(Stone, 1)
+    val s2 = Tile(Stone, 2)
+    val s3 = Tile(Stone, 3)
+    val s4 = Tile(Stone, 4)
+    val s5 = Tile(Stone, 5)
+    val s6 = Tile(Stone, 6)
+    val s7 = Tile(Stone, 7)
+    val s8 = Tile(Stone, 8)
+    val s9 = Tile(Stone, 9)
+    val we = Tile(EastWind)
+    val ww = Tile(WestWind)
+    val ws = Tile(SouthWind)
+    val wn = Tile(NorthWind)
+    val dr = Tile(RedDragon)
+    val dw = Tile(WhiteDragon)
+    val dg = Tile(GreenDragon)
+
   }
 
 
   ///////////////////////////////////////////////////////////////////////
-  // TILES ARRANGEMENTS DEFINITION
+  // TILES FIGURES DEFINITION
 
   type Suit = List[Tile]
 
-  case class Chow(t1: Tile, t2: Tile, t3: Tile)
+  sealed trait FigureProperties {
+    val size: Int
+  }
 
-  /* FIXME : I would like to be able to sort a List[Chow]. Why the method
-	`sorted` doesn't work out of the box and I do have to create a companion
-	object ? */
+  sealed trait Figure {
+    val properties: FigureProperties
+  }
 
-  object Chow extends Ordering[Chow] {
+
+
+  case class Chow(t1: Tile, t2: Tile, t3: Tile) extends Figure {
+    val properties = Chow
+  }
+
+  object Chow extends Ordering[Chow] with FigureProperties {
+
+    val size = 3
+
     def compare(chow1: Chow, chow2: Chow) = Tile.ord.compare(chow1.t1, chow2.t1)
 
     def apply(xs: List[Tile]) = {
       require(xs.length == 3)
       new Chow(xs(0), xs(1), xs(2))
     }
+
   }
 
-  case class Pung(t: Tile)
 
-  object Pung extends Ordering[Pung] {
+
+  case class Dui(t: Tile) extends Figure {
+    val properties = Dui
+  }
+
+  object Dui extends Ordering[Dui] with FigureProperties {
+
+    val size = 2
+
+    def compare(dui1: Dui, dui2: Dui) = Tile.ord.compare(dui1.t, dui2.t)
+
+  }
+
+
+
+  case class Pung(t: Tile) extends Figure {
+    val properties = Pung
+  }
+
+  object Pung extends Ordering[Pung] with FigureProperties {
+
+    val size = 3
+
     def compare(pung1: Pung, pung2: Pung) = Tile.ord.compare(pung1.t, pung2.t)
   }
 
@@ -130,6 +252,60 @@ package object tiles {
 
   case class Hand private(val hand: List[TileOccurence]) {
 
+    require(hand.forall {
+      to => to._2 >= 1 && to._2 <= 4
+    })
+
+    lazy val size: Int = hand.foldLeft(0)((sum: Int, toc: TileOccurence) => sum + toc._2)
+
+    /**
+     * an ordered list of possible pungs
+     */
+    lazy val findPungs: List[Pung] = {
+      hand.filter(t => t._2 >= Pung.size).map {
+        t => Pung(t._1)
+      }
+    }
+
+    /**
+     * an ordered list of possible chows
+     */
+    lazy val findChows: List[Chow] = {
+      listsOf(Chow.size, allSuits).map(Chow(_))
+    }
+
+    /**
+     * an ordered list of possible duis
+     */
+    lazy val findDuis: List[Dui] = {
+      hand.filter(t => t._2 >= Dui.size).map {
+        t => {
+          val d = Dui(t._1)
+          if (t._2 == 4) List(d,d)
+          else List(d)
+        }
+      }.flatten
+    }
+
+    /**
+     * an ordered list of possible length free suits
+     */
+    lazy val allSuits: List[Suit] = {
+      splitByFamily.map {
+        tilesSameFamily =>
+          findSuits(tilesSameFamily)
+      }.flatten
+    }
+
+    /**
+     * a list of sub-list containing ordered TileOccurence of the same family
+     */
+    lazy val splitByFamily: List[List[TileOccurence]] = {
+      hand.groupBy {
+        e => e._1.family
+      }.values.toList.sorted
+    }
+
     def remove(t: Tile): Hand = {
       Hand(remove(t, hand))
     }
@@ -157,18 +333,6 @@ package object tiles {
     }
 
     /**
-     *
-     * @return a list of <code>List[TileOccurence]</code>.
-     *         Each list element contains tiles of the same family
-     */
-    def splitByFamily: List[List[TileOccurence]] = {
-      hand.groupBy {
-        e => e._1.family
-      }.values.toList.sorted
-    }
-
-
-    /**
      * Search for the longest suits.
      * @param tiles where to find suits.
      * @return the list of the longest suits
@@ -185,6 +349,7 @@ package object tiles {
       tiles match {
         case Nil => Nil
         case h :: t => {
+
           val suit = findSuit(t, h._1)
           suit :: findSuits(remove(suit, tiles))
         }
@@ -193,47 +358,33 @@ package object tiles {
     }
 
 
-    private def listsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
+    def listsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
       require(suitSize > 0)
-      suits.map {
-        suit =>
-          findCombination(suit.size, suitSize).map {
-            indices: List[Int] =>
-              indices.map(i => suit(i))
-          }
-      }.flatten
-    }
 
-
-    def findChows: List[Chow] = {
-
-      val allSuits = splitByFamily.map {
-        tilesSameFamily =>
-          findSuits(tilesSameFamily)
-      }.flatten
-
-      listsOf(3, allSuits).map(Chow(_))
-
-    }
-
-    def findCombination(suit: Int, size: Int): List[List[Int]] = {
-      suit match {
-        case i if i < size => Nil
-        case _ => (suit until (suit - size) by -1).toList ::
-          findCombination(suit - 1, size)
+      def listsOf(suitSize: Int, suit: Suit): List[Suit] = {
+        findSubSuitsIndices(suit.size, suitSize).map {
+          indices: List[Int] =>
+            indices.map(i => suit(i))
+        }
       }
+
+      suits.map(listsOf(suitSize, _)).flatten
     }
 
 
     /**
-     * return an ordered list of possible pungs
+     * Computes all fixed <code>length</code> sub-suit indices of a suit of tiles which length is
+     * <code>suitSize</code>.
+     * @param suitSize The list where to compute sub-lists indices from
+     * @param length The fixed length of each sub-suit
+     * @return a list of list of indices. Indices are sorted ascending and lists too.
      *
-     */
-    def findPungs: List[Pung] = {
-      hand.filter(t => t._2 >= 3).map {
-        t => Pung(t._1)
-      }
+     **/
+    def findSubSuitsIndices(suitSize: Int, length: Int): List[List[Int]] = {
+      val nbElements = suitSize - length + 1
+      (for {i <- 0 until nbElements} yield (for {j <- i until i + length} yield j).toList) toList
     }
+
 
     override def toString: String = "Hand : " + hand.toString
 
