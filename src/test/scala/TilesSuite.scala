@@ -52,7 +52,7 @@ class TilesSuite extends FunSuite {
   }
 
   test("remove inner when single") {
-    val hand = Hand(Nil, 2)
+    val hand = Hand(List[Tile]())
     val tiles = List((b1, 1), (b2, 4), (b3, 1))
     val actual = hand.remove(b1, tiles)
     val expected = List((b2, 4), (b3, 1))
@@ -60,7 +60,7 @@ class TilesSuite extends FunSuite {
   }
 
   test("remove several") {
-    val hand = Hand(Nil, 0xF00)
+    val hand = Hand(List[Tile]())
     val tiles = List((b1, 1), (b2, 4), (b3, 1))
     val actual = hand.remove(List(b1, b3), tiles)
     val expected = List((b2, 4))

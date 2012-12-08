@@ -174,29 +174,30 @@ package object tiles {
 
 
   case class Chow(t1: Tile, t2: Tile, t3: Tile) extends Figure {
-    val properties = Chow
+
+    def this(xs: List[Tile]) {
+      this(xs(0), xs(1), xs(2))
+      require(xs.length == 3)
+    }
+
+    val properties = ChowProperties
   }
 
-  object Chow extends Ordering[Chow] with FigureProperties {
+  object ChowProperties extends Ordering[Chow] with FigureProperties {
 
     val size = 3
 
     def compare(chow1: Chow, chow2: Chow) = Tile.ord.compare(chow1.t1, chow2.t1)
-
-    def apply(xs: List[Tile]) = {
-      require(xs.length == 3)
-      new Chow(xs(0), xs(1), xs(2))
-    }
 
   }
 
 
 
   case class Dui(t: Tile) extends Figure {
-    val properties = Dui
+    val properties = DuiProperties
   }
 
-  object Dui extends Ordering[Dui] with FigureProperties {
+  object DuiProperties extends Ordering[Dui] with FigureProperties {
 
     val size = 2
 
@@ -207,10 +208,10 @@ package object tiles {
 
 
   case class Pung(t: Tile) extends Figure {
-    val properties = Pung
+    val properties = PungProperties
   }
 
-  object Pung extends Ordering[Pung] with FigureProperties {
+  object PungProperties extends Ordering[Pung] with FigureProperties {
 
     val size = 3
 
@@ -236,10 +237,8 @@ package object tiles {
   implicit val ordListTileOccurence = new Ordering[List[TileOccurence]] {
 
     /**
+     * Implementation note:
      * Comparison is done on the first tile of each list.
-     * @param x
-     * @param y
-     * @return
      */
     def compare(x: List[(Tile, Occurence)], y: List[(Tile, Occurence)]): Int = {
       if (x.isEmpty && y.isEmpty) 0
@@ -250,7 +249,7 @@ package object tiles {
   }
 
 
-  case class Hand private(val hand: List[TileOccurence]) {
+  case class Hand(hand: List[TileOccurence]) {
 
     require(hand.forall {
       to => to._2 >= 1 && to._2 <= 4
@@ -262,8 +261,8 @@ package object tiles {
      * an ordered list of possible pungs
      */
     lazy val findPungs: List[Pung] = {
-      hand.filter(t => t._2 >= Pung.size).map {
-        t => Pung(t._1)
+      hand.filter(t => t._2 >= PungProperties.size).map {
+        t => new Pung(t._1)
       }
     }
 
@@ -271,16 +270,16 @@ package object tiles {
      * an ordered list of possible chows
      */
     lazy val findChows: List[Chow] = {
-      listsOf(Chow.size, allSuits).map(Chow(_))
+      listsOf(ChowProperties.size, allSuits).map(new Chow(_))
     }
 
     /**
      * an ordered list of possible duis
      */
     lazy val findDuis: List[Dui] = {
-      hand.filter(t => t._2 >= Dui.size).map {
+      hand.filter(t => t._2 >= DuiProperties.size).map {
         t => {
-          val d = Dui(t._1)
+          val d = new Dui(t._1)
           if (t._2 == 4) List(d,d)
           else List(d)
         }
@@ -307,7 +306,8 @@ package object tiles {
     }
 
     def remove(t: Tile): Hand = {
-      Hand(remove(t, hand))
+      val removed: List[_root_.org.liprudent.majiang.tiles.TileOccurence] = remove(t, hand)
+      new Hand(removed)
     }
 
     /**
@@ -324,7 +324,7 @@ package object tiles {
         case None => from
         case Some((tile, occ)) =>
           if (occ == 1) from.filterNot(isTile)
-          else ((tile, occ - 1) :: from.filterNot(isTile)) sorted
+          else ((tile, occ - 1) :: from.filterNot(isTile)).sorted
       }
     }
 
@@ -382,7 +382,7 @@ package object tiles {
      **/
     def findSubSuitsIndices(suitSize: Int, length: Int): List[List[Int]] = {
       val nbElements = suitSize - length + 1
-      (for {i <- 0 until nbElements} yield (for {j <- i until i + length} yield j).toList) toList
+      (for {i <- 0 until nbElements} yield (for {j <- i until i + length} yield j).toList).toList
     }
 
 
@@ -392,7 +392,7 @@ package object tiles {
 
   object Hand {
 
-    def apply(tiles: List[Tile], foo: Any = 0): Hand = {
+    def apply(tiles: List[Tile])(implicit notUsed:DummyImplicit): Hand = {
       val hand = tiles.groupBy(t => t).map {
         case (k, v) => (k, v.size)
       }.toList.sorted

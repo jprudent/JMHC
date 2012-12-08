@@ -34,7 +34,7 @@ package object mahjong {
     val description = "All Chows but one Pair"
 
     def find(m: Mahjong): Option[Figures] =
-      if(m.allDuis.size == 1 && m.allChows.size == 4)
+      if (m.allDuis.size == 1 && m.allChows.size == 4)
         Some(m.allChows)
       else
         None
@@ -47,14 +47,17 @@ package object mahjong {
     val description = "Three identical chows in three families"
 
     def find(m: Mahjong): Option[Figures] = {
-      m.allChows
-        .groupBy(_.t1.value)
-        .values
+      val resolved: List[Figure] = m.allChows
+        .groupBy(_.t1.value) // Map[Int, List[Chow]
+        .values.toList // List[List[Chow]]
         .filter(_.size == 3)
-      match {
+        .flatten // List[Chow]
+
+      resolved match {
         case Nil => None
-        case x::xs => Some(x::xs)
+        case xs => Some(xs)
       }
+
     }
   }
 
@@ -66,9 +69,13 @@ package object mahjong {
 
     def apply(m: Mahjong): DetailedPoints = {
       val res = combinations.map(combination => combination.find(m))
-      res.zip(combinations)
-        .filter((figures : Option[Figures], combination: Combination) => figures.isDefined)
-        .map((figures : Option[Figures], combination: Combination) => (figures.get,combination))
+      val zipped: List[(Option[Figures], Combination)] = res.zip(combinations)
+      zipped.filter {
+        case (optFigures, _) => optFigures.isDefined
+      }
+        .map {
+        case (optFigures, combination) => (optFigures.get, combination)
+      }
     }
 
   }
