@@ -2,6 +2,7 @@ package org.liprudent.majiang
 
 import tiles.Tile
 
+
 package object figures {
 
 
@@ -13,6 +14,8 @@ package object figures {
 
   sealed trait Figure {
     val properties: FigureProperties
+
+    def asList: List[Tile]
   }
 
   implicit object OrdFigure extends Ordering[Figure] {
@@ -29,12 +32,16 @@ package object figures {
 
   case class Chow(t1: Tile, t2: Tile, t3: Tile) extends Figure {
 
+    require(t1.previousOf(t2) && t2.previousOf(t3))
+
     def this(xs: List[Tile]) {
       this(xs(0), xs(1), xs(2))
       require(xs.length == 3)
     }
 
     val properties = Chow
+
+    override def asList = List(t1, t2, t3)
   }
 
   object OrdChow extends Ordering[Chow] {
@@ -48,6 +55,8 @@ package object figures {
 
   case class Dui(t: Tile) extends Figure {
     val properties = DuiProperties
+
+    override def asList = List(t, t)
   }
 
 
@@ -62,6 +71,8 @@ package object figures {
 
   case class Pung(t: Tile) extends Figure {
     val properties = PungProperties
+
+    override def asList = List(t, t, t)
   }
 
   object PungProperties extends Ordering[Pung] with FigureProperties {

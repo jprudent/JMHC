@@ -3,8 +3,8 @@ package org.liprudent.majiang.tiles
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.liprudent.majiang.tiles.Tile._
-import org.liprudent.majiang.tiles.Types.TileOccurence
+import Tile._
+import Types.TileOccurence
 import org.liprudent.majiang.figures._
 
 @RunWith(classOf[JUnitRunner])

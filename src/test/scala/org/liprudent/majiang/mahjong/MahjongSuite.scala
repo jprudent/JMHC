@@ -1,14 +1,11 @@
-package org.liprudent.majiang.figures
+package org.liprudent.majiang.mahjong
 
-import org.liprudent.majiang.mahjong
-import mahjong._
-import mahjong.Mahjong
-import mahjong.PlayerTiles
 import org.liprudent.majiang.tiles._
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.liprudent.majiang.tiles.Tile._
+import Tile._
+import org.liprudent.majiang.figures.{Pung, Dui, Chow}
 
 @RunWith(classOf[JUnitRunner])
 class MahjongSuite extends FunSuite {
@@ -21,8 +18,9 @@ class MahjongSuite extends FunSuite {
 
   test("a mahjong has 14 tiles") {
     new Hands {
-      assert(MahjongFinder.quickValid(invalid) == false)
-      assert(MahjongFinder.quickValid(valid) == true)
+      assert(MahjongFinder(invalid).quickValid == false)
+      assert(MahjongFinder(valid).quickValid == true)
+      assert(MahjongFinder(noMahjong).quickValid == true)
     }
   }
 

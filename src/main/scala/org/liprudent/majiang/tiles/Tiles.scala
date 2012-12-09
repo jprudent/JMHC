@@ -1,9 +1,9 @@
 package org.liprudent.majiang.tiles
 
-import org.liprudent.majiang.tiles.Types._
+import Types.Occurence
+import Types.TileOccurence
 import org.liprudent.majiang.figures._
 import scala.Some
-import org.liprudent.majiang.figures.Pung
 
 
 //////////////////////////////////////////////////////////////////////
@@ -32,17 +32,17 @@ sealed abstract class SuitFamily extends Family {
 
 case object Bamboo extends SuitFamily {
   override val name = "Bamboo"
-  override val order = 0;
+  override val order = 0
 }
 
 case object Stone extends SuitFamily {
   override val name = "Stone"
-  override val order = 2;
+  override val order = 2
 }
 
 case object Character extends SuitFamily {
   override val name = "Character"
-  override val order = 1;
+  override val order = 1
 }
 
 sealed abstract class HonorFamily extends Family {
@@ -51,37 +51,37 @@ sealed abstract class HonorFamily extends Family {
 
 case object EastWind extends HonorFamily {
   override val name = "East Wind"
-  override val order = 3;
+  override val order = 3
 }
 
 case object WestWind extends HonorFamily {
   override val name = "West Wind"
-  override val order = 5;
+  override val order = 5
 }
 
 case object NorthWind extends HonorFamily {
   override val name = "North Wind"
-  override val order = 4;
+  override val order = 4
 }
 
 case object SouthWind extends HonorFamily {
   override val name = "South Wind"
-  override val order = 6;
+  override val order = 6
 }
 
 case object RedDragon extends HonorFamily {
   override val name = "Red Dragon"
-  override val order = 7;
+  override val order = 7
 }
 
 case object GreenDragon extends HonorFamily {
   override val name = "Green Dragon"
-  override val order = 8;
+  override val order = 8
 }
 
 case object WhiteDragon extends HonorFamily {
   override val name = "White Dragon"
-  override val order = 9;
+  override val order = 9
 }
 
 class Tile private(val family: Family, val value: Int) {
@@ -117,7 +117,7 @@ object Tile {
      * First criteria of compare is the family, then the value
      */
     def compare(t1: Tile, t2: Tile) = {
-      var compFamily = Family.ord.compare(t1.family, t2.family)
+      val compFamily = Family.ord.compare(t1.family, t2.family)
       if (compFamily == 0) t1.value.compare(t2.value)
       else compFamily
     }
@@ -225,6 +225,11 @@ case class Hand(hand: List[TileOccurence]) {
   }
 
   /**
+   * all possible figures
+   */
+  lazy val allFigures: List[Figure] = findPungs ::: findChows ::: findDuis
+
+  /**
    * an ordered list of possible length free suits
    */
   lazy val allSuits: List[Suit] = {
@@ -246,6 +251,10 @@ case class Hand(hand: List[TileOccurence]) {
   def remove(t: Tile): Hand = {
     val removed: List[TileOccurence] = remove(t, hand)
     new Hand(removed)
+  }
+
+  def remove(ts: List[Tile]): Hand = {
+    ts.foldLeft(this)((handAcc, tile) => handAcc.remove(tile))
   }
 
   /**

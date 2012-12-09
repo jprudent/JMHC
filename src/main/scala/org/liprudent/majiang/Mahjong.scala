@@ -1,8 +1,8 @@
 package org.liprudent.majiang
 
-import tiles._
 import scala.Some
-import figures.{OrdFigure, Dui, Chow, Figure}
+import org.liprudent.majiang.figures.{OrdFigure, Dui, Chow, Figure}
+import org.liprudent.majiang.tiles.Hand
 
 package object mahjong {
 
@@ -77,22 +77,38 @@ package object mahjong {
         case (optFigures, _) => optFigures.isDefined
       }
         .map {
-        case (optFigures, combination) => (optFigures.get.sorted, combination)
+        case (optFigures, combination) => (optFigures.get.sorted(OrdFigure), combination)
       }
     }
 
   }
 
-  object MahjongFinder {
+  case class MahjongFinder(ptiles: PlayerTiles) {
 
-    def apply(ptiles: PlayerTiles): List[Figures] = {
-      if (!quickValid(ptiles)) Nil
-      else Nil
+    def find(ptiles: PlayerTiles): List[DetailedPoints] = {
+      if (!quickValid) Nil
+      else findFigures(ptiles.hand).filter(isWellFormed(_, ptiles.disclosed))
+        .map(f => Points(Mahjong(f, ptiles.disclosed)))
     }
 
-    def quickValid(ptiles: PlayerTiles): Boolean = {
+    //TODO pour le moment, recherche de 4 figures de 3 tuiles et 1 paire
+    def isWellFormed(closed: Figures, disclosed: Figures): Boolean = {
+      val all = closed ::: disclosed
+      all.size == 5 && all.filter(_.properties.size == 3).size == 4 && all.filter(_.properties.size == 2).size == 1
+    }
+
+    //TODO return Set
+    private def findFigures(hand: Hand): List[Figures] = {
+      hand.allFigures match {
+        case f :: Nil => List(List(f))
+        case f :: fs => findFigures(hand.remove(f.asList)).map(fs => f :: fs)
+      }
+    }
+
+    def quickValid: Boolean = {
       ptiles.size == 14
     }
+
 
   }
 
