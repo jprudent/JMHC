@@ -4,6 +4,8 @@ import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.liprudent.majiang.tiles.Tile._
+import org.liprudent.majiang.tiles.Types.TileOccurence
+import org.liprudent.majiang.figures._
 
 @RunWith(classOf[JUnitRunner])
 class TilesSuite extends FunSuite {
@@ -20,7 +22,7 @@ class TilesSuite extends FunSuite {
   }
 
   test("Hand creation") {
-    val expected = List((b1, 2), (b2, 4), (b3, 1), (dw,2))
+    val expected = List((b1, 2), (b2, 4), (b3, 1), (dw, 2))
 
     val lst = List(b1, b2, b3, b1, dw, dw, b2, b2, b2)
     val actual = Hand(lst).hand
@@ -33,7 +35,7 @@ class TilesSuite extends FunSuite {
 
     val families: List[List[TileOccurence]] = hand1.splitByFamily
     assert(families == List(List((b1, 1), (b2, 1)), List((c1, 1), (c2, 1)), List((s1, 1)),
-      List((we,1)), List((ww, 1)), List((dr, 2))), families)
+      List((we, 1)), List((ww, 1)), List((dr, 2))), families)
 
   }
 
@@ -68,7 +70,7 @@ class TilesSuite extends FunSuite {
   }
 
   test("Find suits") {
-    val hand1 = Hand(List(b1, b2, b3, b1, b2, b2, b2, we,wn,dg,dg))
+    val hand1 = Hand(List(b1, b2, b3, b1, b2, b2, b2, we, wn, dg, dg))
     val actual: List[Suit] = hand1.findSuits(hand1.hand)
     val expected = List(List(b1, b2, b3), List(b1, b2), List(b2), List(b2), List(we), List(wn), List(dg), List(dg))
 
@@ -89,6 +91,12 @@ class TilesSuite extends FunSuite {
     val expected = List(List(b1, b2, b3), List(b2, b3, b4))
     val actual = hand1.listsOf(3, List(List(b1, b2, b3, b4)))
     assert(actual == expected, actual)
+  }
+
+  test("Chow sorting") {
+    val expected = List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8))
+    val actual = expected.reverse.sorted(OrdChow)
+    assert(actual === expected)
   }
 
   test("Chows finding") {

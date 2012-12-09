@@ -2,6 +2,7 @@ package org.liprudent.majiang
 
 import tiles._
 import scala.Some
+import figures.{OrdFigure, Dui, Chow, Figure}
 
 package object mahjong {
 
@@ -25,6 +26,8 @@ package object mahjong {
     val description: String
 
     def find(m: Mahjong): Option[Figures]
+
+    override lazy val toString = "n°%d, %d points, %s".format(id, points, name)
   }
 
   object AllChows extends Combination {
@@ -74,7 +77,7 @@ package object mahjong {
         case (optFigures, _) => optFigures.isDefined
       }
         .map {
-        case (optFigures, combination) => (optFigures.get, combination)
+        case (optFigures, combination) => (optFigures.get.sorted, combination)
       }
     }
 
