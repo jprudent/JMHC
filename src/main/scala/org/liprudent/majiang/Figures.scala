@@ -19,12 +19,23 @@ package object figures {
   }
 
   implicit object OrdFigure extends Ordering[Figure] {
-    override def compare(f1: Figure, f2: Figure) = {
-      f1 match {
-        case chow1: Chow => f2 match {
-          case chow2: Chow => OrdChow.compare(chow1, chow2)
+    override def compare(x: Figure, y: Figure): Int = {
+      x match {
+        case x: Chow => y match {
+          case y: Pung => 1
+          case y: Chow => OrdChow.compare(x, y)
+          case y: Dui => -1
         }
-        case _ => throw new Exception("Not Implemented")
+        case x: Pung => y match {
+          case y: Pung => PungProperties.compare(x, y)
+          case y: Chow => -1
+          case y: Dui => -1
+        }
+        case x: Dui => y match {
+          case y: Pung => 1
+          case y: Chow => 1
+          case y: Dui => DuiProperties.compare(x, y)
+        }
       }
     }
   }
@@ -74,6 +85,7 @@ package object figures {
 
     override def asList = List(t, t, t)
   }
+
 
   object PungProperties extends Ordering[Pung] with FigureProperties {
 

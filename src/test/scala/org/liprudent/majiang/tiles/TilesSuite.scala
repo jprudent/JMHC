@@ -133,4 +133,23 @@ class TilesSuite extends FunSuite {
     assert(pungs2 == List(), pungs2)
   }
 
+  test("All figures") {
+    val hand = Hand(List(b1, b2, b3, b1, b2, b3, b1, b2, b3))
+    val expected = List(Pung(b1), Pung(b2), Pung(b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Dui(b1), Dui(b2), Dui(b3))
+    val actual = hand.allFigures
+    assert(expected == actual, actual)
+  }
+
+  test("Figures ordering") {
+    val expected = List(Pung(b1), Pung(b2), Pung(b3), Chow(b1, b2, b3), Chow(b2, b3, b4), Chow(b4, b5, b6), Dui(b1), Dui(b2), Dui(b3))
+    val actual = expected.reverse.sorted(OrdFigure)
+    assert(actual == expected, actual)
+  }
+
+  test("simple Figures ordering") {
+    val expected = List(Pung(b1), Chow(b1, b2, b3), Dui(b2))
+    val actual = List(Chow(b1, b2, b3), Pung(b1), Dui(b2)).sorted(OrdFigure)
+    assert(actual == expected, actual)
+  }
+
 }

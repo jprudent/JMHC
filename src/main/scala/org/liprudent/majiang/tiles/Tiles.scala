@@ -226,6 +226,8 @@ case class Hand(hand: List[TileOccurence]) {
 
   /**
    * all possible figures
+   * <p>
+   * result is ordered : pungs, chows, duis
    */
   lazy val allFigures: List[Figure] = findPungs ::: findChows ::: findDuis
 
