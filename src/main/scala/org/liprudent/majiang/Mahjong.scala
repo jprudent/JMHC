@@ -69,18 +69,18 @@ package object mahjong {
     override def toString = {
       val title = "For Hule : " + huLe + "\n"
       val detail = detailedPoints.foldLeft("")((string, line) => {
-        line._2 + ":" + line._1 + "\n"
+        string + line._2 + ":" + line._1 + "\n"
       })
       title + detail
     }
   }
 
   /**
-   * Ordering is done on Combination.points, then Combination.id
+   * Ordering is done on Combination.points descending, then Combination.id ascending
    */
   object OrdDetailedPoint extends Ordering[(List[Figure], Combination)] {
     override def compare(x: (List[Figure], Combination), y: (List[Figure], Combination)) = {
-      x._2.points.compare(y._2.points) match {
+      y._2.points.compare(x._2.points) match {
         case 0 => x._2.id.compare(y._2.id)
         case n => n
       }
@@ -100,6 +100,7 @@ package object mahjong {
         .map {
         case (optFigures, combination) => (optFigures.get.sorted(OrdFigure), combination)
       }
+        .sorted(OrdDetailedPoint)
       DetailedPoints(m, detailedPoints)
     }
 
@@ -113,8 +114,6 @@ package object mahjong {
         .filter(closed => MahjongFinder.isWellFormedMahjong(closed, ptiles.disclosed))
         .map(closed => Points(HuLe(closed, ptiles.disclosed)))
         .toList
-      //.sorted(OrdDetailedPoint)
-
     }
 
     def quickValid: Boolean = {

@@ -25,14 +25,14 @@ class MahjongSuite extends FunSuite {
     }
   }
 
-  ignore("an invalid hand has no mahjong") {
+  test("an invalid hand has no mahjong") {
     new Hands {
       val actual = MahjongFinder(invalid).find
       assert(actual == Nil, actual)
     }
   }
 
-  ignore("if there is no mahjong ... well there is no mahjong") {
+  test("if there is no mahjong ... well there is no mahjong") {
     new Hands {
       val actual = MahjongFinder(noMahjong).find
       assert(actual == Nil, actual)
@@ -43,8 +43,13 @@ class MahjongSuite extends FunSuite {
     new Hands {
       val actual = MahjongFinder(allChows_mixedTripleChow).find
       val expected = List(
-        (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChow),
-        (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
+        DetailedPoints(
+          HuLe(List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), Nil),
+          List(
+            (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow),
+            (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
+          )
+        )
       )
       assert(actual == expected, actual)
     }
@@ -91,18 +96,20 @@ class MahjongSuite extends FunSuite {
   }
 
   test("s2s3s4s6s7s8s9s9 c6c7c8b6b7b8") {
-    val expected = List(
-      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows),
-      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChow)
+
+    val hule: HuLe = HuLe(
+      List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9)),
+      List(Chow(b6, b7, b8), Chow(c6, c7, c8))
     )
 
-    val actual = Points(
-      HuLe(
-        List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9)),
-        List(Chow(b6, b7, b8), Chow(c6, c7, c8))
-      )
-    )
+    val expected = DetailedPoints(hule,
+      List(
+        (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChow),
+        (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
+      ))
 
-    assert(actual == expected, actual)
+    val actual = Points(hule)
+
+    assert(actual == expected, "actual : " + actual + "\nexpexted : " + expected)
   }
 }
