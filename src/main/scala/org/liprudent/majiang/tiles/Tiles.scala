@@ -2,8 +2,9 @@ package org.liprudent.majiang.tiles
 
 import Types.Occurence
 import Types.TileOccurence
+import Types.Figures
+
 import org.liprudent.majiang.figures._
-import scala.Some
 
 
 //////////////////////////////////////////////////////////////////////
@@ -161,6 +162,16 @@ object Tile {
 
 }
 
+trait TileOrigin
+
+case object SelfDrawn extends TileOrigin
+
+case object Discarded extends TileOrigin
+
+case object KongStole extends TileOrigin
+
+case class ContextualTile(tile: Tile, origin: TileOrigin)
+
 ///////////////////////////////////////////////////////////////////////
 // HAND DEFINITIONS
 
@@ -186,20 +197,118 @@ object OrdListTileOccurence extends Ordering[List[TileOccurence]] {
   }
 }
 
+/**
+ * A TileSet is just a data structure that contains some tiles
+ * <p/>
+ * Methods are provided to add and remove tiles
+ * @param tocs The list of tiles this class handles
+ */
+case class TileSet(tocs: List[TileOccurence]) {
 
-case class Hand(hand: List[TileOccurence]) {
-
-  require(hand.forall {
+  require(tocs.forall {
     to => to._2 >= 1 && to._2 <= 4
   })
 
-  lazy val size: Int = hand.foldLeft(0)((sum: Int, toc: TileOccurence) => sum + toc._2)
+  /**
+   * The size of the data structure
+   */
+  lazy val size: Int = tocs.foldLeft(0)((sum: Int, toc: TileOccurence) => sum + toc._2)
+
+  /**
+   * a tile removed
+   * @param tile the tile to remove
+   * @return a new TileSet with the tile removed
+   */
+  def removed(tile: Tile): TileSet = {
+    val removed: List[TileOccurence] = remove(tile, tocs)
+    TileSet(removed)
+  }
+
+  /**
+   * a list of tiles removed
+   * @param tiles
+   * @return a new TileSet with the tiles removed
+   */
+  def removed(tiles: List[Tile]): TileSet = {
+    tiles.foldLeft(this)((handAcc, tile) => handAcc.removed(tile))
+  }
+
+  def added(tile: Tile): TileSet = {
+    val added = add(tile, tocs)
+    TileSet(added)
+  }
+
+  /**
+   *
+   * @param p the predicate used to test elements.
+   * @return true if the given predicate p holds for some of the elements, otherwise false.
+   *
+   */
+  def exists(p: (Tile) => Boolean) = defactorized.exists(p)
+
+
+  protected lazy val defactorized: List[Tile] = tocs.map(toc => for {i <- 1 to toc._2} yield (toc._1)).flatten
+
+  /**
+   * Remove a tile from list of tiles.
+   * @param t The tile to remove
+   * @param from The list where to remove the tile <code>t</code>
+   * @return The list <code>from</code> minus the tile <code>t</code>
+   */
+  protected def remove(t: Tile, from: List[TileOccurence]): List[TileOccurence] = {
+
+    def isTile = (tileOccurence: TileOccurence) => tileOccurence._1 == t
+
+    from.find(isTile) match {
+      case None => from
+      case Some((tile, occ)) =>
+        if (occ == 1) from.filterNot(isTile)
+        else ((tile, occ - 1) :: from.filterNot(isTile)).sorted
+    }
+  }
+
+  protected def remove(tiles: List[Tile], from: List[TileOccurence]): List[TileOccurence] = {
+    tiles.foldLeft(from)((acc: List[TileOccurence], t: Tile) => remove(t, acc))
+  }
+
+
+  /**
+   * Add a tile to a list of tiles.
+   * @param t The tile to add
+   * @param to The list where to add the tile <code>t</code>
+   * @return The list <code>to</code> plus the tile <code>t</code>
+   */
+  protected def add(t: Tile, to: List[TileOccurence]): List[TileOccurence] = {
+
+    def isTile = (tileOccurence: TileOccurence) => tileOccurence._1 == t
+
+    to.find(isTile) match {
+      case None => (t, 1) :: to.sorted
+      case Some((tile, occ)) =>
+        require(occ < 4 && occ >= 1, "There are " + occ + " " + tile)
+        (tile, occ + 1) :: to.filterNot(isTile).sorted
+    }
+  }
+
+}
+
+object TileSet {
+  def apply(tiles: Iterable[Tile])(implicit dummy: DummyImplicit): TileSet = {
+    val tocs = tiles.groupBy(t => t).map {
+      case (k, v) => (k, v.size)
+    }.toList.sorted
+
+    TileSet(tocs)
+  }
+}
+
+case class FiguresComputer(tileSet: TileSet) {
 
   /**
    * an ordered list of possible pungs
    */
   lazy val findPungs: List[Pung] = {
-    hand.filter(t => t._2 >= PungProperties.size).map {
+    tileSet.tocs.filter(t => t._2 >= PungProperties.size).map {
       t => new Pung(t._1)
     }
   }
@@ -215,7 +324,7 @@ case class Hand(hand: List[TileOccurence]) {
    * an ordered list of possible duis
    */
   lazy val findDuis: List[Dui] = {
-    hand.filter(t => t._2 >= DuiProperties.size).map {
+    tileSet.tocs.filter(t => t._2 >= DuiProperties.size).map {
       t => {
         val d = new Dui(t._1)
         if (t._2 == 4) List(d, d)
@@ -232,61 +341,60 @@ case class Hand(hand: List[TileOccurence]) {
   lazy val allFigures: List[Figure] = findPungs ::: findChows ::: findDuis
 
   /**
+   *
+   * @return All possible combinations of figures. Each element of the set is an ordered list of figures.
+   */
+  lazy val allFiguresCombinations: Set[Figures] = findFigures(this)
+
+  //TODO optimization: it's useless to try all combinations for a given Figure type
+  //List(Chow(b1,b2,b3), Chow(b2,b3,b4)) == List(Chow(b2,b3,b4), Chow(b1,b2,b3))
+  protected def findFigures(figuresComputer: FiguresComputer): Set[Figures] = {
+    figuresComputer.allFigures match {
+      case Nil => Set()
+      case all => {
+        all.map {
+          figure => {
+            val next: Set[Figures] = findFigures(FiguresComputer(figuresComputer.tileSet.removed(figure.asList)))
+            next match {
+              case s if s.isEmpty => Set(List(figure))
+              case _ => next.map(figures => (figure :: figures))
+            }
+          }
+        }
+          .flatten
+          .toSet[Figures]
+          .map(figures => figures.sorted(OrdFigure))
+      }
+    }
+  }
+
+
+  /**
    * an ordered list of possible length free suits
    */
-  lazy val allSuits: List[Suit] = {
+  protected lazy val allSuits: List[Suit] = {
     splitByFamily.map {
       tilesSameFamily =>
-        findSuits(tilesSameFamily)
+        findSuits(TileSet(tilesSameFamily))
     }.flatten
   }
 
   /**
    * a list of sub-list containing ordered TileOccurence of the same family
    */
-  lazy val splitByFamily: List[List[TileOccurence]] = {
-    hand.groupBy {
+  protected[tiles] val splitByFamily: List[List[TileOccurence]] = {
+    tileSet.tocs.groupBy {
       e => e._1.family
     }.values.toList.sorted(OrdListTileOccurence)
   }
 
-  def remove(t: Tile): Hand = {
-    val removed: List[TileOccurence] = remove(t, hand)
-    new Hand(removed)
-  }
-
-  def remove(ts: List[Tile]): Hand = {
-    ts.foldLeft(this)((handAcc, tile) => handAcc.remove(tile))
-  }
-
-  /**
-   * Remove a tile from list of tiles.
-   * @param t The tile to remove
-   * @param from The list where to remove the tile <code>t</code>
-   * @return The list <code>from</code> minus the tile <code>t</code>
-   */
-  def remove(t: Tile, from: List[TileOccurence]): List[TileOccurence] = {
-
-    def isTile = (tileOccurence: TileOccurence) => tileOccurence._1 == t
-
-    from.find(isTile) match {
-      case None => from
-      case Some((tile, occ)) =>
-        if (occ == 1) from.filterNot(isTile)
-        else ((tile, occ - 1) :: from.filterNot(isTile)).sorted
-    }
-  }
-
-  def remove(tiles: List[Tile], from: List[TileOccurence]): List[TileOccurence] = {
-    tiles.foldLeft(from)((acc: List[TileOccurence], t: Tile) => remove(t, acc))
-  }
 
   /**
    * Search for the longest suits.
    * @param tiles where to find suits.
    * @return the list of the longest suits
    */
-  def findSuits(tiles: List[TileOccurence]): List[Suit] = {
+  protected[tiles] def findSuits(tiles: TileSet): List[Suit] = {
 
     def findSuit(tiles: List[TileOccurence], prev: Tile): Suit = {
       tiles match {
@@ -296,18 +404,23 @@ case class Hand(hand: List[TileOccurence]) {
     }
 
     tiles match {
-      case Nil => Nil
-      case h :: t => {
-
+      case TileSet(Nil) => Nil
+      case TileSet(h :: t) => {
         val suit = findSuit(t, h._1)
-        suit :: findSuits(remove(suit, tiles))
+        suit :: findSuits(tiles.removed(suit))
       }
     }
 
   }
 
 
-  def listsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
+  /**
+   * Find all sublists of fixed length in given suits
+   * @param suitSize sublists fixed length
+   * @param suits the suits where to find sublists. Theses suits can have any length.
+   * @return A list of sub-lists with fixed length
+   */
+  protected[tiles] def listsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
     require(suitSize > 0)
 
     def listsOf(suitSize: Int, suit: Suit): List[Suit] = {
@@ -329,23 +442,55 @@ case class Hand(hand: List[TileOccurence]) {
    * @return a list of list of indices. Indices are sorted ascending and lists too.
    *
    **/
-  def findSubSuitsIndices(suitSize: Int, length: Int): List[List[Int]] = {
+  protected[tiles] def findSubSuitsIndices(suitSize: Int, length: Int): List[List[Int]] = {
     val nbElements = suitSize - length + 1
     (for {i <- 0 until nbElements} yield (for {j <- i until i + length} yield j).toList).toList
   }
+}
+
+object FiguresComputer {
+  def apply(tiles: List[Tile]): FiguresComputer = FiguresComputer(TileSet(tiles))
+}
+
+/**
+ * A hand represents the closed tiles of a player
+ * <p/>
+ * Note: There is no remove method because in mahjong a tile is removed only after one is added.
+ * So if you need to remove a tile, call <code>addRemove</code> method.
+ * @param tileSet The tiles the hand is made of.
+ * @param lastTileContext The context of the last tile
+ */
+case class Hand(tileSet: TileSet, lastTileContext: ContextualTile) {
+
+  require(tileSet.exists(t => t == lastTileContext.tile))
+
+  /**
+   * Add a new tile in hand
+   * @param contextualTile The new tile to add
+   * @return The new hand with the new tile added
+   */
+  def add(contextualTile: ContextualTile): Hand =
+    Hand(tileSet.added(contextualTile.tile), contextualTile)
+
+  /**
+   * add a new tile and remove one
+   * @param added ContextualTile to add
+   * @param removed tile to remove
+   * @return a new Hand with tiles updated
+   */
+  def addRemove(added: ContextualTile, removed: Tile): Hand = {
+    Hand(add(added).tileSet.removed(removed), added)
+  }
 
 
-  override def toString: String = "Hand : " + hand.toString
+  override def toString: String = "Hand : " + tileSet.toString + "\nLast tile: " + lastTileContext
 
 }
 
 object Hand {
 
-  def apply(tiles: List[Tile])(implicit notUsed: DummyImplicit): Hand = {
-    val hand = tiles.groupBy(t => t).map {
-      case (k, v) => (k, v.size)
-    }.toList.sorted
-    new Hand(hand)
+  def apply(tiles: List[Tile], lastTileContext: ContextualTile)(implicit notUsed: DummyImplicit): Hand = {
+    new Hand(TileSet(tiles), lastTileContext)
   }
 
 }

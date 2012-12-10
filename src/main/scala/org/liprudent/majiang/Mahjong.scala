@@ -2,19 +2,17 @@ package org.liprudent.majiang
 
 import scala.Some
 import org.liprudent.majiang.figures.{OrdFigure, Dui, Chow, Figure}
-import org.liprudent.majiang.tiles.Hand
-import collection.immutable.Set
+import tiles.{FiguresComputer, ContextualTile, Hand}
+import tiles.Types.Figures
 
 package object mahjong {
 
-  type Figures = List[Figure]
-
   case class PlayerTiles(hand: Hand, disclosed: Figures) {
-    lazy val size = hand.size + disclosedSize
+    lazy val size = hand.tileSet.size + disclosedSize
     lazy val disclosedSize = disclosed.foldLeft(0)((sum: Int, f: Figure) => sum + f.properties.size)
   }
 
-  case class HuLe(closed: Figures, disclosed: Figures) {
+  case class HuLe(closed: Figures, disclosed: Figures, lastTileContext: ContextualTile) {
     lazy val allFigures = closed ::: disclosed
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
@@ -87,7 +85,7 @@ package object mahjong {
     }
   }
 
-  object Points {
+  object HulePointsComputer {
 
     val combinations = List(AllChows, MixedTripleChow)
 
@@ -106,14 +104,21 @@ package object mahjong {
 
   }
 
-  case class MahjongFinder(ptiles: PlayerTiles) {
+  case class HuLeFinder(ptiles: PlayerTiles) {
 
+    /**
+     *
+     * @return A list. Each element is a detailed solution for given <code>ptiles</code>.
+     */
     def find: List[DetailedPoints] = {
       if (!quickValid) Nil
-      else MahjongFinder.findFigures(ptiles.hand)
-        .filter(closed => MahjongFinder.isWellFormedMahjong(closed, ptiles.disclosed))
-        .map(closed => Points(HuLe(closed, ptiles.disclosed)))
-        .toList
+      else {
+        val computer = FiguresComputer(ptiles.hand.tileSet)
+        computer.allFiguresCombinations
+          .filter(closed => HuLeFinder.isWellFormedMahjong(closed, ptiles.disclosed))
+          .map(closed => HulePointsComputer(HuLe(closed, ptiles.disclosed, ptiles.hand.lastTileContext)))
+          .toList
+      }
     }
 
     def quickValid: Boolean = {
@@ -122,36 +127,12 @@ package object mahjong {
 
   }
 
-  object MahjongFinder {
+  object HuLeFinder {
     //TODO pour le moment, recherche de 4 figures de 3 tuiles et 1 paire
     def isWellFormedMahjong(closed: Figures, disclosed: Figures): Boolean = {
       val all = closed ::: disclosed
       all.size == 5 && all.filter(_.properties.size == 3).size == 4 && all.filter(_.properties.size == 2).size == 1
     }
-
-
-    //TODO optimization: it's useless to try all combinations for a given Figure type
-    //List(Chow(b1,b2,b3), Chow(b2,b3,b4)) == List(Chow(b2,b3,b4), Chow(b1,b2,b3))
-    def findFigures(hand: Hand): Set[Figures] = {
-      hand.allFigures match {
-        case Nil => Set()
-        case all => {
-          all.map {
-            figure => {
-              val next: Set[Figures] = findFigures(hand.remove(figure.asList))
-              next match {
-                case s if s.isEmpty => Set(List(figure))
-                case _ => next.map(figures => (figure :: figures))
-              }
-            }
-          }
-            .flatten
-            .toSet[Figures]
-            .map(figures => figures.sorted(OrdFigure))
-        }
-      }
-    }
-
   }
 
 }
