@@ -23,13 +23,21 @@ class TilesSuite extends FunSuite {
   test("Figures ordering") {
     val expected = List(Pung(b1), Pung(b2), Pung(b3), Chow(b1, b2, b3), Chow(b2, b3, b4), Chow(b4, b5, b6), Dui(b1), Dui(b2), Dui(b3))
     val actual = expected.reverse.sorted(OrdFigure)
-    assert(actual == expected, actual)
+    assert(actual === expected, actual)
   }
 
   test("simple Figures ordering") {
     val expected = List(Pung(b1), Chow(b1, b2, b3), Dui(b2))
     val actual = List(Chow(b1, b2, b3), Pung(b1), Dui(b2)).sorted(OrdFigure)
-    assert(actual == expected, actual)
+    assert(actual === expected)
+  }
+
+  test("TileSet method exists") {
+    val ts = TileSet(List(c1, c4, c7, b2, b5, b8, s3, s6, s9))
+    assert(ts.exists(_ == c1))
+    assert(ts.exists(_ == c4))
+    assert(ts.exists(_ == s3))
+
   }
 
 }

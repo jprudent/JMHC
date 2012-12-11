@@ -85,7 +85,7 @@ case object WhiteDragon extends HonorFamily {
   override val order = 9
 }
 
-class Tile private(val family: Family, val value: Int) {
+case class Tile(val family: Family, val value: Int) {
 
   // a tile value should be between 1 and 9
   require(family.validValue(value))
@@ -320,7 +320,7 @@ case class FiguresComputer(tileSet: TileSet) {
   /**
    * an ordered list of possible pungs
    */
-  lazy val findPungs: List[Pung] = {
+  lazy val pungs: List[Pung] = {
     tileSet.tocs.filter(t => t._2 >= PungProperties.size).map {
       t => new Pung(t._1)
     }
@@ -329,14 +329,14 @@ case class FiguresComputer(tileSet: TileSet) {
   /**
    * an ordered list of possible chows
    */
-  lazy val findChows: List[Chow] = {
+  lazy val chows: List[Chow] = {
     sublistsOf(Chow.size, allSuits).map(new Chow(_))
   }
 
   /**
    * an ordered list of possible duis
    */
-  lazy val findDuis: List[Dui] = {
+  lazy val duis: List[Dui] = {
     tileSet.tocs.filter(t => t._2 >= DuiProperties.size).map {
       t => {
         val d = new Dui(t._1)
@@ -346,12 +346,26 @@ case class FiguresComputer(tileSet: TileSet) {
     }.flatten
   }
 
+  lazy val knitted: List[Knitted] = {
+
+    //quick fail
+    if (tileSet.size < 9 || chows.size >= 2 || pungs.size >= 2) Nil
+
+    else {
+      List(Bamboo, Character, Stone)
+        .permutations // all combinations of those 3 families
+        .map(families => Knitted(families(0), families(1), families(2))).toList // as Knitted
+        .filter(knitted => knitted.asList.forall(tile => tileSet.exists(t => t == tile))) // where each knitted tile exists in tileSet
+        .toList
+    }
+  }
+
   /**
    * all possible figures
    * <p>
    * result is ordered : pungs, chows, duis
    */
-  lazy val allFigures: List[Figure] = findPungs ::: findChows ::: findDuis
+  lazy val allFigures: List[Figure] = (knitted ::: duis ::: chows ::: pungs).sorted(OrdFigure)
 
   /**
    *

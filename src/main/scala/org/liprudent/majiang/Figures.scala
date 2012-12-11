@@ -1,6 +1,6 @@
 package org.liprudent.majiang
 
-import tiles.Tile
+import tiles.{SuitFamily, Tile}
 
 
 package object figures {
@@ -21,17 +21,26 @@ package object figures {
   implicit object OrdFigure extends Ordering[Figure] {
     override def compare(x: Figure, y: Figure): Int = {
       x match {
+        case x: Knitted => y match {
+          case y: Knitted => KnittedProperties.compare(x, y)
+          case y: Pung => -1
+          case y: Chow => -1
+          case y: Dui => -1
+        }
         case x: Chow => y match {
+          case y: Knitted => 1
           case y: Pung => 1
           case y: Chow => OrdChow.compare(x, y)
           case y: Dui => -1
         }
         case x: Pung => y match {
+          case y: Knitted => 1
           case y: Pung => PungProperties.compare(x, y)
           case y: Chow => -1
           case y: Dui => -1
         }
         case x: Dui => y match {
+          case y: Knitted => 1
           case y: Pung => 1
           case y: Chow => 1
           case y: Dui => DuiProperties.compare(x, y)
@@ -92,6 +101,33 @@ package object figures {
     val size = 3
 
     def compare(pung1: Pung, pung2: Pung) = Tile.ord.compare(pung1.t, pung2.t)
+  }
+
+  case class Knitted(fam147: SuitFamily, fam258: SuitFamily, fam369: SuitFamily) extends Figure {
+
+    require(fam147 != fam258 && fam147 != fam369 && fam258 != fam369)
+
+    val properties = KnittedProperties
+
+    override def asList = List(
+      Tile(fam147, 1),
+      Tile(fam147, 4),
+      Tile(fam147, 7),
+      Tile(fam258, 2),
+      Tile(fam258, 5),
+      Tile(fam258, 8),
+      Tile(fam369, 3),
+      Tile(fam369, 6),
+      Tile(fam369, 9)
+    )
+  }
+
+  object KnittedProperties extends Ordering[Knitted] with FigureProperties {
+
+    val size = 9
+
+    def compare(knitted1: Knitted, knitted2: Knitted) =
+      knitted2.fam147.order - knitted1.fam147.order
   }
 
 }

@@ -1,6 +1,6 @@
 package org.liprudent.majiang
 
-import org.liprudent.majiang.figures.{OrdFigure, Chow, Figure}
+import org.liprudent.majiang.figures._
 import tiles._
 import tiles.ContextualTile
 import tiles.Types.Figures
@@ -65,6 +65,17 @@ package object mahjong {
     }
   }
 
+  object KnittedStraight extends Combination {
+    val id = 35
+    val points = 12
+    val name = "Knitted Straight"
+    val description = "1-4-7 in one family, 2-5-8 in the second family, 3-6-9 in the third family"
+
+    def find(m: HuLe): Option[Figures] = {
+      m.closed.find(_.isInstanceOf[Knitted]).map(List(_))
+    }
+  }
+
   case class DetailedPoints(huLe: HuLe, detailedPoints: List[(List[Figure], Combination)]) {
     override def toString = {
       val title = "For Hule : " + huLe + "\n"
@@ -89,10 +100,10 @@ package object mahjong {
 
   object HulePointsComputer {
 
-    val combinations = List(AllChows, MixedTripleChow)
+    val combinations = List(AllChows, MixedTripleChow, KnittedStraight)
 
-    def apply(m: HuLe): DetailedPoints = {
-      val res = combinations.map(combination => combination.find(m))
+    def apply(huLe: HuLe): DetailedPoints = {
+      val res = combinations.map(combination => combination.find(huLe))
       val zipped: List[(Option[Figures], Combination)] = res.zip(combinations)
       val detailedPoints = zipped.filter {
         case (optFigures, _) => optFigures.isDefined
@@ -101,7 +112,7 @@ package object mahjong {
         case (optFigures, combination) => (optFigures.get.sorted(OrdFigure), combination)
       }
         .sorted(OrdDetailedPoint)
-      DetailedPoints(m, detailedPoints)
+      DetailedPoints(huLe, detailedPoints)
     }
 
   }
@@ -112,7 +123,7 @@ package object mahjong {
      *
      * @return A list. Each element is a detailed solution for given <code>ptiles</code>.
      */
-    def find: List[DetailedPoints] = {
+    lazy val find: List[DetailedPoints] = {
       if (!quickValid) Nil
       else {
         val computer = FiguresComputer(ptiles.hand.tileSet)
@@ -123,9 +134,7 @@ package object mahjong {
       }
     }
 
-    def quickValid: Boolean = {
-      ptiles.size == 14
-    }
+    lazy val quickValid = ptiles.size == 14
 
   }
 
@@ -133,21 +142,34 @@ package object mahjong {
     //TODO pour le moment, recherche de 4 figures de 3 tuiles et 1 paire
     def isWellFormedMahjong(closed: Figures, disclosed: Figures): Boolean = {
       val all = closed ::: disclosed
-      all.size == 5 && all.filter(_.properties.size == 3).size == 4 && all.filter(_.properties.size == 2).size == 1
+      //classical mahjong hand
+      classicalMahjondHand(all) ||
+        //knitted staight hand
+        knittedStraightHand(all)
     }
   }
 
+  def knittedStraightHand(all: List[figures.Figure]): Boolean = {
+    all.size == 3 && all.exists(_.isInstanceOf[Knitted]) &&
+      all.filter(_.properties.size == 3).size == 1 &&
+      all.filter(_.properties.size == 2).size == 1
+  }
+
+
+  def classicalMahjondHand(all: List[figures.Figure]): Boolean = {
+    all.size == 5 && all.filter(_.properties.size == 3).size == 4 && all.filter(_.properties.size == 2).size == 1
+  }
 
   object UniqueWait {
 
     def waitingTiles(tileSet: TileSet): List[Tile] = {
 
-      def completeCombination(figures: Figures, tileSet: TileSet) = Figures.size(figures) == tileSet.size
+      def completeCombination(figures: Figures, tileSet: TileSet) =
+        Figures.size(figures) == tileSet.size
 
       def satisfy(tile: Tile): Boolean = {
         val added: TileSet = tileSet.added(tile)
         val allCombinations = FiguresComputer(added).allFiguresCombinations
-        println("for tileset " + tileSet + "\nadded tile = " + tile + "\nadded " + added + "\nallCombinations " + allCombinations)
         allCombinations.filter(figures => completeCombination(figures, added)).size == 1
       }
 
