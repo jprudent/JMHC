@@ -81,4 +81,35 @@ class MahjongSuite extends FunSuite {
 
     assert(actual == expected, "actual : " + actual + "\nexpexted : " + expected)
   }
+
+  test("waiting tiles: simple case middle") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b1, b3)))
+    assert(List(b2) === waitingFor)
+  }
+
+  test("waiting tiles: simple case left") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b8, b9)))
+    assert(List(b7) === waitingFor)
+  }
+
+  test("waiting tiles: simple case right") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b1, b2)))
+    assert(List(b3) === waitingFor)
+  }
+
+  test("waiting tiles: double wait") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b2, b3)))
+    assert(List(b1, b4) === waitingFor)
+  }
+
+  test("waiting tiles: pair") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b2)))
+    assert(List(b2) === waitingFor)
+  }
+
+  test("waiting tiles: hot") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b5, b6, b7, s2, s3, s3, s3, s4, s5, s6, s7, c5, c6, c7)))
+    assert(List(s3) === waitingFor)
+  }
+
 }

@@ -1,9 +1,11 @@
 package org.liprudent.majiang
 
-import scala.Some
-import org.liprudent.majiang.figures.{OrdFigure, Dui, Chow, Figure}
-import tiles.{FiguresComputer, ContextualTile, Hand}
+import org.liprudent.majiang.figures.{OrdFigure, Chow, Figure}
+import tiles._
+import tiles.ContextualTile
 import tiles.Types.Figures
+import scala.Some
+import org.liprudent.majiang.figures.Dui
 
 package object mahjong {
 
@@ -132,6 +134,24 @@ package object mahjong {
     def isWellFormedMahjong(closed: Figures, disclosed: Figures): Boolean = {
       val all = closed ::: disclosed
       all.size == 5 && all.filter(_.properties.size == 3).size == 4 && all.filter(_.properties.size == 2).size == 1
+    }
+  }
+
+
+  object UniqueWait {
+
+    def waitingTiles(tileSet: TileSet): List[Tile] = {
+
+      def completeCombination(figures: Figures, tileSet: TileSet) = Figures.size(figures) == tileSet.size
+
+      def satisfy(tile: Tile): Boolean = {
+        val added: TileSet = tileSet.added(tile)
+        val allCombinations = FiguresComputer(added).allFiguresCombinations
+        println("for tileset " + tileSet + "\nadded tile = " + tile + "\nadded " + added + "\nallCombinations " + allCombinations)
+        allCombinations.filter(figures => completeCombination(figures, added)).size == 1
+      }
+
+      Tile.all.filter(satisfy).toList.sorted
     }
   }
 

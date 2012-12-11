@@ -160,6 +160,13 @@ object Tile {
   val dw = Tile(WhiteDragon)
   val dg = Tile(GreenDragon)
 
+  val all = Set(
+    b1, b2, b3, b4, b5, b6, b7, b8, b9,
+    c1, c2, c3, c4, c5, c6, c7, c8, c9,
+    s1, s2, s3, s4, s5, s6, s7, s8, s9,
+    we, ww, ws, wn,
+    dr, dw, dg)
+
 }
 
 trait TileOrigin
@@ -260,7 +267,7 @@ case class TileSet(tocs: List[TileOccurence]) {
     def isTile = (tileOccurence: TileOccurence) => tileOccurence._1 == t
 
     from.find(isTile) match {
-      case None => from
+      case None => throw new IllegalArgumentException("Tile " + t + " is not in " + defactorized)
       case Some((tile, occ)) =>
         if (occ == 1) from.filterNot(isTile)
         else ((tile, occ - 1) :: from.filterNot(isTile)).sorted
@@ -282,12 +289,14 @@ case class TileSet(tocs: List[TileOccurence]) {
 
     def isTile = (tileOccurence: TileOccurence) => tileOccurence._1 == t
 
-    to.find(isTile) match {
-      case None => (t, 1) :: to.sorted
+    val added = to.find(isTile) match {
+      case None => (t, 1) :: to
       case Some((tile, occ)) =>
         require(occ < 4 && occ >= 1, "There are " + occ + " " + tile)
-        (tile, occ + 1) :: to.filterNot(isTile).sorted
+        (tile, occ + 1) :: to.filterNot(isTile)
     }
+
+    added.sorted
   }
 
 }
@@ -300,6 +309,10 @@ object TileSet {
 
     TileSet(tocs)
   }
+
+  //  def apply(tile:Tile*) : TileSet = {
+  //    apply(tile:_*)
+  //  }
 }
 
 case class FiguresComputer(tileSet: TileSet) {
@@ -317,7 +330,7 @@ case class FiguresComputer(tileSet: TileSet) {
    * an ordered list of possible chows
    */
   lazy val findChows: List[Chow] = {
-    listsOf(Chow.size, allSuits).map(new Chow(_))
+    sublistsOf(Chow.size, allSuits).map(new Chow(_))
   }
 
   /**
@@ -420,7 +433,7 @@ case class FiguresComputer(tileSet: TileSet) {
    * @param suits the suits where to find sublists. Theses suits can have any length.
    * @return A list of sub-lists with fixed length
    */
-  protected[tiles] def listsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
+  protected[tiles] def sublistsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
     require(suitSize > 0)
 
     def listsOf(suitSize: Int, suit: Suit): List[Suit] = {

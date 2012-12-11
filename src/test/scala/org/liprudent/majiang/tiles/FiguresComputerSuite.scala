@@ -29,7 +29,7 @@ class FiguresComputerSuite extends FunSuite {
   test("listOf") {
     val hand1 = FiguresComputer(List(b1, b2, b3, b4))
     val expected = List(List(b1, b2, b3), List(b2, b3, b4))
-    val actual = hand1.listsOf(3, List(List(b1, b2, b3, b4)))
+    val actual = hand1.sublistsOf(3, List(List(b1, b2, b3, b4)))
     assert(actual == expected, actual)
   }
 
