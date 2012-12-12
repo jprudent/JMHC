@@ -96,6 +96,18 @@ class FiguresComputerSuite extends FunSuite {
       List(b1, b4, b7, c2, c5, c8, s3, s6, s9), List(we, ww, dr, dg, dw))))
   }
 
+  test("13 orphans") {
+    val computer = FiguresComputer(List(b1, b9, c1, c9, s1, s9, dr, dg, dw, ww, we, ws, wn, wn))
+    val thirteenOrphans = computer.thirteenOrphans
+    assert(thirteenOrphans === List(ThirteenOrphans(wn)))
+  }
+
+  test("not 13 orphans") {
+    val computer = FiguresComputer(List(b2, b9, c1, c9, s1, s9, dr, dg, dw, ww, we, ws, wn, wn))
+    val thirteenOrphans = computer.thirteenOrphans
+    assert(thirteenOrphans === List())
+  }
+
   test("All figures") {
     val hand = FiguresComputer(List(b1, b2, b3, b1, b2, b3, b1, b2, b3))
     val expected = List(Pung(b1), Pung(b2), Pung(b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Dui(b1), Dui(b2), Dui(b3))

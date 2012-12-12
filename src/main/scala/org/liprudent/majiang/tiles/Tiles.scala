@@ -409,6 +409,20 @@ case class FiguresComputer(tileSet: TileSet) {
     }
   }
 
+  lazy val thirteenOrphans: List[ThirteenOrphans] = {
+    val containsFixed = ThirteenOrphansProperties.fixedTiles.forall(tile => tileSet.exists(_ == tile))
+    if (containsFixed) {
+      val extra = tileSet.tocs.filter(toc => toc._2 == 2)
+      extra match {
+        case (tile, occ) :: Nil if tile.family.isInstanceOf[HonorFamily] => List(ThirteenOrphans(tile))
+        case _ => Nil
+      }
+    }
+    else {
+      Nil
+    }
+  }
+
   private def hasTwins(tileSet: TileSet) =
     tileSet.tocs.forall(_._2 >= 2)
 
@@ -420,7 +434,7 @@ case class FiguresComputer(tileSet: TileSet) {
    * <p>
    * result is ordered : pungs, chows, duis
    */
-  lazy val allFigures: List[Figure] = (someKnittedSomeDragons ::: knitted ::: duis ::: chows ::: pungs).sorted(OrdFigure)
+  lazy val allFigures: List[Figure] = (thirteenOrphans ::: someKnittedSomeDragons ::: knitted ::: duis ::: chows ::: pungs).sorted(OrdFigure)
 
   /**
    *

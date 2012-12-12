@@ -36,6 +36,10 @@ class MahjongSuite extends FunSuite {
       Hand(List(b1, b4, b7, s2, s5, s8, c9, ww, we, ws, wn, dr, dg, dw), ContextualTile(b1, Discarded)),
       Nil
     )
+    val thirteenOrphans = PlayerTiles(
+      Hand(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), ContextualTile(b1, Discarded)),
+      Nil
+    )
   }
 
   test("a mahjong has 14 tiles") {
@@ -144,6 +148,24 @@ class MahjongSuite extends FunSuite {
     }
   }
 
+  test("HuLe Finder 13 orphans") {
+    new Hands {
+      val actual = HuLeFinder(thirteenOrphans).find
+
+      val expected = List(
+        DetailedPoints(
+          HuLe(List(ThirteenOrphans(dr)),
+            Nil,
+            ContextualTile(b1, Discarded)),
+          List(
+            (List(ThirteenOrphans(dr)), ThirteenOrphansComb)
+          )
+        )
+      )
+      assert(actual === expected)
+    }
+  }
+
   test("isWellFormedMahjong") {
     new Hands {
       val validFigures = List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(dr))
@@ -226,7 +248,7 @@ class MahjongSuite extends FunSuite {
 
   test("waiting on 13 orphans 1") {
     val waitingFor: List[Tile] = UniqueWait.waitingTiles(
-      TileSet(List(b1, b9, c1, c9, s1, s9, ww, we, ws, wn, dr, dg)))
-    assert(List(dw) === waitingFor)
+      TileSet(List(b1, b9, c1, c9, s1, s9, ww, we, ws, wn, dr, dg, dw)))
+    assert(List(we, wn, ww, ws, dr, dg, dw) === waitingFor)
   }
 }

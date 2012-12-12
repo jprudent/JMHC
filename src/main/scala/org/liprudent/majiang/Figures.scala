@@ -1,6 +1,6 @@
 package org.liprudent.majiang
 
-import tiles.{TileSet, SuitFamily, Tile}
+import tiles.{HonorFamily, TileSet, SuitFamily, Tile}
 
 
 package object figures {
@@ -22,13 +22,19 @@ package object figures {
     //TODO need to understand why result is reversed
     override def compare(x: Figure, y: Figure): Int = {
       x match {
+        case x: ThirteenOrphans => y match {
+          case y: ThirteenOrphans => ThirteenOrphansProperties.compare(x, y)
+          case _ => -1
+        }
 
         case x: SomeKnittedWithSomeDragons => y match {
+          case y: ThirteenOrphans => 1
           case y: SomeKnittedWithSomeDragons => SomeKnittedWithSomeDragonsProperties.compare(x, y)
           case _ => -1
         }
 
         case x: Knitted => y match {
+          case y: ThirteenOrphans => 1
           case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => KnittedProperties.compare(x, y)
           case y: Pung => -1
@@ -36,6 +42,7 @@ package object figures {
           case y: Dui => -1
         }
         case x: Chow => y match {
+          case y: ThirteenOrphans => 1
           case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => 1
           case y: Pung => 1
@@ -43,6 +50,7 @@ package object figures {
           case y: Dui => -1
         }
         case x: Pung => y match {
+          case y: ThirteenOrphans => 1
           case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => 1
           case y: Pung => PungProperties.compare(x, y)
@@ -50,6 +58,7 @@ package object figures {
           case y: Dui => -1
         }
         case x: Dui => y match {
+          case y: ThirteenOrphans => 1
           case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => 1
           case y: Pung => 1
@@ -142,6 +151,7 @@ package object figures {
   }
 
   case class SomeKnittedWithSomeDragons(knitted: List[Tile], dragons: List[Tile]) extends Figure {
+
     require(knitted.forall(_.family.isInstanceOf[SuitFamily]), "wrong kind")
     require(dragons.forall(!_.family.isInstanceOf[SuitFamily]), "wrong kind")
     require(knitted == knitted.sorted, "sorted required")
@@ -162,6 +172,30 @@ package object figures {
     def compare(x: SomeKnittedWithSomeDragons, y: SomeKnittedWithSomeDragons) =
     // the more dragons you have, the strongest you are
       x.dragons.size - y.dragons.size
+  }
+
+  case class ThirteenOrphans(extraDragon: Tile) extends Figure {
+
+    assert(extraDragon.family.isInstanceOf[HonorFamily])
+
+    val properties = ThirteenOrphansProperties
+
+    override def asList = (extraDragon :: properties.fixedTiles).sorted
+  }
+
+  object ThirteenOrphansProperties extends Ordering[ThirteenOrphans] with FigureProperties {
+
+    val size = 14
+
+    override def compare(x: ThirteenOrphans, y: ThirteenOrphans) =
+      Tile.ord.compare(x.extraDragon, y.extraDragon)
+
+    val fixedTiles = List(
+      Tile.b1, Tile.b9,
+      Tile.c1, Tile.c9,
+      Tile.s1, Tile.s9,
+      Tile.we, Tile.wn, Tile.ww, Tile.ws,
+      Tile.dr, Tile.dg, Tile.dw).sorted
   }
 
 }

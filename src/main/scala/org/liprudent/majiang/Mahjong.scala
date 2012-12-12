@@ -100,6 +100,18 @@ package object mahjong {
       }.map(List(_))
   }
 
+  object ThirteenOrphansComb extends Combination {
+    val id = 7
+    val points = 88
+    val name = "Thirteen Orphans"
+    val description = "1 and 9 in three families and 7 distinct honors plus 1 extra honor"
+
+    def find(m: HuLe): Option[Figures] =
+      m.closed.find {
+        figure => figure.isInstanceOf[ThirteenOrphans]
+      }.map(List(_))
+  }
+
   case class DetailedPoints(huLe: HuLe, detailedPoints: List[(List[Figure], Combination)]) {
     override def toString = {
       val title = "For Hule : " + huLe + "\n"
@@ -132,7 +144,8 @@ package object mahjong {
       MixedTripleChow,
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
-      GreaterHonorsAndKnittedTiles)
+      GreaterHonorsAndKnittedTiles,
+      ThirteenOrphansComb)
 
 
     def apply(huLe: HuLe): DetailedPoints = {
@@ -204,9 +217,16 @@ object HuLeFinder {
       //knitted staight hand
       knittedStraightHand(all) ||
       //partial or complete knitted + unique dragons
-      someKnittedSomeDragons(closed)
+      someKnittedSomeDragons(closed) ||
+      thirteenOrphans(closed)
   }
 
+  def thirteenOrphans(closed: List[Figure]): Boolean = {
+    closed match {
+      case ThirteenOrphans(_) :: Nil => true
+      case _ => false
+    }
+  }
 
   def someKnittedSomeDragons(closed: List[figures.Figure]): Boolean = {
     closed.size == 1 &&
