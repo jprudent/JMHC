@@ -251,10 +251,23 @@ case class TileSet(tocs: List[TileOccurence]) {
    * @return true if the given predicate p holds for some of the elements, otherwise false.
    *
    */
-  def exists(p: (Tile) => Boolean) = defactorized.exists(p)
+  def exists(p: (Tile) => Boolean) = toTiles.exists(p)
+
+  def filter(p: (Tile) => Boolean): TileSet = TileSet(toTiles.filter(p))
+
+  /**
+   * a list of tilesets where tiles are all the sameof the same family
+   */
+  lazy val sameFamily: Boolean = {
+    tocs match {
+      case Nil => true
+      case t :: ts => ts.forall(_._1.family == t._1.family)
+    }
+  }
 
 
-  protected lazy val defactorized: List[Tile] = tocs.map(toc => for {i <- 1 to toc._2} yield (toc._1)).flatten
+  lazy val toTiles: List[Tile] =
+    tocs.map(toc => for {i <- 1 to toc._2} yield (toc._1)).flatten
 
   /**
    * Remove a tile from list of tiles.
@@ -267,7 +280,7 @@ case class TileSet(tocs: List[TileOccurence]) {
     def isTile = (tileOccurence: TileOccurence) => tileOccurence._1 == t
 
     from.find(isTile) match {
-      case None => throw new IllegalArgumentException("Tile " + t + " is not in " + defactorized)
+      case None => throw new IllegalArgumentException("Tile " + t + " is not in " + toTiles)
       case Some((tile, occ)) =>
         if (occ == 1) from.filterNot(isTile)
         else ((tile, occ - 1) :: from.filterNot(isTile)).sorted
@@ -360,12 +373,54 @@ case class FiguresComputer(tileSet: TileSet) {
     }
   }
 
+  lazy val someKnittedSomeDragons: List[SomeKnittedWithSomeDragons] = {
+
+    //quick fail
+    if (tileSet.size != 14) Nil
+
+    else {
+      val honors = tileSet.filter(!_.family.isInstanceOf[SuitFamily])
+      if (hasTwins(honors) || honors.size < 5) {
+        Nil
+      }
+      else {
+        val knitted = tileSet.filter(_.family.isInstanceOf[SuitFamily])
+        val knittedComputer: FiguresComputer = FiguresComputer(tileSet)
+        if (knitted.size != 14 - honors.size || hasChowsOrTwins(knittedComputer)) {
+          Nil
+        }
+        else {
+
+          val tiles147 = knitted.filter(tile => tile.value == 1 || tile.value == 4 || tile.value == 7)
+          val tiles258 = knitted.filter(tile => tile.value == 2 || tile.value == 5 || tile.value == 8)
+          val tiles369 = knitted.filter(tile => tile.value == 3 || tile.value == 6 || tile.value == 9)
+          val knitteds: List[TileSet] = List(tiles147, tiles258, tiles369)
+
+          //all tiles should be the same family
+          if (knitteds.forall(tileSet => tileSet.sameFamily)) {
+            val allKnitted: List[Tile] = knitteds.map(_.toTiles).flatten.sorted
+            assert(allKnitted.size == 14 - honors.size)
+            List(SomeKnittedWithSomeDragons(allKnitted, honors.toTiles))
+          } else {
+            Nil
+          }
+        }
+      }
+    }
+  }
+
+  private def hasTwins(tileSet: TileSet) =
+    tileSet.tocs.forall(_._2 >= 2)
+
+  private def hasChowsOrTwins(computer: FiguresComputer) =
+    List(computer.chows, computer.pungs, computer.duis).exists(_.size != 0)
+
   /**
    * all possible figures
    * <p>
    * result is ordered : pungs, chows, duis
    */
-  lazy val allFigures: List[Figure] = (knitted ::: duis ::: chows ::: pungs).sorted(OrdFigure)
+  lazy val allFigures: List[Figure] = (someKnittedSomeDragons ::: knitted ::: duis ::: chows ::: pungs).sorted(OrdFigure)
 
   /**
    *

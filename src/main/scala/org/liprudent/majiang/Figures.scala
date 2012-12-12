@@ -1,6 +1,6 @@
 package org.liprudent.majiang
 
-import tiles.{SuitFamily, Tile}
+import tiles.{TileSet, SuitFamily, Tile}
 
 
 package object figures {
@@ -19,27 +19,38 @@ package object figures {
   }
 
   implicit object OrdFigure extends Ordering[Figure] {
+    //TODO need to understand why result is reversed
     override def compare(x: Figure, y: Figure): Int = {
       x match {
+
+        case x: SomeKnittedWithSomeDragons => y match {
+          case y: SomeKnittedWithSomeDragons => SomeKnittedWithSomeDragonsProperties.compare(x, y)
+          case _ => -1
+        }
+
         case x: Knitted => y match {
+          case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => KnittedProperties.compare(x, y)
           case y: Pung => -1
           case y: Chow => -1
           case y: Dui => -1
         }
         case x: Chow => y match {
+          case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => 1
           case y: Pung => 1
           case y: Chow => OrdChow.compare(x, y)
           case y: Dui => -1
         }
         case x: Pung => y match {
+          case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => 1
           case y: Pung => PungProperties.compare(x, y)
           case y: Chow => -1
           case y: Dui => -1
         }
         case x: Dui => y match {
+          case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => 1
           case y: Pung => 1
           case y: Chow => 1
@@ -128,6 +139,29 @@ package object figures {
 
     def compare(knitted1: Knitted, knitted2: Knitted) =
       knitted2.fam147.order - knitted1.fam147.order
+  }
+
+  case class SomeKnittedWithSomeDragons(knitted: List[Tile], dragons: List[Tile]) extends Figure {
+    require(knitted.forall(_.family.isInstanceOf[SuitFamily]), "wrong kind")
+    require(dragons.forall(!_.family.isInstanceOf[SuitFamily]), "wrong kind")
+    require(knitted == knitted.sorted, "sorted required")
+    require(dragons == dragons.sorted, "sorted required")
+    require(TileSet(knitted).tocs.size == knitted.size, "no pair, no pung allowed")
+    require(TileSet(dragons).tocs.size == dragons.size, "no pair, no pung allowed")
+
+    val properties = SomeKnittedWithSomeDragonsProperties
+
+    override def asList = dragons ::: knitted
+
+  }
+
+  object SomeKnittedWithSomeDragonsProperties extends Ordering[SomeKnittedWithSomeDragons] with FigureProperties {
+
+    val size = 14
+
+    def compare(x: SomeKnittedWithSomeDragons, y: SomeKnittedWithSomeDragons) =
+    // the more dragons you have, the strongest you are
+      x.dragons.size - y.dragons.size
   }
 
 }

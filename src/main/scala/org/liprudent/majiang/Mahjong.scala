@@ -1,5 +1,6 @@
 package org.liprudent.majiang
 
+import mahjong.{HuLe, HulePointsComputer, DetailedPoints, PlayerTiles}
 import org.liprudent.majiang.figures._
 import tiles._
 import tiles.ContextualTile
@@ -76,6 +77,29 @@ package object mahjong {
     }
   }
 
+  object LesserHonorsAndKnittedTiles extends Combination {
+    val id = 34
+    val points = 12
+    val name = "Lesser Honors and Knitted Tiles"
+    val description = "6 unique honors and incomplete knitted straight OR 5 unique honors and complete knitted straight"
+
+    def find(m: HuLe): Option[Figures] =
+      m.closed.find(_.isInstanceOf[SomeKnittedWithSomeDragons]).map(List(_))
+  }
+
+  object GreaterHonorsAndKnittedTiles extends Combination {
+    val id = 20
+    val points = 24
+    val name = "Greater Honors and Knitted Tiles"
+    val description = "The 7 unique honors and incomplete knitted tiles"
+
+    def find(m: HuLe): Option[Figures] =
+      m.closed.find {
+        figure => figure.isInstanceOf[SomeKnittedWithSomeDragons] &&
+          figure.asInstanceOf[SomeKnittedWithSomeDragons].dragons.size == 7
+      }.map(List(_))
+  }
+
   case class DetailedPoints(huLe: HuLe, detailedPoints: List[(List[Figure], Combination)]) {
     override def toString = {
       val title = "For Hule : " + huLe + "\n"
@@ -100,53 +124,93 @@ package object mahjong {
 
   object HulePointsComputer {
 
-    val combinations = List(AllChows, MixedTripleChow, KnittedStraight)
+    //TODO uncomment when all combinations have been implemented
+    //require(combinations.size == 88)
+
+    val combinations = List(
+      AllChows,
+      MixedTripleChow,
+      KnittedStraight,
+      LesserHonorsAndKnittedTiles,
+      GreaterHonorsAndKnittedTiles)
+
 
     def apply(huLe: HuLe): DetailedPoints = {
       val res = combinations.map(combination => combination.find(huLe))
       val zipped: List[(Option[Figures], Combination)] = res.zip(combinations)
-      val detailedPoints = zipped.filter {
+      val allDetailedPoints = zipped.filter {
         case (optFigures, _) => optFigures.isDefined
       }
         .map {
         case (optFigures, combination) => (optFigures.get.sorted(OrdFigure), combination)
       }
         .sorted(OrdDetailedPoint)
+
+      val detailedPoints = applyExclusion(allDetailedPoints)
+
       DetailedPoints(huLe, detailedPoints)
     }
 
-  }
 
-  case class HuLeFinder(ptiles: PlayerTiles) {
-
-    /**
-     *
-     * @return A list. Each element is a detailed solution for given <code>ptiles</code>.
-     */
-    lazy val find: List[DetailedPoints] = {
-      if (!quickValid) Nil
-      else {
-        val computer = FiguresComputer(ptiles.hand.tileSet)
-        computer.allFiguresCombinations
-          .filter(closed => HuLeFinder.isWellFormedMahjong(closed, ptiles.disclosed))
-          .map(closed => HulePointsComputer(HuLe(closed, ptiles.disclosed, ptiles.hand.lastTileContext)))
-          .toList
+    private def applyExclusion(allDetailedPoints: List[(Figures, Combination)]): List[(Figures, Combination)] = {
+      allDetailedPoints match {
+        case Nil => Nil
+        case (figures, combination) :: t =>
+          (figures, combination) :: applyExclusion(t.filter {
+            case (tailFigures, comb) => tailFigures != figures
+          })
       }
     }
-
-    lazy val quickValid = ptiles.size == 14
-
   }
 
-  object HuLeFinder {
-    //TODO pour le moment, recherche de 4 figures de 3 tuiles et 1 paire
-    def isWellFormedMahjong(closed: Figures, disclosed: Figures): Boolean = {
-      val all = closed ::: disclosed
-      //classical mahjong hand
-      classicalMahjondHand(all) ||
-        //knitted staight hand
-        knittedStraightHand(all)
+  private def countFiguresUsed(allDetailedPoints: List[(Figures, Combination)]): Map[Figure, Int] = {
+    allDetailedPoints
+      .map {
+      case (figures, combination) => figures
     }
+      .foldLeft(Map[Figure, Int]())((map, figures) =>
+      figures.foldLeft(map)((map, figure) => map.updated(figure, map.getOrElse(figure, 0) + 1)))
+  }
+
+}
+
+case class HuLeFinder(ptiles: PlayerTiles) {
+
+  /**
+   *
+   * @return A list. Each element is a detailed solution for given <code>ptiles</code>.
+   */
+  lazy val find: List[DetailedPoints] = {
+    if (!quickValid) Nil
+    else {
+      val computer = FiguresComputer(ptiles.hand.tileSet)
+      computer.allFiguresCombinations
+        .filter(closed => HuLeFinder.isWellFormedMahjong(closed, ptiles.disclosed))
+        .map(closed => HulePointsComputer(HuLe(closed, ptiles.disclosed, ptiles.hand.lastTileContext)))
+        .toList
+    }
+  }
+
+  lazy val quickValid = ptiles.size == 14
+
+}
+
+object HuLeFinder {
+  //TODO pour le moment, recherche de 4 figures de 3 tuiles et 1 paire
+  def isWellFormedMahjong(closed: Figures, disclosed: Figures): Boolean = {
+    val all = closed ::: disclosed
+    //classical mahjong hand
+    classicalMahjondHand(all) ||
+      //knitted staight hand
+      knittedStraightHand(all) ||
+      //partial or complete knitted + unique dragons
+      someKnittedSomeDragons(closed)
+  }
+
+
+  def someKnittedSomeDragons(closed: List[figures.Figure]): Boolean = {
+    closed.size == 1 &&
+      closed(0).isInstanceOf[SomeKnittedWithSomeDragons]
   }
 
   def knittedStraightHand(all: List[figures.Figure]): Boolean = {
@@ -159,22 +223,22 @@ package object mahjong {
   def classicalMahjondHand(all: List[figures.Figure]): Boolean = {
     all.size == 5 && all.filter(_.properties.size == 3).size == 4 && all.filter(_.properties.size == 2).size == 1
   }
+}
 
-  object UniqueWait {
+object UniqueWait {
 
-    def waitingTiles(tileSet: TileSet): List[Tile] = {
+  def waitingTiles(tileSet: TileSet): List[Tile] = {
 
-      def completeCombination(figures: Figures, tileSet: TileSet) =
-        Figures.size(figures) == tileSet.size
+    def completeCombination(figures: Figures, tileSet: TileSet) =
+      Figures.size(figures) == tileSet.size
 
-      def satisfy(tile: Tile): Boolean = {
-        val added: TileSet = tileSet.added(tile)
-        val allCombinations = FiguresComputer(added).allFiguresCombinations
-        allCombinations.filter(figures => completeCombination(figures, added)).size == 1
-      }
-
-      Tile.all.filter(satisfy).toList.sorted
+    def satisfy(tile: Tile): Boolean = {
+      val added: TileSet = tileSet.added(tile)
+      val allCombinations = FiguresComputer(added).allFiguresCombinations
+      allCombinations.filter(figures => completeCombination(figures, added)).size == 1
     }
+
+    Tile.all.filter(satisfy).toList.sorted
   }
 
 }

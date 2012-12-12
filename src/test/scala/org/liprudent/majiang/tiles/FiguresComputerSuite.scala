@@ -89,6 +89,13 @@ class FiguresComputerSuite extends FunSuite {
     assert(knitted === List(Knitted(Bamboo, Character, Stone)))
   }
 
+  test("Some honors and some knitted") {
+    val computer = FiguresComputer(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, dr, dg, dw, ww, we))
+    val someHonorsSomeKnitted = computer.someKnittedSomeDragons
+    assert(someHonorsSomeKnitted === List(SomeKnittedWithSomeDragons(
+      List(b1, b4, b7, c2, c5, c8, s3, s6, s9), List(we, ww, dr, dg, dw))))
+  }
+
   test("All figures") {
     val hand = FiguresComputer(List(b1, b2, b3, b1, b2, b3, b1, b2, b3))
     val expected = List(Pung(b1), Pung(b2), Pung(b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Dui(b1), Dui(b2), Dui(b3))
