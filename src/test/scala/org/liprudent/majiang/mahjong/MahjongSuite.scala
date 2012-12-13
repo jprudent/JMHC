@@ -194,61 +194,73 @@ class MahjongSuite extends FunSuite {
   }
 
   test("waiting tiles: simple case middle") {
-    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b1, b3)))
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b1, b3, c2, c2, c2, ww, ww, ww, we, we, we, dr, dr)), Nil)
     assert(List(b2) === waitingFor)
   }
 
   test("waiting tiles: simple case left") {
-    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b8, b9)))
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b8, b9, c2, c2, c2, ww, ww, ww, we, we, we, dr, dr)), Nil)
     assert(List(b7) === waitingFor)
   }
 
   test("waiting tiles: simple case right") {
-    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b1, b2)))
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b1, b2, c2, c2, c2, ww, ww, ww, we, we, we, dr, dr)), Nil)
     assert(List(b3) === waitingFor)
   }
 
   test("waiting tiles: double wait") {
-    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b2, b3)))
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b2, b3, c2, c2, c2, ww, ww, ww, we, we, we, dr, dr)), Nil)
     assert(List(b1, b4) === waitingFor)
   }
 
   test("waiting tiles: pair") {
-    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b2)))
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b2, c2, c2, c2, ww, ww, ww, we, we, we, dr, dr, dr)), Nil)
     assert(List(b2) === waitingFor)
   }
 
   test("waiting tiles: hot") {
-    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b5, b6, b7, s2, s3, s3, s3, s4, s5, s6, s7, c5, c6, c7)))
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b5, b6, b7, s2, s3, s3, s4, s5, s6, s7, c5, c6, c7)), Nil)
     assert(List(s3) === waitingFor)
   }
 
   test("waiting on knitted straitght") {
-    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b4, b7, c2, c5, c8, s3, s6, s9)))
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b4, b7, c2, c5, c8, s3, s6, s9)), List(Pung(dr), Dui(b4)))
     assert(List(b1) === waitingFor)
   }
 
   test("waiting on lesser honor and knitted straitght 1") {
     val waitingFor: List[Tile] = UniqueWait.waitingTiles(
-      TileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, dr, dg, dw, ww)))
+      TileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, dr, dg, dw, ww)), Nil)
     assert(List(we, wn, ws) === waitingFor)
   }
 
   test("waiting on lesser honor and knitted straitght 2") {
     val waitingFor: List[Tile] = UniqueWait.waitingTiles(
-      TileSet(List(b1, b4, b7, c2, c8, s3, s6, s9, dr, dg, dw, ww, we)))
+      TileSet(List(b1, b4, b7, c2, c8, s3, s6, s9, dr, dg, dw, ww, we)), Nil)
     assert(List(c5, wn, ws) === waitingFor)
   }
 
   test("waiting on lesser honor and knitted tiles") {
     val waitingFor: List[Tile] = UniqueWait.waitingTiles(
-      TileSet(List(b1, b4, b7, c2, c5, c8, s3, ww, we, ws, wn, dr, dg)))
+      TileSet(List(b1, b4, b7, c2, c5, c8, s3, ww, we, ws, wn, dr, dg)), Nil)
     assert(List(s6, s9, dw) === waitingFor)
   }
 
   test("waiting on 13 orphans 1") {
     val waitingFor: List[Tile] = UniqueWait.waitingTiles(
-      TileSet(List(b1, b9, c1, c9, s1, s9, ww, we, ws, wn, dr, dg, dw)))
+      TileSet(List(b1, b9, c1, c9, s1, s9, ww, we, ws, wn, dr, dg, dw)), Nil)
     assert(List(we, wn, ww, ws, dr, dg, dw) === waitingFor)
+  }
+
+  test("waiting on 7 pairs") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(
+      TileSet(List(b1, b1, c1, c1, s1, s1, ww, ww, ws, ws, dr, dr, dw)), Nil)
+    assert(List(dw) === waitingFor)
+  }
+
+  test("no waiting") {
+    val waitingFor: List[Tile] = UniqueWait.waitingTiles(
+      TileSet(List(b1, b1, c1, c1, b1, c1, ww, ww, ws, ws, dr, dr, dw)), Nil)
+    assert(List() === waitingFor)
   }
 }

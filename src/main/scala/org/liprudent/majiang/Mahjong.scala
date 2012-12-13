@@ -218,7 +218,12 @@ object HuLeFinder {
       knittedStraightHand(all) ||
       //partial or complete knitted + unique dragons
       someKnittedSomeDragons(closed) ||
-      thirteenOrphans(closed)
+      thirteenOrphans(closed) ||
+      sevenPairs(all)
+  }
+
+  def sevenPairs(all: List[Figure]) = {
+    all.size == 7 && all.forall(_.isInstanceOf[Dui])
   }
 
   def thirteenOrphans(closed: List[Figure]): Boolean = {
@@ -247,15 +252,16 @@ object HuLeFinder {
 
 object UniqueWait {
 
-  def waitingTiles(tileSet: TileSet): List[Tile] = {
+  def waitingTiles(freeTiles: TileSet, imposed: List[Figure]): List[Tile] = {
 
     def completeCombination(figures: Figures, tileSet: TileSet) =
       Figures.size(figures) == tileSet.size
 
     def satisfy(tile: Tile): Boolean = {
-      val added: TileSet = tileSet.added(tile)
+      val added: TileSet = freeTiles.added(tile)
       val allCombinations = FiguresComputer(added).allFiguresCombinations
-      allCombinations.filter(figures => completeCombination(figures, added)).size == 1
+      val acceptedFreeFigures = allCombinations.filter(figures => completeCombination(figures, added))
+      allCombinations.filter(acceptedFreeFigure => HuLeFinder.isWellFormedMahjong(acceptedFreeFigure, imposed)).size > 0
     }
 
     Tile.all.filter(satisfy).toList.sorted
