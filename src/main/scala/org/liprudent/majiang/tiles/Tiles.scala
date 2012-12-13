@@ -48,41 +48,50 @@ case object Character extends SuitFamily {
 
 sealed abstract class HonorFamily extends Family {
   override def validValue(value: Int) = value == 0xF00
+
+  def shortName: String
 }
 
 case object EastWind extends HonorFamily {
   override val name = "East Wind"
   override val order = 3
+  override val shortName = "we"
 }
 
 case object WestWind extends HonorFamily {
   override val name = "West Wind"
   override val order = 5
+  override val shortName = "ww"
 }
 
 case object NorthWind extends HonorFamily {
   override val name = "North Wind"
   override val order = 4
+  override val shortName = "wn"
 }
 
 case object SouthWind extends HonorFamily {
   override val name = "South Wind"
   override val order = 6
+  override val shortName = "ws"
 }
 
 case object RedDragon extends HonorFamily {
   override val name = "Red Dragon"
   override val order = 7
+  override val shortName = "dr"
 }
 
 case object GreenDragon extends HonorFamily {
   override val name = "Green Dragon"
   override val order = 8
+  override val shortName = "dg"
 }
 
 case object WhiteDragon extends HonorFamily {
   override val name = "White Dragon"
   override val order = 9
+  override val shortName = "dw"
 }
 
 case class Tile(val family: Family, val value: Int) {
@@ -103,7 +112,10 @@ case class Tile(val family: Family, val value: Int) {
 
   def nextOf(tile: Tile) = tile.previousOf(this)
 
-  override def toString = value + "-" + family.name.substring(0, 3)
+  override def toString = family match {
+    case t: SuitFamily => family.name.substring(0, 1).toLowerCase + value
+    case t: HonorFamily => t.shortName
+  }
 }
 
 object Tile {

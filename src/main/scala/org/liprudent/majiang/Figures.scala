@@ -82,6 +82,10 @@ package object figures {
     val properties = Chow
 
     override def asList = List(t1, t2, t3)
+
+    def hasSameValues(y: Chow) =
+      y.t1.value == t1.value
+
   }
 
   object OrdChow extends Ordering[Chow] {
@@ -90,6 +94,7 @@ package object figures {
 
   object Chow extends FigureProperties {
     val size = 3
+
   }
 
 

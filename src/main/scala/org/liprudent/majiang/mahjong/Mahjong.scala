@@ -3,10 +3,12 @@ package org.liprudent.majiang
 import mahjong.{HuLe, HulePointsComputer, DetailedPoints, PlayerTiles}
 import org.liprudent.majiang.figures._
 import tiles._
-import tiles.ContextualTile
-import tiles.Types.Figures
-import scala.Some
+import org.liprudent.majiang.tiles.Types._
+import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
+import org.liprudent.majiang.figures.ThirteenOrphans
+import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Dui
+import tiles.ContextualTile
 
 package object mahjong {
 
@@ -20,115 +22,18 @@ package object mahjong {
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(disclosed == disclosed.sorted(OrdFigure), "not sorted")
 
-    lazy val allFigures = closed ::: disclosed
+    lazy val allFigures = (closed ::: disclosed).sorted(OrdFigure)
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
   }
 
-  sealed trait Combination {
-    val id: Int
-    val points: Int
-    val name: String
-    val description: String
-
-    def find(m: HuLe): Option[Figures]
-
-    override lazy val toString = "n°%d, %d points, %s".format(id, points, name)
-  }
-
-  object AllChows extends Combination {
-    val id = 63
-    val points = 2
-    val name = "All Chows"
-    val description = "All Chows but one Pair"
-
-    def find(m: HuLe): Option[Figures] =
-      if (m.allDuis.size == 1 && m.allChows.size == 4)
-        Some(m.allChows)
-      else
-        None
-  }
-
-  object MixedTripleChow extends Combination {
-    val id = 41
-    val points = 8
-    val name = "Mixed Triple Chow"
-    val description = "Three identical chows in three families"
-
-    def find(m: HuLe): Option[Figures] = {
-      val resolved: List[Figure] = m.allChows
-        .groupBy(_.t1.value) // Map[Int, List[Chow]
-        .values.toList // List[List[Chow]]
-        .filter(_.size == 3)
-        .flatten // List[Chow]
-
-      resolved match {
-        case Nil => None
-        case xs => Some(xs)
-      }
-
-    }
-  }
-
-  object KnittedStraight extends Combination {
-    val id = 35
-    val points = 12
-    val name = "Knitted Straight"
-    val description = "1-4-7 in one family, 2-5-8 in the second family, 3-6-9 in the third family"
-
-    def find(m: HuLe): Option[Figures] = {
-      m.closed.find(_.isInstanceOf[Knitted]).map(List(_))
-    }
-  }
-
-  object LesserHonorsAndKnittedTiles extends Combination {
-    val id = 34
-    val points = 12
-    val name = "Lesser Honors and Knitted Tiles"
-    val description = "6 unique honors and incomplete knitted straight OR 5 unique honors and complete knitted straight"
-
-    def find(m: HuLe): Option[Figures] =
-      m.closed.find(_.isInstanceOf[SomeKnittedWithSomeDragons]).map(List(_))
-  }
-
-  object GreaterHonorsAndKnittedTiles extends Combination {
-    val id = 20
-    val points = 24
-    val name = "Greater Honors and Knitted Tiles"
-    val description = "The 7 unique honors and incomplete knitted tiles"
-
-    def find(m: HuLe): Option[Figures] =
-      m.closed.find {
-        figure => figure.isInstanceOf[SomeKnittedWithSomeDragons] &&
-          figure.asInstanceOf[SomeKnittedWithSomeDragons].dragons.size == 7
-      }.map(List(_))
-  }
-
-  object SevenPairs extends Combination {
-    val id = 19
-    val points = 24
-    val name = "Seven Pairs"
-    val description = "7 pairs"
-
-    def find(m: HuLe): Option[Figures] =
-      if (m.closed.size == 7 && m.closed.forall(_.isInstanceOf[Dui]))
-        Some(m.closed)
-      else None
-  }
-
-  object ThirteenOrphansComb extends Combination {
-    val id = 7
-    val points = 88
-    val name = "Thirteen Orphans"
-    val description = "1 and 9 in three families and 7 distinct honors plus 1 extra honor"
-
-    def find(m: HuLe): Option[Figures] =
-      m.closed.find {
-        figure => figure.isInstanceOf[ThirteenOrphans]
-      }.map(List(_))
-  }
 
   case class DetailedPoints(huLe: HuLe, detailedPoints: List[(List[Figure], Combination)]) {
+
+    require(detailedPoints.forall {
+      case (figures, comn) => figures.sorted(OrdFigure) == figures
+    }, "not sorted")
+
     override def toString = {
       val title = "For Hule : " + huLe + "\n"
       val detail = detailedPoints.foldLeft("")((string, line) => {
@@ -156,7 +61,9 @@ package object mahjong {
     //require(combinations.size == 88)
 
     val combinations = List(
+      MixedDoubleChows,
       AllChows,
+      MeldedHand,
       MixedTripleChow,
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
@@ -185,10 +92,38 @@ package object mahjong {
     private def applyExclusion(allDetailedPoints: List[(Figures, Combination)]): List[(Figures, Combination)] = {
       allDetailedPoints match {
         case Nil => Nil
-        case (figures, combination) :: t =>
-          (figures, combination) :: applyExclusion(t.filter {
-            case (tailFigures, comb) => tailFigures != figures
-          })
+        case head :: tail => {
+          val filteredTail = tail.filterNot {
+            case tailElem => isExcluded(head, tailElem)
+          }
+          println("filtered tail : " + filteredTail)
+          head :: applyExclusion(filteredTail)
+        }
+      }
+    }
+
+    protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
+      val figRef = ref._1
+      val combRef = ref._2
+      val figExc = toExclude._1
+      val combExc = toExclude._2
+
+      def bothUseTheSameFigures =
+        figRef == figExc
+
+      def oneFiguresIsContainedInTheOther =
+        figRef.size > 1 && figExc.size > 1 &&
+          (figRef.forall(fig => figExc.contains(fig)) || figExc.forall(fig => figRef.contains(fig)))
+
+      combRef.fullHand match {
+        case true => combExc.fullHand match {
+          case true => true
+          case false => false
+        }
+        case false => combExc.fullHand match {
+          case true => false
+          case false => bothUseTheSameFigures || oneFiguresIsContainedInTheOther
+        }
       }
     }
   }
@@ -215,8 +150,8 @@ case class HuLeFinder(ptiles: PlayerTiles) {
     else {
       val computer = FiguresComputer(ptiles.hand.tileSet)
       computer.allFiguresCombinations
-        .filter(closed => HuLeFinder.isWellFormedMahjong(closed, ptiles.disclosed))
-        .map(closed => HulePointsComputer(HuLe(closed, ptiles.disclosed, ptiles.hand.lastTileContext)))
+        .filter(closedCombination => HuLeFinder.isWellFormedMahjong(closedCombination, ptiles.disclosed))
+        .map(closedCombination => HulePointsComputer(HuLe(closedCombination, ptiles.disclosed, ptiles.hand.lastTileContext)))
         .toList
     }
   }

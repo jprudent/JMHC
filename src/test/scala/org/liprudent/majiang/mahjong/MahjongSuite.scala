@@ -10,7 +10,7 @@ import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.tiles.ContextualTile
-import org.liprudent.majiang.{UniqueWait, HuLeFinder}
+import org.liprudent.majiang.{HuLeFinder, UniqueWait}
 
 @RunWith(classOf[JUnitRunner])
 class MahjongSuite extends FunSuite {
@@ -80,7 +80,7 @@ class MahjongSuite extends FunSuite {
           )
         )
       )
-      assert(actual == expected, actual)
+      assert(actual === expected)
     }
   }
 
@@ -196,25 +196,6 @@ class MahjongSuite extends FunSuite {
   }
 
 
-  test("HuLe Points computer s2s3s4s6s7s8s9s9 c6c7c8b6b7b8") {
-
-    val hule: HuLe = HuLe(
-      List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9)),
-      List(Chow(b6, b7, b8), Chow(c6, c7, c8)),
-      ContextualTile(b1, SelfDrawn)
-    )
-
-    val expected = DetailedPoints(hule,
-      List(
-        (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChow),
-        (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
-      ))
-
-    val actual = HulePointsComputer(hule)
-
-    assert(actual == expected, "actual : " + actual + "\nexpexted : " + expected)
-  }
-
   test("waiting tiles: simple case middle") {
     val waitingFor: List[Tile] = UniqueWait.waitingTiles(TileSet(List(b1, b3, c2, c2, c2, ww, ww, ww, we, we, we, dr, dr)), Nil)
     assert(List(b2) === waitingFor)
@@ -285,4 +266,31 @@ class MahjongSuite extends FunSuite {
       TileSet(List(b1, b1, c1, c1, b1, c1, ww, ww, ws, ws, dr, dr, dw)), Nil)
     assert(List() === waitingFor)
   }
+
+  test("is excluded : greater honors and knitted tiles - Lesser Honors and knitted tiles") {
+    val ref = (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))),
+      GreaterHonorsAndKnittedTiles)
+    val excl = (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))),
+      LesserHonorsAndKnittedTiles)
+
+    assert(HulePointsComputer.isExcluded(ref, excl))
+
+  }
+
+  test("is not excluded : All Chows - Mixed Triple Chow") {
+
+    val ref = (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
+    val excl = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow)
+
+    assert(!HulePointsComputer.isExcluded(ref, excl))
+
+  }
+
+  test("is excluded : Mixed Triple Chow - Mixed Double Chow") {
+    val ref = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow)
+    val excl = (List(Chow(b7, b8, b9), Chow(c7, c8, c9)), MixedDoubleChows)
+
+    assert(HulePointsComputer.isExcluded(ref, excl))
+  }
+
 }
