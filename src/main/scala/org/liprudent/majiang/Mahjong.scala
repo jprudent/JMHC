@@ -16,6 +16,10 @@ package object mahjong {
   }
 
   case class HuLe(closed: Figures, disclosed: Figures, lastTileContext: ContextualTile) {
+
+    require(closed == closed.sorted(OrdFigure), "not sorted")
+    require(disclosed == disclosed.sorted(OrdFigure), "not sorted")
+
     lazy val allFigures = closed ::: disclosed
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
@@ -100,6 +104,18 @@ package object mahjong {
       }.map(List(_))
   }
 
+  object SevenPairs extends Combination {
+    val id = 19
+    val points = 24
+    val name = "Seven Pairs"
+    val description = "7 pairs"
+
+    def find(m: HuLe): Option[Figures] =
+      if (m.closed.size == 7 && m.closed.forall(_.isInstanceOf[Dui]))
+        Some(m.closed)
+      else None
+  }
+
   object ThirteenOrphansComb extends Combination {
     val id = 7
     val points = 88
@@ -145,6 +161,7 @@ package object mahjong {
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
       GreaterHonorsAndKnittedTiles,
+      SevenPairs,
       ThirteenOrphansComb)
 
 

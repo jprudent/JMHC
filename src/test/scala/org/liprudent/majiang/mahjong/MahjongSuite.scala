@@ -40,6 +40,10 @@ class MahjongSuite extends FunSuite {
       Hand(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), ContextualTile(b1, Discarded)),
       Nil
     )
+    val sevenPairs = PlayerTiles(
+      Hand(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), ContextualTile(b1, Discarded)),
+      Nil
+    )
   }
 
   test("a mahjong has 14 tiles") {
@@ -159,6 +163,24 @@ class MahjongSuite extends FunSuite {
             ContextualTile(b1, Discarded)),
           List(
             (List(ThirteenOrphans(dr)), ThirteenOrphansComb)
+          )
+        )
+      )
+      assert(actual === expected)
+    }
+  }
+
+  test("HuLe Finder 7 pairs") {
+    new Hands {
+      val actual = HuLeFinder(sevenPairs).find
+
+      val expected = List(
+        DetailedPoints(
+          HuLe(List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)),
+            Nil,
+            ContextualTile(b1, Discarded)),
+          List(
+            (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)), SevenPairs)
           )
         )
       )
