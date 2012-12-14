@@ -20,6 +20,20 @@ sealed trait Combination {
 
   def find(m: HuLe): Option[Figures]
 
+  val implied = List[Combination]()
+
+  /**
+   * Check wether x implies y
+   * @param x this combination with these figures
+   * @param y the other combination with those figures
+   * @return true if y is implied by x. false otherwise
+   */
+  def imply(x: Figures, y: (Figures, Combination)): Boolean = {
+    def containsAll(x: Figures, y: Figures): Boolean =
+      y.forall(figure => x.contains(figure))
+    implied.exists(combination => combination == y._2 && containsAll(x, y._1))
+  }
+
   override lazy val toString = "n°%d, %d points, %s".format(id, points, name)
 }
 
@@ -41,6 +55,7 @@ object MixedDoubleChows extends Combination {
       case first :: others => Some(first)
     }
   }
+
 }
 
 object AllChows extends Combination {
@@ -79,6 +94,8 @@ object MixedTripleChow extends Combination {
   val name = "Mixed Triple Chow"
   val description = "Three identical chows in three families"
   val fullHand = false
+
+  override val implied = List(MixedDoubleChows)
 
   def find(m: HuLe): Option[Figures] = {
     val resolved: List[Figure] = m.allChows
@@ -124,6 +141,8 @@ object GreaterHonorsAndKnittedTiles extends Combination {
   val name = "Greater Honors and Knitted Tiles"
   val description = "The 7 unique honors and incomplete knitted tiles"
   val fullHand = true
+
+  override val implied = List(LesserHonorsAndKnittedTiles)
 
   def find(m: HuLe): Option[Figures] =
     m.closed.find {

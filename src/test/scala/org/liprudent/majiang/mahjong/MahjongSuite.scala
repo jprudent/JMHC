@@ -293,4 +293,12 @@ class MahjongSuite extends FunSuite {
     assert(HulePointsComputer.isExcluded(ref, excl))
   }
 
+
+  test("is not excluded : Melded Hand - All Chows") {
+    val ref = (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), MeldedHand)
+    val excl = (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
+
+    assert(!HulePointsComputer.isExcluded(ref, excl))
+  }
+
 }

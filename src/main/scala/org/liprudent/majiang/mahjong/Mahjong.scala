@@ -96,35 +96,14 @@ package object mahjong {
           val filteredTail = tail.filterNot {
             case tailElem => isExcluded(head, tailElem)
           }
-          println("filtered tail : " + filteredTail)
           head :: applyExclusion(filteredTail)
         }
       }
     }
 
+
     protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
-      val figRef = ref._1
-      val combRef = ref._2
-      val figExc = toExclude._1
-      val combExc = toExclude._2
-
-      def bothUseTheSameFigures =
-        figRef == figExc
-
-      def oneFiguresIsContainedInTheOther =
-        figRef.size > 1 && figExc.size > 1 &&
-          (figRef.forall(fig => figExc.contains(fig)) || figExc.forall(fig => figRef.contains(fig)))
-
-      combRef.fullHand match {
-        case true => combExc.fullHand match {
-          case true => true
-          case false => false
-        }
-        case false => combExc.fullHand match {
-          case true => false
-          case false => bothUseTheSameFigures || oneFiguresIsContainedInTheOther
-        }
-      }
+      ref._2.imply(ref._1, toExclude)
     }
   }
 
