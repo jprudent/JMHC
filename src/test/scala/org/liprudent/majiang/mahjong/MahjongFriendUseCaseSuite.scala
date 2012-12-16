@@ -15,7 +15,10 @@ import org.liprudent.majiang.tiles.ContextualTile
 @RunWith(classOf[JUnitRunner])
 class MahjongFriendUseCaseSuite extends FunSuite {
 
-  test("case MeldedHand AllChows MixedDoubleChows") {
+  test(
+    """"case MeldedHand AllChows MixedDoubleChows
+      |verif: dubious on One Voided Suit
+    """.stripMargin) {
     val givenClosed = TileSet(List(b3, b3))
     val givenDisclosed = List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9))
     val givenContextualTile = ContextualTile(b3, Discarded)
@@ -26,10 +29,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), MeldedHand),
       (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)), AllChows),
       (List(Chow(b5, b6, b7), Chow(c5, c6, c7)), MixedDoubleChows),
+      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), OneVoidedSuit),
       (List(Dui(b3)), SingleWait)
     )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
+    test(givenClosed, givenDisclosed, givenContextualTile, givenContext, thenClosed, thenCombinations, 11)
 
   }
 
@@ -132,7 +136,10 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
-  test("case Mixed Triple Chow - Fully Concealed Hand, All Chows") {
+  test(
+    """case Mixed Triple Chow - Fully Concealed Hand, All Chows
+      |verif: dubious on OutsideHand
+    """.stripMargin) {
     val givenClosed = TileSet(List(b1, b2, b3, b7, b8, b9, c7, c8, c9, s7, s8, s9, dr, dr))
     val givenDisclosed = Nil
     val givenContextualTile: ContextualTile = ContextualTile(b1, SelfDrawn)
@@ -143,11 +150,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenCombinations =
       List(
         (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow),
+        (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), OutsideHand),
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), FullyConcealedHand),
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 18)
 
   }
 
@@ -250,6 +258,31 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """case All Terminals or Honors - Dragon Pung - Seat Wind - One Voided Suit - Pung of Terminals of Honor - Flowers
+      |verif : mahjong and friends
+    """.stripMargin) {
+    val givenClosed = TileSet(List(c1, c2, c3, ww, ww, ws, ws, ww))
+    val givenDisclosed: List[Figure] = List(Pung(dr), Pung(b9))
+    val givenContextualTile: ContextualTile = ContextualTile(ww, Discarded)
+    val givenBonus: Bonus = Bonus(List(sa))
+    val givenContext = PlayerContext(WestWind, EastWind)
+
+    val thenClosed = List(Chow(c1, c2, c3), Pung(ww), Dui(ws))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(b9), Pung(dr), Chow(c1, c2, c3), Pung(ww), Dui(ws)), OutsideHand),
+        (List(Pung(dr)), DragonPung),
+        (List(Pung(ww)), SeatWind),
+        (List(Pung(b9), Chow(c1, c2, c3)), OneVoidedSuit),
+        (List(Pung(b9)), PungOfTerminalOrHonors),
+        (List(Bonus(List(sa))), FlowerTiles)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
+
+  }
+
 
   private def test(
                     givenClosed: TileSet,
@@ -263,7 +296,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     ) {
 
     val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
-      givenDisclosed,
+      givenDisclosed.sorted(OrdFigure),
       givenBonus)
 
     val actual = HuLeFinder(pts, givenContext).find

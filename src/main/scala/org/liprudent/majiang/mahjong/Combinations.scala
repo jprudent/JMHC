@@ -154,6 +154,30 @@ object EdgeWait extends Combination with WaitCombination {
 
 }
 
+object OneVoidedSuit extends Combination {
+  val id = 75
+  val points = 1
+  val name = "One voided suit"
+  val description = "1 family (bamboo, stone, characted) is absent"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] = {
+    m.allTiles.groupBy(tile => tile.family match {
+      case f: HonorFamily => "honors"
+      case f => f.name
+    }).filter {
+      case (part, tiles) if part == "honors" => false
+      case _ => true
+    }
+      .keySet.size == 2
+
+    match {
+      case true => Some(m.allFigures.filter(figure => figure.asList.exists(tile => tile.family.isInstanceOf[SuitFamily])))
+      case false => None
+    }
+  }
+}
+
 
 object PungOfTerminalOrHonors extends Combination {
   val id = 73
@@ -243,6 +267,21 @@ object SeatWind extends Combination {
     }
 }
 
+object DragonPung extends Combination {
+  val id = 59
+  val points = 2
+  val name = "Dragon Pung"
+  val description = "A pung of dragon"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] =
+    m.allPungs.find(_.t.family.isInstanceOf[DragonFamily]) match {
+      case None => None
+      case Some(pung) => Some(List(pung))
+    }
+}
+
+
 object FullyConcealedHand extends Combination {
   val id = 56
   val points = 4
@@ -259,6 +298,30 @@ object FullyConcealedHand extends Combination {
       case false => None
     }
 }
+
+object OutsideHand extends Combination {
+  val id = 55
+  val points = 4
+  val name = "Outside Hand"
+  val description = "At least 1 honor or 1 terminal in each figure"
+  val fullHand = true
+
+  def find(m: HuLe): Option[Figures] = {
+
+    m.allFigures.forall(figure => figure match {
+      case f: SomeKnittedWithSomeDragons => false
+      case f: Knitted => false
+      case f: ThirteenOrphans => false
+      case f => f.asList.exists(_.isTerminalOrHonor)
+    })
+
+    match {
+      case true => Some(m.allFigures)
+      case false => None
+    }
+  }
+}
+
 
 object MeldedHand extends Combination {
   val id = 53
@@ -447,6 +510,8 @@ object AllTerminalsAndHonors extends Combination {
   val name = "All Terminals And Honors"
   val description = "only 1, 9 and honors"
   val fullHand = true
+
+  override val implied = List(OutsideHand)
 
   def find(m: HuLe): Option[Figures] = {
     m.allTiles.forall {

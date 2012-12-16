@@ -117,6 +117,21 @@ class CombinationsSuite extends FunSuite {
     assert(actual === expected)
   }
 
+  test("Pung of terminal or honor") {
+    val closed: List[Figure] = List(Pung(ww), Chow(c1, c2, c3), Dui(ws))
+    val disclosed: List[Figure] = List(Pung(b9), Pung(dr))
+    val lastTile: ContextualTile = ContextualTile(ww, Discarded)
+    val context = PlayerContext(WestWind, EastWind)
+
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = PungOfTerminalOrHonors.find(hule)
+    val expected = Some(List(Pung(b9)))
+
+    assert(actual === expected)
+
+  }
+
 
 }
 

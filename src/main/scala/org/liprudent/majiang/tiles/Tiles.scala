@@ -160,6 +160,13 @@ case class Tile(val family: Family, val value: Int) {
   // a tile value should be between 1 and 9
   require(family.validValue(value))
 
+
+  lazy val isTerminal = family.isInstanceOf[SuitFamily] && (value == 9 || value == 1)
+
+  lazy val isHonor = family.isInstanceOf[HonorFamily]
+
+  lazy val isTerminalOrHonor = isTerminal || isHonor
+
   /**
    * return true if family is same
    */

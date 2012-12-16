@@ -175,6 +175,8 @@ package object figures {
 
     val properties = SomeKnittedWithSomeDragonsProperties
 
+    lazy val groupedKnitted: List[List[Tile]] = knitted.groupBy(_.family).values.toList
+
     override def asList = dragons ::: knitted
 
   }
