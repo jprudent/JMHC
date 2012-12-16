@@ -6,7 +6,8 @@ import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.tiles.Types.Figures
 import scala.Some
 import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
-import org.liprudent.majiang.tiles.SelfDrawn
+import org.liprudent.majiang.tiles.{TileSet, Discarded, SuitFamily, SelfDrawn}
+import org.liprudent.majiang.UniqueWait
 
 sealed trait Combination {
   val id: Int
@@ -20,6 +21,9 @@ sealed trait Combination {
 
   def find(m: HuLe): Option[Figures]
 
+  /**
+   * List of implied combinations by this one
+   */
   val implied = List[Combination]()
 
   /**
@@ -35,6 +39,50 @@ sealed trait Combination {
   }
 
   override lazy val toString = "n°%d, %d points, %s".format(id, points, name)
+}
+
+object FlowerTiles extends Combination {
+  val id = 81
+  val points = 1
+  val name = "Flower Tiles"
+  val description = "Flowers and Seasons Tiles"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] = {
+    m.bonus.bonus match {
+      case Nil => None
+      case _ => Some(List(m.bonus))
+    }
+  }
+
+}
+
+object ClosedWait extends Combination {
+  val id = 78
+  val points = 1
+  val name = "Closed Wait"
+  val description = "Single wait on the middle of a chow"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] = {
+    if (m.lastTileContext.origin != Discarded) None
+    else {
+      val closedTiles = m.closed.map(_.asList).flatten
+      val tilesBeforeWinning: TileSet = TileSet(closedTiles).removed(m.lastTileContext.tile)
+      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.disclosed)
+      println(waitingTiles)
+
+      waitingTiles match {
+        case w :: Nil => {
+          m.closed.find(_ match {
+            case Chow(_, middle, _) if middle == w => true
+            case _ => false
+          }).map(List(_))
+        }
+        case _ => None
+      }
+    }
+  }
 }
 
 object MixedDoubleChows extends Combination {
@@ -109,6 +157,21 @@ object MixedTripleChow extends Combination {
       case xs => Some(xs)
     }
 
+  }
+}
+
+object UpperFour extends Combination {
+  val id = 36
+  val points = 12
+  val name = "Upper Four"
+  val description = "Only 9,8,7,6"
+  val fullHand = true
+
+  def find(m: HuLe): Option[Figures] = {
+    m.allTiles.forall(t => t.family.isInstanceOf[SuitFamily] && t.value >= 6) match {
+      case false => None
+      case true => Some(m.allFigures)
+    }
   }
 }
 

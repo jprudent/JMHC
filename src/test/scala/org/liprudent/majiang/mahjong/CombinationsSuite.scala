@@ -40,5 +40,35 @@ class CombinationsSuite extends FunSuite {
     val expected = Some(List(Chow(b5, b6, b7), Chow(c5, c6, c7)))
     assert(actual === expected)
   }
+
+  test("flower tiles") {
+
+    val hule = HuLe(
+      List(Dui(b3)),
+      List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
+      ContextualTile(b3, Discarded),
+      Bonus(List(fb, sa))
+    )
+
+    val actual = FlowerTiles.find(hule)
+    val expected = Some(List(Bonus(List(fb, sa))))
+
+    assert(actual === expected)
+
+  }
+
+  test("closed wait") {
+    val disclosed: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
+    val contextualTile: ContextualTile = ContextualTile(s8, Discarded)
+    val hule = HuLe(List(Pung(s6), Chow(s7, s8, s9), Dui(c6)),
+      disclosed,
+      contextualTile)
+
+    val actual = ClosedWait.find(hule)
+    val expected = Some(List(Chow(s7, s8, s9)))
+
+    assert(actual === expected)
+
+  }
 }
 

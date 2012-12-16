@@ -1,6 +1,6 @@
 package org.liprudent.majiang
 
-import tiles.{HonorFamily, TileSet, SuitFamily, Tile}
+import tiles._
 
 
 package object figures {
@@ -37,9 +37,14 @@ package object figures {
           case y: ThirteenOrphans => 1
           case y: SomeKnittedWithSomeDragons => 1
           case y: Knitted => KnittedProperties.compare(x, y)
-          case y: Pung => -1
-          case y: Chow => -1
-          case y: Dui => -1
+          case _ => -1
+        }
+        case x: Pung => y match {
+          case y: ThirteenOrphans => 1
+          case y: SomeKnittedWithSomeDragons => 1
+          case y: Knitted => 1
+          case y: Pung => PungProperties.compare(x, y)
+          case _ => -1
         }
         case x: Chow => y match {
           case y: ThirteenOrphans => 1
@@ -47,15 +52,7 @@ package object figures {
           case y: Knitted => 1
           case y: Pung => 1
           case y: Chow => OrdChow.compare(x, y)
-          case y: Dui => -1
-        }
-        case x: Pung => y match {
-          case y: ThirteenOrphans => 1
-          case y: SomeKnittedWithSomeDragons => 1
-          case y: Knitted => 1
-          case y: Pung => PungProperties.compare(x, y)
-          case y: Chow => -1
-          case y: Dui => -1
+          case _ => -1
         }
         case x: Dui => y match {
           case y: ThirteenOrphans => 1
@@ -64,6 +61,11 @@ package object figures {
           case y: Pung => 1
           case y: Chow => 1
           case y: Dui => DuiProperties.compare(x, y)
+          case _ => -1
+
+        }
+        case x: Bonus => y match {
+          case y: Bonus => OrdBonus.compare(x, y)
         }
       }
     }
@@ -201,6 +203,22 @@ package object figures {
       Tile.s1, Tile.s9,
       Tile.we, Tile.wn, Tile.ww, Tile.ws,
       Tile.dr, Tile.dg, Tile.dw).sorted
+  }
+
+  case class Bonus(bonus: List[Tile]) extends Figure {
+
+    require(bonus.forall(_.family.isInstanceOf[BonusFamily]))
+    require(bonus == bonus.sorted)
+
+    val properties = new FigureProperties {
+      val size: Int = bonus.size
+    }
+
+    override def asList = bonus
+  }
+
+  object OrdBonus extends Ordering[Bonus] {
+    override def compare(x: Bonus, y: Bonus) = x.bonus.size - y.bonus.size
   }
 
 }

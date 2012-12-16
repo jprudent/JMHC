@@ -267,6 +267,7 @@ class MahjongSuite extends FunSuite {
     assert(List() === waitingFor)
   }
 
+
   test("is excluded : greater honors and knitted tiles - Lesser Honors and knitted tiles") {
     val ref = (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))),
       GreaterHonorsAndKnittedTiles)

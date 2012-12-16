@@ -47,7 +47,7 @@ case object Character extends SuitFamily {
 }
 
 sealed abstract class HonorFamily extends Family {
-  override def validValue(value: Int) = value == 0xF00
+  override def validValue(value: Int) = value == 0xF00D
 
   def shortName: String
 }
@@ -94,6 +94,63 @@ case object WhiteDragon extends HonorFamily {
   override val shortName = "dw"
 }
 
+sealed abstract class BonusFamily extends Family {
+  override def validValue(value: Int) = value == 0xBABA
+
+  def shortName: String
+}
+
+case object PlumbFlower extends BonusFamily {
+  override val name = "Plumb Flower"
+  override val order = 10
+  override val shortName = "fp"
+}
+
+case object OrchidFlower extends BonusFamily {
+  override val name = "Orchid Flower"
+  override val order = 10
+  override val shortName = "fo"
+}
+
+case object ChrysanthemumFlower extends BonusFamily {
+  override val name = "Chrysanthemum Flower"
+  override val order = 11
+  override val shortName = "fc"
+}
+
+case object BambooFlower extends BonusFamily {
+  override val name = "Bamboo Flower"
+  override val order = 12
+  override val shortName = "fb"
+}
+
+case object SpringSeason extends BonusFamily {
+  override val name = "Spring Season"
+  override val order = 13
+  override val shortName = "ss"
+}
+
+
+case object SummerSeason extends BonusFamily {
+  override val name = "Summer Season"
+  override val order = 14
+  override val shortName = "su"
+}
+
+
+case object AutomnSeason extends BonusFamily {
+  override val name = "Automn Season"
+  override val order = 15
+  override val shortName = "sa"
+}
+
+
+case object WinterSeason extends BonusFamily {
+  override val name = "Winter Season"
+  override val order = 16
+  override val shortName = "sw"
+}
+
 case class Tile(val family: Family, val value: Int) {
 
   // a tile value should be between 1 and 9
@@ -115,6 +172,7 @@ case class Tile(val family: Family, val value: Int) {
   override def toString = family match {
     case t: SuitFamily => family.name.substring(0, 1).toLowerCase + value
     case t: HonorFamily => t.shortName
+    case t: BonusFamily => t.shortName
   }
 }
 
@@ -122,7 +180,9 @@ object Tile {
 
   def apply(family: SuitFamily, value: Int) = new Tile(family, value)
 
-  def apply(family: HonorFamily) = new Tile(family, 0xF00)
+  def apply(family: HonorFamily) = new Tile(family, 0xF00D)
+
+  def apply(family: BonusFamily) = new Tile(family, 0xBABA)
 
   implicit val ord = new Ordering[Tile] {
 
@@ -171,8 +231,16 @@ object Tile {
   val dr = Tile(RedDragon)
   val dw = Tile(WhiteDragon)
   val dg = Tile(GreenDragon)
+  val fp = Tile(PlumbFlower)
+  val fo = Tile(OrchidFlower)
+  val fc = Tile(ChrysanthemumFlower)
+  val fb = Tile(BambooFlower)
+  val ss = Tile(SpringSeason)
+  val su = Tile(SummerSeason)
+  val sa = Tile(AutomnSeason)
+  val sw = Tile(WinterSeason)
 
-  val all = Set(
+  val allButBonus = Set(
     b1, b2, b3, b4, b5, b6, b7, b8, b9,
     c1, c2, c3, c4, c5, c6, c7, c8, c9,
     s1, s2, s3, s4, s5, s6, s7, s8, s9,
@@ -277,6 +345,8 @@ case class TileSet(tocs: List[TileOccurence]) {
     }
   }
 
+  def occurence(tile: Tile): Occurence =
+    tocs.find(_._1 == tile).map(_._2).getOrElse(0)
 
   lazy val toTiles: List[Tile] =
     tocs.map(toc => for {i <- 1 to toc._2} yield (toc._1)).flatten

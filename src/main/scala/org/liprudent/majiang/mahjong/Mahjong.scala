@@ -12,12 +12,28 @@ import tiles.ContextualTile
 
 package object mahjong {
 
-  case class PlayerTiles(hand: Hand, disclosed: Figures) {
+  /**
+   * Represent the different sets of tiles owned by a player.
+   * @param hand The hand
+   * @param disclosed The tiles disclosed and contained in figures
+   * @param bonus Flowers and seasons. Default is Nil.
+   */
+  case class PlayerTiles(hand: Hand, disclosed: Figures, bonus: Bonus = Bonus(Nil)) {
+
+    require(disclosed.sorted(OrdFigure) == disclosed, "disclosed not sorted")
+
     lazy val size = hand.tileSet.size + disclosedSize
     lazy val disclosedSize = disclosed.foldLeft(0)((sum: Int, f: Figure) => sum + f.properties.size)
   }
 
-  case class HuLe(closed: Figures, disclosed: Figures, lastTileContext: ContextualTile) {
+  /**
+   * Sets of tiles representing a Hu Le (mahjong hand)
+   * @param closed Figures in closed hand
+   * @param disclosed disclosed figures
+   * @param lastTileContext context of last tile
+   * @param bonus flowers and seasons
+   */
+  case class HuLe(closed: Figures, disclosed: Figures, lastTileContext: ContextualTile, bonus: Bonus = Bonus(Nil)) {
 
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(disclosed == disclosed.sorted(OrdFigure), "not sorted")
@@ -25,6 +41,7 @@ package object mahjong {
     lazy val allFigures = (closed ::: disclosed).sorted(OrdFigure)
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
+    lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
   }
 
 
@@ -41,6 +58,8 @@ package object mahjong {
       })
       title + detail
     }
+
+    lazy val total = detailedPoints.foldLeft(0)((total, c) => total + c._2.points)
   }
 
   /**
@@ -61,10 +80,13 @@ package object mahjong {
     //require(combinations.size == 88)
 
     val combinations = List(
+      FlowerTiles,
+      ClosedWait,
       MixedDoubleChows,
       AllChows,
       MeldedHand,
       MixedTripleChow,
+      UpperFour,
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
       GreaterHonorsAndKnittedTiles,
@@ -130,7 +152,7 @@ case class HuLeFinder(ptiles: PlayerTiles) {
       val computer = FiguresComputer(ptiles.hand.tileSet)
       computer.allFiguresCombinations
         .filter(closedCombination => HuLeFinder.isWellFormedMahjong(closedCombination, ptiles.disclosed))
-        .map(closedCombination => HulePointsComputer(HuLe(closedCombination, ptiles.disclosed, ptiles.hand.lastTileContext)))
+        .map(closedCombination => HulePointsComputer(HuLe(closedCombination, ptiles.disclosed, ptiles.hand.lastTileContext, ptiles.bonus)))
         .toList
     }
   }
@@ -183,19 +205,17 @@ object HuLeFinder {
 
 object UniqueWait {
 
-  def waitingTiles(freeTiles: TileSet, imposed: List[Figure]): List[Tile] = {
+  def waitingTiles(closed: TileSet, disclosed: List[Figure]): List[Tile] = {
 
-    def completeCombination(figures: Figures, tileSet: TileSet) =
-      Figures.size(figures) == tileSet.size
 
     def satisfy(tile: Tile): Boolean = {
-      val added: TileSet = freeTiles.added(tile)
+      val added: TileSet = closed.added(tile)
       val allCombinations = FiguresComputer(added).allFiguresCombinations
-      val acceptedFreeFigures = allCombinations.filter(figures => completeCombination(figures, added))
-      allCombinations.filter(acceptedFreeFigure => HuLeFinder.isWellFormedMahjong(acceptedFreeFigure, imposed)).size > 0
+      allCombinations.filter(possibleClosed => HuLeFinder.isWellFormedMahjong(possibleClosed, disclosed)).size > 0
     }
 
-    Tile.all.filter(satisfy).toList.sorted
+    val tilesToTry = Tile.allButBonus.filter(tile => closed.occurence(tile) < 4)
+    tilesToTry.filter(satisfy).toList.sorted
   }
 
 }
