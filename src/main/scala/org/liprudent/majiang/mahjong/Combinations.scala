@@ -388,12 +388,34 @@ object SevenPairs extends Combination {
     else None
 }
 
+object AllTerminalsAndHonors extends Combination {
+  val id = 18
+  val points = 32
+  val name = "All Terminals And Honors"
+  val description = "only 1, 9 and honors"
+  val fullHand = true
+
+  def find(m: HuLe): Option[Figures] = {
+    m.allTiles.forall {
+      case Tile(family, value) if value == 1 || value == 9 || family.isInstanceOf[HonorFamily] => true
+      case _ => false
+    }
+    match {
+      case true => Some(m.allFigures)
+      case false => None
+    }
+  }
+}
+
+
 object ThirteenOrphansComb extends Combination {
   val id = 7
   val points = 88
   val name = "Thirteen Orphans"
   val description = "1 and 9 in three families and 7 distinct honors plus 1 extra honor"
   val fullHand = true
+
+  override val implied = List(AllTerminalsAndHonors)
 
   def find(m: HuLe): Option[Figures] =
     m.closed.find {

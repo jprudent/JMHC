@@ -151,7 +151,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
-  test("case Half Flush - Pung of terminals or honor - Self Drawn - Flowers") {
+  test(
+    """case Half Flush - Pung of terminals or honor - Self Drawn - Flowers
+      |verif : pymcr m 111d 888d h d33356WeWe w d4 self_draw
+      |verif : mahjong friends
+    """.stripMargin) {
     val givenClosed = TileSet(List(s2, s2, s2, s5, s6, s4, we, we))
     val givenDisclosed: List[Figure] = List(Pung(s1), Pung(s8))
     val givenContextualTile: ContextualTile = ContextualTile(s4, SelfDrawn)
@@ -170,6 +174,29 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
 
   }
+
+  test(
+    """case All Terminal And Honors - 7 pairs - All Types - Fully Concealed Hand
+      |verif : http://mahjong.forum2jeux.com/t265-livre-sur-les-regles-officielles-chinoises-v2
+    """.stripMargin) {
+    val givenClosed = TileSet(List(we, we, dr, dr, dg, dg, b1, b1, b9, b9, c1, c1, s9, s9))
+    val givenDisclosed: List[Figure] = List()
+    val givenContextualTile: ContextualTile = ContextualTile(s9, SelfDrawn)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(WestWind, EastWind)
+
+    val thenClosed = List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), AllTerminalsAndHonors),
+        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), SevenPairs),
+        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), AllTypes),
+        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), FullyConcealedHand)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 66)
+  }
+
 
   private def test(
                     givenClosed: TileSet,

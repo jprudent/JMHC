@@ -123,6 +123,7 @@ package object mahjong {
       LesserHonorsAndKnittedTiles,
       GreaterHonorsAndKnittedTiles,
       SevenPairs,
+      AllTerminalsAndHonors,
       ThirteenOrphansComb)
 
 
