@@ -198,8 +198,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   }
 
   test(
-    """case Mixed Shifted Chows - All Chows - Short Straight - Single Wait - Flowere
+    """case Mixed Shifted Chows - All Chows - Short Straight - Single Wait/Closed Wait - Flowere
       |verif : mahjong friends
+      |verif : http://mahjong.forum2jeux.com/t442-finir-sur-la-paire#4869
       |tricky part: winning tile b2 can be used to form Chow(b1,b2,b3) or Dui(b2).
       |             So single wait is scored or closed wait is scored, not both.
     """.stripMargin) {
@@ -220,6 +221,32 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       )
 
     test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
+
+  }
+
+  test(
+    """case Mixed Shifted Chows - All Chows - Single Wait/Edge Wait - Flowers
+      |verif : my head
+      |verif : http://mahjong.forum2jeux.com/t442-finir-sur-la-paire#4869
+      |tricky part: winning tile b3 can be used to form Chow(b1,b2,b3) or Dui(b3).
+      |             So single wait is scored or edge wait is scored, not both.
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s4, s5, s6, b1, b2, b3, b6, b7, b8, b3, b3))
+    val givenDisclosed: List[Figure] = List(Chow(c5, c6, c7))
+    val givenContextualTile: ContextualTile = ContextualTile(b3, Discarded)
+    val givenBonus: Bonus = Bonus(List(fp, fo, ss, sw))
+    val givenContext = PlayerContext(WestWind, EastWind)
+
+    val thenClosed = List(Chow(s4, s5, s6), Chow(b1, b2, b3), Chow(b6, b7, b8), Dui(b3))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Chow(s4, s5, s6), Chow(b6, b7, b8), Chow(c5, c6, c7)), MixedShiftedChow),
+        (List(Chow(s4, s5, s6), Chow(b1, b2, b3), Chow(b6, b7, b8), Chow(c5, c6, c7)), AllChows),
+        (List(Chow(b1, b2, b3)), EdgeWait),
+        (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
 
   }
 
