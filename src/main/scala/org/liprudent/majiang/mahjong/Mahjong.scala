@@ -59,7 +59,13 @@ package object mahjong {
       title + detail
     }
 
-    lazy val total = detailedPoints.foldLeft(0)((total, c) => total + c._2.points)
+    lazy val total = detailedPoints.foldLeft(0)((total, c) => {
+      val combinationPoints = c._2 match {
+        case FlowerTiles => c._1(0).asList.size
+        case _ => c._2.points
+      }
+      combinationPoints + total
+    })
   }
 
   /**

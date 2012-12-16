@@ -27,7 +27,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       (List(Chow(b5, b6, b7), Chow(c5, c6, c7)), MixedDoubleChows)
     )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, thenClosed, thenCombinations)
+    test(givenClosed, givenDisclosed, givenContextualTile, thenClosed, thenCombinations, 9)
 
   }
 
@@ -42,12 +42,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
     )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, thenClosed, thenCombinations)
+    test(givenClosed, givenDisclosed, givenContextualTile, thenClosed, thenCombinations, 10)
   }
 
 
 
-  test("case Mixed Upper Four - Flowers - Double Chow - Closed Wait") {
+  test("case Upper Four - Flowers - Double Chow - Closed Wait") {
 
     val givenClosed = TileSet(List(s6, s6, s6, s7, s8, s9, c6, c6))
     val givenDisclosed: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
@@ -63,7 +63,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fb, ss, sa))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, thenClosed, thenCombinations)
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, thenClosed, thenCombinations, 17)
 
   }
 
@@ -73,7 +73,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     givenContextualTile: ContextualTile,
                     givenBonus: Bonus,
                     thenClosed: List[Figure],
-                    thenCombinations: List[(List[Figure], Combination)]
+                    thenCombinations: List[(List[Figure], Combination)],
+                    thenTotal: Int
                     ) {
 
     val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
@@ -93,6 +94,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     assert(actual(0).huLe === expected(0).huLe)
     assert(actual === expected)
+    assert(actual(0).total === thenTotal)
 
   }
 
@@ -101,9 +103,10 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     givenDisclosed: List[Figure],
                     givenContextualTile: ContextualTile,
                     thenClosed: List[Figure],
-                    thenCombinations: List[(List[Figure], Combination)]
+                    thenCombinations: List[(List[Figure], Combination)],
+                    thenTotal: Int
                     ) {
-    test(givenClosed, givenDisclosed, givenContextualTile, Bonus(Nil), thenClosed, thenCombinations)
+    test(givenClosed, givenDisclosed, givenContextualTile, Bonus(Nil), thenClosed, thenCombinations, thenTotal)
   }
 
 }
