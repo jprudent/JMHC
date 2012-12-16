@@ -42,4 +42,13 @@ class FiguresSuite extends FunSuite {
 
   }
 
+  test("ordering 2") {
+    val sut = List(Pung(ww), Pung(b2), Chow(c1, c2, c3), Chow(s3, s4, s5), Dui(dg))
+
+    val actual = sut.sorted(OrdFigure)
+    val expected = actual
+
+    assert(actual === expected)
+  }
+
 }

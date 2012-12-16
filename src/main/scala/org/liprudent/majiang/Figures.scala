@@ -16,6 +16,7 @@ package object figures {
     val properties: FigureProperties
 
     def asList: List[Tile]
+
   }
 
   implicit object OrdFigure extends Ordering[Figure] {
@@ -66,6 +67,7 @@ package object figures {
         }
         case x: Bonus => y match {
           case y: Bonus => OrdBonus.compare(x, y)
+          case _ => 1
         }
       }
     }

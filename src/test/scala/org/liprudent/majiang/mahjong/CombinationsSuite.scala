@@ -15,7 +15,8 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
-      ContextualTile(b3, Discarded))
+      ContextualTile(b3, Discarded),
+      PlayerContext(WestWind, EastWind))
     val actual = AllChows.find(hule)
     val expected = Some(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)))
     assert(actual === expected)
@@ -25,7 +26,8 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
-      ContextualTile(b3, Discarded))
+      ContextualTile(b3, Discarded),
+      PlayerContext(WestWind, EastWind))
     val actual = MeldedHand.find(hule)
     val expected = Some(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)))
     assert(actual === expected)
@@ -35,7 +37,8 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
-      ContextualTile(b3, Discarded))
+      ContextualTile(b3, Discarded),
+      PlayerContext(WestWind, EastWind))
     val actual = MixedDoubleChows.find(hule)
     val expected = Some(List(Chow(b5, b6, b7), Chow(c5, c6, c7)))
     assert(actual === expected)
@@ -47,6 +50,7 @@ class CombinationsSuite extends FunSuite {
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
       ContextualTile(b3, Discarded),
+      PlayerContext(WestWind, EastWind),
       Bonus(List(fb, sa))
     )
 
@@ -60,9 +64,11 @@ class CombinationsSuite extends FunSuite {
   test("closed wait") {
     val disclosed: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
     val contextualTile: ContextualTile = ContextualTile(s8, Discarded)
+    val context = PlayerContext(WestWind, EastWind)
     val hule = HuLe(List(Pung(s6), Chow(s7, s8, s9), Dui(c6)),
       disclosed,
-      contextualTile)
+      contextualTile,
+      context)
 
     val actual = ClosedWait.find(hule)
     val expected = Some(List(Chow(s7, s8, s9)))
@@ -70,5 +76,47 @@ class CombinationsSuite extends FunSuite {
     assert(actual === expected)
 
   }
+
+  test("all types") {
+    val closed = List(Pung(b2), Chow(c1, c2, c3), Dui(dg))
+    val disclosed = List(Pung(ww), Chow(s3, s4, s5))
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded)
+    val context = PlayerContext(WestWind, EastWind)
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = AllTypes.find(hule)
+    val expected = Some((closed ::: disclosed).sorted(OrdFigure))
+
+    assert(actual === expected)
+  }
+
+  test("seat wind") {
+    val closed = List(Pung(b2), Chow(c1, c2, c3), Dui(dg))
+    val disclosed = List(Pung(ww), Chow(s3, s4, s5))
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded)
+    val context = PlayerContext(WestWind, EastWind)
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = SeatWind.find(hule)
+    val expected = Some(List(Pung(ww)))
+
+    assert(actual === expected)
+  }
+
+  test("single wait") {
+    val closed = List(Pung(b2), Chow(c1, c2, c3), Dui(dg))
+    val disclosed = List(Pung(ww), Chow(s3, s4, s5))
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded)
+    val context = PlayerContext(WestWind, EastWind)
+
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = SingleWait.find(hule)
+    val expected = Some(List(Dui(dg)))
+
+    assert(actual === expected)
+  }
+
+
 }
 

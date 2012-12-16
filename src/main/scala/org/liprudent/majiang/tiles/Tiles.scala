@@ -52,43 +52,47 @@ sealed abstract class HonorFamily extends Family {
   def shortName: String
 }
 
-case object EastWind extends HonorFamily {
+sealed abstract class WindFamily extends HonorFamily {}
+
+sealed abstract class DragonFamily extends HonorFamily {}
+
+case object EastWind extends WindFamily {
   override val name = "East Wind"
   override val order = 3
   override val shortName = "we"
 }
 
-case object WestWind extends HonorFamily {
+case object WestWind extends WindFamily {
   override val name = "West Wind"
   override val order = 5
   override val shortName = "ww"
 }
 
-case object NorthWind extends HonorFamily {
+case object NorthWind extends WindFamily {
   override val name = "North Wind"
   override val order = 4
   override val shortName = "wn"
 }
 
-case object SouthWind extends HonorFamily {
+case object SouthWind extends WindFamily {
   override val name = "South Wind"
   override val order = 6
   override val shortName = "ws"
 }
 
-case object RedDragon extends HonorFamily {
+case object RedDragon extends DragonFamily {
   override val name = "Red Dragon"
   override val order = 7
   override val shortName = "dr"
 }
 
-case object GreenDragon extends HonorFamily {
+case object GreenDragon extends DragonFamily {
   override val name = "Green Dragon"
   override val order = 8
   override val shortName = "dg"
 }
 
-case object WhiteDragon extends HonorFamily {
+case object WhiteDragon extends DragonFamily {
   override val name = "White Dragon"
   override val order = 9
   override val shortName = "dw"

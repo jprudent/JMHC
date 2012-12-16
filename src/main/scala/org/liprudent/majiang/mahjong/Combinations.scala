@@ -1,13 +1,14 @@
 package org.liprudent.majiang.mahjong
 
 import org.liprudent.majiang.figures._
+import org.liprudent.majiang.tiles.Types.Figures
+import org.liprudent.majiang.tiles._
+import org.liprudent.majiang.UniqueWait
+import org.liprudent.majiang.figures.ThirteenOrphans
 import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Dui
-import org.liprudent.majiang.tiles.Types.Figures
 import scala.Some
 import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
-import org.liprudent.majiang.tiles.{TileSet, Discarded, SuitFamily, SelfDrawn}
-import org.liprudent.majiang.UniqueWait
 
 sealed trait Combination {
   val id: Int
@@ -56,6 +57,46 @@ object FlowerTiles extends Combination {
   }
 
 }
+
+sealed trait WaitCombination extends Combination {
+
+  def matchingWait(figure: Figure, waitingTile: Tile): Boolean
+
+  def find(m: HuLe): Option[Figures] = {
+    if (m.lastTileContext.origin != Discarded) None
+    else {
+      val closedTiles = m.closed.map(_.asList).flatten
+      val tilesBeforeWinning: TileSet = TileSet(closedTiles).removed(m.lastTileContext.tile)
+      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.disclosed)
+      println(waitingTiles)
+
+      waitingTiles match {
+        case w :: Nil => {
+          m.closed.find(figure => matchingWait(figure, w)).map(List(_))
+        }
+        case _ => None
+      }
+    }
+  }
+}
+
+
+object SingleWait extends Combination with WaitCombination {
+  val id = 79
+  val points = 1
+  val name = "Single Wait"
+  val description = "Single wait on pair"
+  val fullHand = false
+
+  def matchingWait(figure: Figure, waitingTile: Tile): Boolean = {
+    figure match {
+      case Dui(tile) if tile == waitingTile => true
+      case _ => false
+    }
+  }
+
+}
+
 
 object ClosedWait extends Combination {
   val id = 78
@@ -120,6 +161,35 @@ object AllChows extends Combination {
       None
 }
 
+object SeatWind extends Combination {
+  val id = 61
+  val points = 2
+  val name = "Seat Wind"
+  val description = "1 pung of player's wind"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] =
+    m.allPungs.find(_.t.family == m.context.seatWind) match {
+      case None => None
+      case Some(pung) => Some(List(pung))
+    }
+}
+
+object FullyConcealedHand extends Combination {
+  val id = 56
+  val points = 4
+  val name = "Fully Concealed Hand"
+  val description = "Nothing disclosed, finish on self drawn"
+  val fullHand = true
+
+  def find(m: HuLe): Option[Figures] =
+    m.lastTileContext.origin == SelfDrawn && m.disclosed.size == 0
+    match {
+      case true => Some(m.allFigures)
+      case false => None
+    }
+}
+
 object MeldedHand extends Combination {
   val id = 53
   val points = 6
@@ -133,6 +203,35 @@ object MeldedHand extends Combination {
       Some(m.allFigures)
     else
       None
+  }
+}
+
+object AllTypes extends Combination {
+  val id = 52
+  val points = 6
+  val name = "All Types"
+  val description = "5 figures in all families (bamboo, character, stone, wind, honor)"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] = {
+
+    def hasFamily(family: Family, figures: Figures) =
+      figures.exists(figure => figure match {
+        case f: Knitted if family.isInstanceOf[SuitFamily] => true
+        case f: SomeKnittedWithSomeDragons => true
+        case f => f.asList.forall(_.family == family)
+      })
+
+
+    List(List(Bamboo), List(Character), List(Stone),
+      List(EastWind, NorthWind, WestWind, SouthWind),
+      List(RedDragon, WhiteDragon, GreenDragon))
+      .forall(listFamily => listFamily.exists(family => hasFamily(family, m.allFigures)))
+    match {
+      case true => Some(m.allFigures)
+      case false => None
+    }
+
   }
 }
 
@@ -194,6 +293,8 @@ object LesserHonorsAndKnittedTiles extends Combination {
   val description = "6 unique honors and incomplete knitted straight OR 5 unique honors and complete knitted straight"
   val fullHand = true
 
+  override val implied = List(AllTypes)
+
   def find(m: HuLe): Option[Figures] =
     m.closed.find(_.isInstanceOf[SomeKnittedWithSomeDragons]).map(List(_))
 }
@@ -205,7 +306,7 @@ object GreaterHonorsAndKnittedTiles extends Combination {
   val description = "The 7 unique honors and incomplete knitted tiles"
   val fullHand = true
 
-  override val implied = List(LesserHonorsAndKnittedTiles)
+  override val implied = List(LesserHonorsAndKnittedTiles, AllTypes)
 
   def find(m: HuLe): Option[Figures] =
     m.closed.find {
@@ -220,6 +321,8 @@ object SevenPairs extends Combination {
   val name = "Seven Pairs"
   val description = "7 pairs"
   val fullHand = true
+
+  override val implied = List(SingleWait)
 
   def find(m: HuLe): Option[Figures] =
     if (m.closed.size == 7 && m.closed.forall(_.isInstanceOf[Dui]))

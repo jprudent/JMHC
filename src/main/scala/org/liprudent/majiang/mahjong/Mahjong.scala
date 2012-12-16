@@ -1,12 +1,17 @@
 package org.liprudent.majiang
 
-import mahjong.{HuLe, HulePointsComputer, DetailedPoints, PlayerTiles}
+import mahjong._
+import mahjong.DetailedPoints
+import mahjong.HuLe
+import mahjong.PlayerTiles
 import org.liprudent.majiang.figures._
 import tiles._
 import org.liprudent.majiang.tiles.Types._
 import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
 import org.liprudent.majiang.figures.ThirteenOrphans
 import org.liprudent.majiang.figures.Knitted
+import org.liprudent.majiang.figures.Pung
+import org.liprudent.majiang.figures.Bonus
 import org.liprudent.majiang.figures.Dui
 import tiles.ContextualTile
 
@@ -27,18 +32,32 @@ package object mahjong {
   }
 
   /**
+   * Context of the game
+   * @param seatWind Player's wind
+   * @param prevalentWind Game's wind
+   */
+  case class PlayerContext(seatWind: WindFamily, prevalentWind: WindFamily)
+
+  /**
    * Sets of tiles representing a Hu Le (mahjong hand)
    * @param closed Figures in closed hand
    * @param disclosed disclosed figures
    * @param lastTileContext context of last tile
+   * @param context Player's context
    * @param bonus flowers and seasons
    */
-  case class HuLe(closed: Figures, disclosed: Figures, lastTileContext: ContextualTile, bonus: Bonus = Bonus(Nil)) {
+  case class HuLe(
+                   closed: Figures,
+                   disclosed: Figures,
+                   lastTileContext: ContextualTile,
+                   context: PlayerContext,
+                   bonus: Bonus = Bonus(Nil)) {
 
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(disclosed == disclosed.sorted(OrdFigure), "not sorted")
 
     lazy val allFigures = (closed ::: disclosed).sorted(OrdFigure)
+    lazy val allPungs: List[Pung] = allFigures.filter(_.isInstanceOf[Pung]).asInstanceOf[List[Pung]]
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
@@ -87,10 +106,14 @@ package object mahjong {
 
     val combinations = List(
       FlowerTiles,
+      SingleWait,
       ClosedWait,
       MixedDoubleChows,
       AllChows,
+      SeatWind,
+      FullyConcealedHand,
       MeldedHand,
+      AllTypes,
       MixedTripleChow,
       UpperFour,
       KnittedStraight,
@@ -146,7 +169,7 @@ package object mahjong {
 
 }
 
-case class HuLeFinder(ptiles: PlayerTiles) {
+case class HuLeFinder(ptiles: PlayerTiles, context: PlayerContext) {
 
   /**
    *
@@ -158,7 +181,9 @@ case class HuLeFinder(ptiles: PlayerTiles) {
       val computer = FiguresComputer(ptiles.hand.tileSet)
       computer.allFiguresCombinations
         .filter(closedCombination => HuLeFinder.isWellFormedMahjong(closedCombination, ptiles.disclosed))
-        .map(closedCombination => HulePointsComputer(HuLe(closedCombination, ptiles.disclosed, ptiles.hand.lastTileContext, ptiles.bonus)))
+        .map(closedCombination =>
+        HulePointsComputer(
+          HuLe(closedCombination, ptiles.disclosed, ptiles.hand.lastTileContext, context, ptiles.bonus)))
         .toList
     }
   }

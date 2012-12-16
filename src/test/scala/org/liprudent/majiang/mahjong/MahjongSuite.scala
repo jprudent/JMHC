@@ -6,7 +6,6 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import Tile._
 import org.liprudent.majiang.figures._
-import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.tiles.ContextualTile
@@ -48,65 +47,39 @@ class MahjongSuite extends FunSuite {
 
   test("a mahjong has 14 tiles") {
     new Hands {
-      assert(HuLeFinder(invalid).quickValid == false)
-      assert(HuLeFinder(valid).quickValid == true)
-      assert(HuLeFinder(noMahjong).quickValid == true)
+      assert(HuLeFinder(invalid, PlayerContext(WestWind, WestWind)).quickValid == false)
+      assert(HuLeFinder(valid, PlayerContext(WestWind, WestWind)).quickValid == true)
+      assert(HuLeFinder(noMahjong, PlayerContext(WestWind, WestWind)).quickValid == true)
     }
   }
 
   test("an invalid hand has no mahjong") {
     new Hands {
-      val actual = HuLeFinder(invalid).find
+      val actual = HuLeFinder(invalid, PlayerContext(WestWind, WestWind)).find
       assert(actual == Nil, actual)
     }
   }
 
   test("if there is no mahjong ... well there is no mahjong") {
     new Hands {
-      val actual = HuLeFinder(noMahjong).find
+      val actual = HuLeFinder(noMahjong, PlayerContext(WestWind, WestWind)).find
       assert(actual == Nil, actual)
     }
   }
 
-  test("HuLe Finder : b1b2b3b7b8b9c7c8c9s7s8s9drdr") {
-    new Hands {
-      val actual = HuLeFinder(allChows_mixedTripleChow).find
-      val expected = List(
-        DetailedPoints(
-          HuLe(List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), Nil, ContextualTile(b1, SelfDrawn)),
-          List(
-            (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow),
-            (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
-          )
-        )
-      )
-      assert(actual === expected)
-    }
-  }
 
-  test("HuLe Finder knitted straight: b1b4b7s2s5s8c3c6c9 c8c8c8wwww") {
-    new Hands {
-      val actual = HuLeFinder(knittedStraight).find
-      val expected = List(
-        DetailedPoints(
-          HuLe(List(Knitted(Bamboo, Character, Stone)), List(Pung(c8), Dui(ww)), ContextualTile(b1, SelfDrawn)),
-          List(
-            (List(Knitted(Bamboo, Character, Stone)), KnittedStraight)
-          )
-        )
-      )
-      assert(actual === expected)
-    }
-  }
+
+
 
   test("HuLe Finder knitted straight lesser dragon (5): b1b4b7s2s5s8c3c6c9wwwewswndr") {
     new Hands {
-      val actual = HuLeFinder(knittedStraightLesserDragon5).find
+      val actual = HuLeFinder(knittedStraightLesserDragon5, PlayerContext(WestWind, WestWind)).find
       val expected = List(
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))),
             Nil,
-            ContextualTile(b1, Discarded)),
+            ContextualTile(b1, Discarded),
+            PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))), LesserHonorsAndKnittedTiles)
           )
@@ -118,13 +91,14 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder knitted straight lesser dragon (6): b1b4b7s2s5s8c3c6c9wwwewswndr") {
     new Hands {
-      val actual = HuLeFinder(knittedStraightLesserDragon6).find
+      val actual = HuLeFinder(knittedStraightLesserDragon6, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))),
             Nil,
-            ContextualTile(b1, Discarded)),
+            ContextualTile(b1, Discarded),
+            PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))), LesserHonorsAndKnittedTiles)
           )
@@ -136,13 +110,14 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder greater honors and knitted tiles") {
     new Hands {
-      val actual = HuLeFinder(greaterHonorsAndKnittedTiles).find
+      val actual = HuLeFinder(greaterHonorsAndKnittedTiles, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))),
             Nil,
-            ContextualTile(b1, Discarded)),
+            ContextualTile(b1, Discarded),
+            PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))), GreaterHonorsAndKnittedTiles)
           )
@@ -154,13 +129,14 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder 13 orphans") {
     new Hands {
-      val actual = HuLeFinder(thirteenOrphans).find
+      val actual = HuLeFinder(thirteenOrphans, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(ThirteenOrphans(dr)),
             Nil,
-            ContextualTile(b1, Discarded)),
+            ContextualTile(b1, Discarded),
+            PlayerContext(WestWind, WestWind)),
           List(
             (List(ThirteenOrphans(dr)), ThirteenOrphansComb)
           )
@@ -172,13 +148,14 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder 7 pairs") {
     new Hands {
-      val actual = HuLeFinder(sevenPairs).find
+      val actual = HuLeFinder(sevenPairs, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)),
             Nil,
-            ContextualTile(b1, Discarded)),
+            ContextualTile(b1, Discarded),
+            PlayerContext(WestWind, WestWind)),
           List(
             (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)), SevenPairs)
           )
