@@ -104,16 +104,19 @@ package object mahjong {
     //TODO uncomment when all combinations have been implemented
     //require(combinations.size == 88)
 
-    val combinations = List(
+    val combinations = List[Combination](
       FlowerTiles,
+      SelfDrawnComb,
       SingleWait,
       ClosedWait,
+      PungOfTerminalOrHonors,
       MixedDoubleChows,
       AllChows,
       SeatWind,
       FullyConcealedHand,
       MeldedHand,
       AllTypes,
+      HalfFlush,
       MixedTripleChow,
       UpperFour,
       KnittedStraight,

@@ -58,6 +58,24 @@ object FlowerTiles extends Combination {
 
 }
 
+object SelfDrawnComb extends Combination {
+  val id = 80
+  val points = 1
+  val name = "Self Drawn"
+  val description = "finish with self drawing"
+  val fullHand = false
+
+  override def find(m: HuLe): Option[Figures] = {
+    m.lastTileContext.origin == SelfDrawn
+    match {
+      case true =>
+        m.closed.find(_.asList.contains(m.lastTileContext.tile)).map(List(_))
+      case false => None
+    }
+  }
+
+}
+
 sealed trait WaitCombination extends Combination {
 
   def matchingWait(figure: Figure, waitingTile: Tile): Boolean
@@ -126,6 +144,22 @@ object ClosedWait extends Combination {
   }
 }
 
+object PungOfTerminalOrHonors extends Combination {
+  val id = 73
+  val points = 1
+  val name = "Pung of Terminals or Honor"
+  val description = "Pung of 1 or 9 or winds"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] = {
+    m.allPungs.find {
+      case Pung(Tile(family, value)) if value == 1 || value == 9 || family.isInstanceOf[WindFamily] => true
+      case _ => false
+    }.map(List(_))
+  }
+}
+
+
 object MixedDoubleChows extends Combination {
   val id = 70
   val points = 1
@@ -168,6 +202,8 @@ object SeatWind extends Combination {
   val description = "1 pung of player's wind"
   val fullHand = false
 
+  override val implied = List(PungOfTerminalOrHonors)
+
   def find(m: HuLe): Option[Figures] =
     m.allPungs.find(_.t.family == m.context.seatWind) match {
       case None => None
@@ -181,6 +217,8 @@ object FullyConcealedHand extends Combination {
   val name = "Fully Concealed Hand"
   val description = "Nothing disclosed, finish on self drawn"
   val fullHand = true
+
+  override val implied = List(SelfDrawnComb)
 
   def find(m: HuLe): Option[Figures] =
     m.lastTileContext.origin == SelfDrawn && m.disclosed.size == 0
@@ -234,6 +272,26 @@ object AllTypes extends Combination {
 
   }
 }
+
+object HalfFlush extends Combination {
+  val id = 50
+  val points = 6
+  val name = "Half Flush"
+  val description = "all tiles of the same type (bamboos, character or stone) plus some honors "
+  val fullHand = true
+
+  def find(m: HuLe): Option[Figures] = {
+    val (honors, straight) = m.allTiles.partition(_.family.isInstanceOf[HonorFamily])
+
+    honors.size > 0 &&
+      straight.map(_.family).toSet.size == 1
+    match {
+      case true => Some(m.allFigures)
+      case false => None
+    }
+  }
+}
+
 
 object MixedTripleChow extends Combination {
   val id = 41

@@ -151,6 +151,26 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test("case Half Flush - Pung of terminals or honor - Self Drawn - Flowers") {
+    val givenClosed = TileSet(List(s2, s2, s2, s5, s6, s4, we, we))
+    val givenDisclosed: List[Figure] = List(Pung(s1), Pung(s8))
+    val givenContextualTile: ContextualTile = ContextualTile(s4, SelfDrawn)
+    val givenBonus: Bonus = Bonus(List(fp, fo, sw))
+    val givenContext = PlayerContext(WestWind, EastWind)
+
+    val thenClosed = List(Pung(s2), Chow(s4, s5, s6), Dui(we))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(s1), Pung(s2), Pung(s8), Chow(s4, s5, s6), Dui(we)), HalfFlush),
+        (List(Pung(s1)), PungOfTerminalOrHonors),
+        (List(Chow(s4, s5, s6)), SelfDrawnComb),
+        (List(Bonus(List(fp, fo, sw))), FlowerTiles)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
+
+  }
+
   private def test(
                     givenClosed: TileSet,
                     givenDisclosed: List[Figure],
