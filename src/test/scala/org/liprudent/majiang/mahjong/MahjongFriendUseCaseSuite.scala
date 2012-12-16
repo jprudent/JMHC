@@ -197,6 +197,32 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 66)
   }
 
+  test(
+    """case Mixed Shifted Chows - All Chows - Short Straight - Single Wait - Flowere
+      |verif : mahjong friends
+      |tricky part: winning tile b2 can be used to form Chow(b1,b2,b3) or Dui(b2).
+      |             So single wait is scored or closed wait is scored, not both.
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s3, s4, s5, b1, b2, b3, b4, b5, b6, b2, b2))
+    val givenDisclosed: List[Figure] = List(Chow(c5, c6, c7))
+    val givenContextualTile: ContextualTile = ContextualTile(b2, Discarded)
+    val givenBonus: Bonus = Bonus(List(fp, fo, ss, sw))
+    val givenContext = PlayerContext(WestWind, EastWind)
+
+    val thenClosed = List(Chow(s3, s4, s5), Chow(b1, b2, b3), Chow(b4, b5, b6), Dui(b2))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Chow(s3, s4, s5), Chow(b4, b5, b6), Chow(c5, c6, c7)), MixedShiftedChow),
+        (List(Chow(s3, s4, s5), Chow(b1, b2, b3), Chow(b4, b5, b6), Chow(c5, c6, c7)), AllChows),
+        (List(Chow(b1, b2, b3), Chow(b4, b5, b6)), ShortStraight),
+        (List(Chow(b1, b2, b3)), ClosedWait),
+        (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
+
+  }
+
 
   private def test(
                     givenClosed: TileSet,

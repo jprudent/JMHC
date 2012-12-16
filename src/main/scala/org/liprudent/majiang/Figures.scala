@@ -90,6 +90,11 @@ package object figures {
     def hasSameValues(y: Chow) =
       y.t1.value == t1.value
 
+    def isConsequitive(y: Chow) =
+      y.t1.value == t1.value + 3
+
+    def sameFamily(y: Chow) =
+      t1.sameFamily(y.t1)
   }
 
   object OrdChow extends Ordering[Chow] {

@@ -36,7 +36,7 @@ sealed trait Combination {
   def imply(x: Figures, y: (Figures, Combination)): Boolean = {
     def containsAll(x: Figures, y: Figures): Boolean =
       y.forall(figure => x.contains(figure))
-    implied.exists(combination => combination == y._2 && containsAll(x, y._1))
+    implied.exists(combination => combination == y._2 /*&& containsAll(x, y._1)*/)
   }
 
   override lazy val toString = "n°%d, %d points, %s".format(id, points, name)
@@ -116,33 +116,44 @@ object SingleWait extends Combination with WaitCombination {
 }
 
 
-object ClosedWait extends Combination {
+object ClosedWait extends Combination with WaitCombination {
   val id = 78
   val points = 1
   val name = "Closed Wait"
   val description = "Single wait on the middle of a chow"
   val fullHand = false
 
-  def find(m: HuLe): Option[Figures] = {
-    if (m.lastTileContext.origin != Discarded) None
-    else {
-      val closedTiles = m.closed.map(_.asList).flatten
-      val tilesBeforeWinning: TileSet = TileSet(closedTiles).removed(m.lastTileContext.tile)
-      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.disclosed)
-      println(waitingTiles)
+  override val implied = List(SingleWait)
 
-      waitingTiles match {
-        case w :: Nil => {
-          m.closed.find(_ match {
-            case Chow(_, middle, _) if middle == w => true
-            case _ => false
-          }).map(List(_))
-        }
-        case _ => None
-      }
+  def matchingWait(figure: Figure, waitingTile: Tile): Boolean = {
+    figure match {
+      case Chow(_, middle, _) if middle == waitingTile => true
+      case _ => false
     }
   }
+
 }
+
+object EdgeWait extends Combination with WaitCombination {
+  val id = 77
+  val points = 1
+  val name = "Edge Wait"
+  val description = "Single wait on 3 or 7 of a chow"
+  val fullHand = false
+
+  override val implied = List(SingleWait)
+
+
+  def matchingWait(figure: Figure, waitingTile: Tile): Boolean = {
+    figure match {
+      case Chow(Tile(f1, 1), middle, last) if last == waitingTile => true
+      case Chow(first, middle, Tile(family, 9)) if first == waitingTile => true
+      case _ => false
+    }
+  }
+
+}
+
 
 object PungOfTerminalOrHonors extends Combination {
   val id = 73
@@ -157,6 +168,27 @@ object PungOfTerminalOrHonors extends Combination {
       case _ => false
     }.map(List(_))
   }
+}
+
+object ShortStraight extends Combination {
+  val id = 71
+  val points = 1
+  val name = "Short Straight"
+  val description = "2 consequitives chows in same family"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] = {
+    val allMixedChows: List[Figures] =
+      for {chow1 <- m.allChows
+           chow2 <- m.allChows if chow1.sameFamily(chow2) && chow1.isConsequitive(chow2)
+      } yield (List(chow1, chow2))
+
+    allMixedChows match {
+      case Nil => None
+      case first :: others => Some(first)
+    }
+  }
+
 }
 
 
@@ -272,6 +304,27 @@ object AllTypes extends Combination {
 
   }
 }
+
+object MixedShiftedChow extends Combination {
+  val id = 51
+  val points = 6
+  val name = "Mixed Shifted Chow"
+  val description = "3 chows in 3 families shifted by 2 tiles"
+  val fullHand = false
+
+  def find(m: HuLe): Option[Figures] = {
+    val allShiftedChows = for {chow1 <- m.allChows
+                               chow2 <- m.allChows if chow2.t1.value == chow1.t1.value + 1 && chow2.t1.family != chow1.t1.family
+                               chow3 <- m.allChows if chow3.t1.value == chow2.t1.value + 1 && chow3.t1.family != chow1.t2.family && chow3.t1.family != chow1.t1.family
+    } yield (List(chow1, chow2, chow3))
+
+    allShiftedChows match {
+      case Nil => None
+      case x :: xs => Some(x)
+    }
+  }
+}
+
 
 object HalfFlush extends Combination {
   val id = 50
