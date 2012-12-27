@@ -132,11 +132,14 @@ package object mahjong {
       AllTerminalsAndHonors,
       ThirteenOrphansComb)
 
+    private def findAllMatchingCombinations(hule: HuLe): List[(Combination, Figures)] = {
+      Nil
+    }
 
     def apply(huLe: HuLe): DetailedPoints = {
-      val res = combinations.map(combination => combination.find(huLe))
+      val res: List[Option[Figures]] = combinations.map(combination => combination.find(huLe))
       val zipped: List[(Option[Figures], Combination)] = res.zip(combinations)
-      val allDetailedPoints = zipped.filter {
+      val allDetailedPoints: List[(Figures, Combination)] = zipped.filter {
         case (optFigures, _) => optFigures.isDefined
       }
         .map {
@@ -164,17 +167,11 @@ package object mahjong {
 
 
     protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
-      ref._2.imply(ref._1, toExclude)
+      ref._2.excludes(toExclude._2) || (
+        ref._2.imply(toExclude._2) &&
+          ref._1.containsSlice(toExclude._1)
+        )
     }
-  }
-
-  private def countFiguresUsed(allDetailedPoints: List[(Figures, Combination)]): Map[Figure, Int] = {
-    allDetailedPoints
-      .map {
-      case (figures, combination) => figures
-    }
-      .foldLeft(Map[Figure, Int]())((map, figures) =>
-      figures.foldLeft(map)((map, figure) => map.updated(figure, map.getOrElse(figure, 0) + 1)))
   }
 
 }

@@ -157,7 +157,8 @@ class MahjongSuite extends FunSuite {
             ContextualTile(b1, Discarded),
             PlayerContext(WestWind, WestWind)),
           List(
-            (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)), SevenPairs)
+            (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)), SevenPairs),
+            (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4)), OneVoidedSuit)
           )
         )
       )
@@ -277,6 +278,13 @@ class MahjongSuite extends FunSuite {
     val excl = (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
 
     assert(!HulePointsComputer.isExcluded(ref, excl))
+  }
+
+  test("is excluded : Seat Wind - Pung of honor or terminal") {
+    val ref = (List(Pung(ww)), SeatWind)
+    val excl = (List(Pung(ww)), PungOfTerminalOrHonors)
+
+    assert(HulePointsComputer.isExcluded(ref, excl))
   }
 
 }

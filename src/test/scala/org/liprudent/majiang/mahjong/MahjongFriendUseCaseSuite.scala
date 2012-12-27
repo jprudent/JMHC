@@ -261,6 +261,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   test(
     """case All Terminals or Honors - Dragon Pung - Seat Wind - One Voided Suit - Pung of Terminals of Honor - Flowers
       |verif : mahjong and friends
+      |tricky part: Dragon Pung implies Pung Of Terminal Or Honor but only on a different pung
     """.stripMargin) {
     val givenClosed = TileSet(List(c1, c2, c3, ww, ww, ws, ws, ww))
     val givenDisclosed: List[Figure] = List(Pung(dr), Pung(b9))
@@ -274,8 +275,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(b9), Pung(dr), Chow(c1, c2, c3), Pung(ww), Dui(ws)), OutsideHand),
         (List(Pung(dr)), DragonPung),
         (List(Pung(ww)), SeatWind),
-        (List(Pung(b9), Chow(c1, c2, c3)), OneVoidedSuit),
         (List(Pung(b9)), PungOfTerminalOrHonors),
+        (List(Pung(b9), Chow(c1, c2, c3)), OneVoidedSuit),
         (List(Bonus(List(sa))), FlowerTiles)
       )
 

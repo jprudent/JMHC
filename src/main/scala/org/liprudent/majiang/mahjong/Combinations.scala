@@ -15,29 +15,31 @@ sealed trait Combination {
   val points: Int
   val name: String
   val description: String
-  /**
-   * If true, this combination doesn't exclude with the ones where fullHand is false
-   */
-  val fullHand: Boolean
 
   def find(m: HuLe): Option[Figures]
 
   /**
-   * List of implied combinations by this one
+   * List of implied combinations by this one.
+   * A combination implies another based on the same figures or a subset of figures
+   * example: "Seat Wind" implies "Pung of honor or extremity" if it's a pung of Wind West
+   * if it's a Pung of Wind West and a Pung of 9 bamboos this is not an exclusion
    */
   val implied = List[Combination]()
 
   /**
+   * A list of mutually excluded combinations
+   * Example: When scoring, Wait on the Pair and Edge Wait are mutually excluded
+   */
+  val excluded = List[Combination]()
+
+  /**
    * Check wether x implies y
-   * @param x this combination with these figures
    * @param y the other combination with those figures
    * @return true if y is implied by x. false otherwise
    */
-  def imply(x: Figures, y: (Figures, Combination)): Boolean = {
-    def containsAll(x: Figures, y: Figures): Boolean =
-      y.forall(figure => x.contains(figure))
-    implied.exists(combination => combination == y._2 /*&& containsAll(x, y._1)*/)
-  }
+  def imply(y: Combination) = implied.exists(_ == y)
+
+  def excludes(y: Combination) = excluded.exists(_ == y)
 
   override lazy val toString = "n°%d, %d points, %s".format(id, points, name)
 }
@@ -47,7 +49,7 @@ object FlowerTiles extends Combination {
   val points = 1
   val name = "Flower Tiles"
   val description = "Flowers and Seasons Tiles"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
     m.bonus.bonus match {
@@ -63,7 +65,7 @@ object SelfDrawnComb extends Combination {
   val points = 1
   val name = "Self Drawn"
   val description = "finish with self drawing"
-  val fullHand = false
+
 
   override def find(m: HuLe): Option[Figures] = {
     m.lastTileContext.origin == SelfDrawn
@@ -104,7 +106,7 @@ object SingleWait extends Combination with WaitCombination {
   val points = 1
   val name = "Single Wait"
   val description = "Single wait on pair"
-  val fullHand = false
+
 
   def matchingWait(figure: Figure, waitingTile: Tile): Boolean = {
     figure match {
@@ -121,9 +123,9 @@ object ClosedWait extends Combination with WaitCombination {
   val points = 1
   val name = "Closed Wait"
   val description = "Single wait on the middle of a chow"
-  val fullHand = false
 
-  override val implied = List(SingleWait)
+
+  override val excluded = List(SingleWait)
 
   def matchingWait(figure: Figure, waitingTile: Tile): Boolean = {
     figure match {
@@ -139,9 +141,9 @@ object EdgeWait extends Combination with WaitCombination {
   val points = 1
   val name = "Edge Wait"
   val description = "Single wait on 3 or 7 of a chow"
-  val fullHand = false
 
-  override val implied = List(SingleWait)
+
+  override val excluded = List(SingleWait)
 
 
   def matchingWait(figure: Figure, waitingTile: Tile): Boolean = {
@@ -159,7 +161,7 @@ object OneVoidedSuit extends Combination {
   val points = 1
   val name = "One voided suit"
   val description = "1 family (bamboo, stone, characted) is absent"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
     m.allTiles.groupBy(tile => tile.family match {
@@ -184,7 +186,7 @@ object PungOfTerminalOrHonors extends Combination {
   val points = 1
   val name = "Pung of Terminals or Honor"
   val description = "Pung of 1 or 9 or winds"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
     m.allPungs.find {
@@ -199,7 +201,7 @@ object ShortStraight extends Combination {
   val points = 1
   val name = "Short Straight"
   val description = "2 consequitives chows in same family"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
     val allMixedChows: List[Figures] =
@@ -221,7 +223,7 @@ object MixedDoubleChows extends Combination {
   val points = 1
   val name = "Mixes Double Chows"
   val description = "2 identical chows in two families"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
     val allMixedChows: List[Figures] =
@@ -242,7 +244,7 @@ object AllChows extends Combination {
   val points = 2
   val name = "All Chows"
   val description = "All Chows but one Pair"
-  val fullHand = true
+
 
   def find(m: HuLe): Option[Figures] =
     if (m.allDuis.size == 1 && m.allChows.size == 4)
@@ -256,7 +258,7 @@ object SeatWind extends Combination {
   val points = 2
   val name = "Seat Wind"
   val description = "1 pung of player's wind"
-  val fullHand = false
+
 
   override val implied = List(PungOfTerminalOrHonors)
 
@@ -272,7 +274,7 @@ object DragonPung extends Combination {
   val points = 2
   val name = "Dragon Pung"
   val description = "A pung of dragon"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] =
     m.allPungs.find(_.t.family.isInstanceOf[DragonFamily]) match {
@@ -287,7 +289,7 @@ object FullyConcealedHand extends Combination {
   val points = 4
   val name = "Fully Concealed Hand"
   val description = "Nothing disclosed, finish on self drawn"
-  val fullHand = true
+
 
   override val implied = List(SelfDrawnComb)
 
@@ -304,7 +306,7 @@ object OutsideHand extends Combination {
   val points = 4
   val name = "Outside Hand"
   val description = "At least 1 honor or 1 terminal in each figure"
-  val fullHand = true
+
 
   def find(m: HuLe): Option[Figures] = {
 
@@ -328,7 +330,7 @@ object MeldedHand extends Combination {
   val points = 6
   val name = "Melded Hand"
   val description = "4 figures melded, and finish on discard"
-  val fullHand = true
+
 
   def find(m: HuLe): Option[Figures] = {
     val cond = m.allFigures.size == 5 && m.disclosed.size == 4 && m.lastTileContext.origin != SelfDrawn
@@ -344,7 +346,7 @@ object AllTypes extends Combination {
   val points = 6
   val name = "All Types"
   val description = "5 figures in all families (bamboo, character, stone, wind, honor)"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
 
@@ -373,7 +375,7 @@ object MixedShiftedChow extends Combination {
   val points = 6
   val name = "Mixed Shifted Chow"
   val description = "3 chows in 3 families shifted by 2 tiles"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
     val allShiftedChows = for {chow1 <- m.allChows
@@ -394,7 +396,7 @@ object HalfFlush extends Combination {
   val points = 6
   val name = "Half Flush"
   val description = "all tiles of the same type (bamboos, character or stone) plus some honors "
-  val fullHand = true
+
 
   def find(m: HuLe): Option[Figures] = {
     val (honors, straight) = m.allTiles.partition(_.family.isInstanceOf[HonorFamily])
@@ -414,7 +416,7 @@ object MixedTripleChow extends Combination {
   val points = 8
   val name = "Mixed Triple Chow"
   val description = "Three identical chows in three families"
-  val fullHand = false
+
 
   override val implied = List(MixedDoubleChows)
 
@@ -438,7 +440,7 @@ object UpperFour extends Combination {
   val points = 12
   val name = "Upper Four"
   val description = "Only 9,8,7,6"
-  val fullHand = true
+
 
   def find(m: HuLe): Option[Figures] = {
     m.allTiles.forall(t => t.family.isInstanceOf[SuitFamily] && t.value >= 6) match {
@@ -453,7 +455,7 @@ object KnittedStraight extends Combination {
   val points = 12
   val name = "Knitted Straight"
   val description = "1-4-7 in one family, 2-5-8 in the second family, 3-6-9 in the third family"
-  val fullHand = false
+
 
   def find(m: HuLe): Option[Figures] = {
     m.closed.find(_.isInstanceOf[Knitted]).map(List(_))
@@ -465,7 +467,7 @@ object LesserHonorsAndKnittedTiles extends Combination {
   val points = 12
   val name = "Lesser Honors and Knitted Tiles"
   val description = "6 unique honors and incomplete knitted straight OR 5 unique honors and complete knitted straight"
-  val fullHand = true
+
 
   override val implied = List(AllTypes)
 
@@ -478,7 +480,7 @@ object GreaterHonorsAndKnittedTiles extends Combination {
   val points = 24
   val name = "Greater Honors and Knitted Tiles"
   val description = "The 7 unique honors and incomplete knitted tiles"
-  val fullHand = true
+
 
   override val implied = List(LesserHonorsAndKnittedTiles, AllTypes)
 
@@ -494,7 +496,7 @@ object SevenPairs extends Combination {
   val points = 24
   val name = "Seven Pairs"
   val description = "7 pairs"
-  val fullHand = true
+
 
   override val implied = List(SingleWait)
 
@@ -509,7 +511,7 @@ object AllTerminalsAndHonors extends Combination {
   val points = 32
   val name = "All Terminals And Honors"
   val description = "only 1, 9 and honors"
-  val fullHand = true
+
 
   override val implied = List(OutsideHand)
 
@@ -531,7 +533,7 @@ object ThirteenOrphansComb extends Combination {
   val points = 88
   val name = "Thirteen Orphans"
   val description = "1 and 9 in three families and 7 distinct honors plus 1 extra honor"
-  val fullHand = true
+
 
   override val implied = List(AllTerminalsAndHonors)
 
