@@ -284,6 +284,29 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """case 2 x Pung of Terminals or Honor
+      |verif : My head
+      |tricky part: Pung of Terminals or Honor is scored twice (Pung(c9) and Pung(ww))
+    """.stripMargin) {
+    val givenClosed = TileSet(List(c9, c9, c9, ww, ww, ww, b2, b2))
+    val givenDisclosed: List[Figure] = List(Pung(c8), Chow(b1, b2, b3))
+    val givenContextualTile: ContextualTile = ContextualTile(ww, Discarded)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Pung(c9), Pung(ww), Dui(b2))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(ww)), PungOfTerminalOrHonors),
+        (List(Pung(c9)), PungOfTerminalOrHonors),
+        (List(Pung(c9), Chow(b1, b2, b3), Dui(b2)), OneVoidedSuit)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
+
+  }
+
 
   private def test(
                     givenClosed: TileSet,
