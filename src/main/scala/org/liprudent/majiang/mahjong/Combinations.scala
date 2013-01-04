@@ -411,9 +411,9 @@ object MixedShiftedChow extends Combination {
 
   def find(m: HuLe): Result = {
     val allShiftedChows = for {chow1 <- m.allChows
-                               chow2 <- m.allChows if OrdChow.compare(chow1, chow2) <= -1 && chow2.t1.value == chow1.t1.value + 1 && chow2.t1.family != chow1.t1.family
-                               chow3 <- m.allChows if OrdChow.compare(chow2, chow3) <= -1 && chow3.t1.value == chow2.t1.value + 1 && chow3.t1.family != chow1.t2.family && chow3.t1.family != chow1.t1.family
-    } yield (List(chow1, chow2, chow3))
+                               chow2 <- m.allChows if  chow2.t1.value == chow1.t1.value + 1 && chow2.t1.family != chow1.t1.family
+                               chow3 <- m.allChows if  chow3.t1.value == chow2.t1.value + 1 && chow3.t1.family != chow1.t2.family && chow3.t1.family != chow1.t1.family
+    } yield (List(chow1, chow2, chow3).sorted(OrdChow))
 
     //Every mixed shifted chow is scored
     Result(allShiftedChows)
