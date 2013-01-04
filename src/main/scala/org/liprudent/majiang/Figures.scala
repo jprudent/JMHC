@@ -15,12 +15,13 @@ package object figures {
   sealed trait Figure {
     val properties: FigureProperties
 
+    //TODO rename asListOfTiles or toTiles
     def asList: List[Tile]
 
   }
 
   implicit object OrdFigure extends Ordering[Figure] {
-    //TODO need to understand why result is reversed
+    //result is reversed so the ordering is from greater to lesser
     override def compare(x: Figure, y: Figure): Int = {
       x match {
         case x: ThirteenOrphans => y match {

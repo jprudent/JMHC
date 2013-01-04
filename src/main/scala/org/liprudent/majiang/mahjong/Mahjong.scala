@@ -60,15 +60,23 @@ package object mahjong {
     lazy val allPungs: List[Pung] = allFigures.filter(_.isInstanceOf[Pung]).asInstanceOf[List[Pung]]
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
+
+    lazy val allClosedStraightFamilyFigures: List[Figure] =
+      allFigures.filter(_.asList.forall(_.family.isInstanceOf[SuitFamily]))
+
+    lazy val allDragonPungs: List[Pung] = allPungs.filter(_.t.family.isInstanceOf[DragonFamily])
+
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
+    lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
+
   }
 
 
   case class DetailedPoints(huLe: HuLe, detailedPoints: List[(List[Figure], Combination)]) {
 
     require(detailedPoints.forall {
-      case (figures, comn) => figures.sorted(OrdFigure) == figures
-    }, "not sorted")
+      case (figures, comb) => figures.sorted(OrdFigure) == figures
+    }, ("not sorted \n" + detailedPoints))
 
     override def toString = {
       val title = "For Hule : " + huLe + "\n"
@@ -132,20 +140,18 @@ package object mahjong {
       AllTerminalsAndHonors,
       ThirteenOrphansComb)
 
-    private def findAllMatchingCombinations(hule: HuLe): List[(Combination, Figures)] = {
-      Nil
-    }
-
     def apply(huLe: HuLe): DetailedPoints = {
-      val res: List[Option[Figures]] = combinations.map(combination => combination.find(huLe))
-      val zipped: List[(Option[Figures], Combination)] = res.zip(combinations)
+      val res: List[Result] = combinations.map(combination => combination.find(huLe))
+      val zipped: List[(Result, Combination)] = res.zip(combinations)
       val allDetailedPoints: List[(Figures, Combination)] = zipped.filter {
-        case (optFigures, _) => optFigures.isDefined
+        case (result, _) => result != EmptyResult
       }
         .map {
-        case (optFigures, combination) => (optFigures.get.sorted(OrdFigure), combination)
-      }
+        case (result, combination) => result.figures.map(figures => (figures, combination))
+      } //List[List[(figures,combination)]]
+        .flatten
         .sorted(OrdDetailedPoint)
+
 
       val detailedPoints = applyExclusion(allDetailedPoints)
 
@@ -169,7 +175,7 @@ package object mahjong {
     protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
       ref._2.excludes(toExclude._2) || (
         ref._2.imply(toExclude._2) &&
-          ref._1.containsSlice(toExclude._1)
+          toExclude._1.forall(fig => ref._1.contains(fig))
         )
     }
   }
@@ -200,7 +206,6 @@ case class HuLeFinder(ptiles: PlayerTiles, context: PlayerContext) {
 }
 
 object HuLeFinder {
-  //TODO pour le moment, recherche de 4 figures de 3 tuiles et 1 paire
   def isWellFormedMahjong(closed: Figures, disclosed: Figures): Boolean = {
     val all = closed ::: disclosed
     //classical mahjong hand

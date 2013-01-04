@@ -27,6 +27,7 @@ object Family {
   }
 }
 
+//TODO rename as StraightFamily
 sealed abstract class SuitFamily extends Family {
   override def validValue(value: Int) = value >= 1 && value <= 9
 }
@@ -36,15 +37,16 @@ case object Bamboo extends SuitFamily {
   override val order = 0
 }
 
+case object Character extends SuitFamily {
+  override val name = "Character"
+  override val order = 1
+}
+
 case object Stone extends SuitFamily {
   override val name = "Stone"
   override val order = 2
 }
 
-case object Character extends SuitFamily {
-  override val name = "Character"
-  override val order = 1
-}
 
 sealed abstract class HonorFamily extends Family {
   override def validValue(value: Int) = value == 0xF00D
@@ -112,50 +114,50 @@ case object PlumbFlower extends BonusFamily {
 
 case object OrchidFlower extends BonusFamily {
   override val name = "Orchid Flower"
-  override val order = 10
+  override val order = 11
   override val shortName = "fo"
 }
 
 case object ChrysanthemumFlower extends BonusFamily {
   override val name = "Chrysanthemum Flower"
-  override val order = 11
+  override val order = 12
   override val shortName = "fc"
 }
 
 case object BambooFlower extends BonusFamily {
   override val name = "Bamboo Flower"
-  override val order = 12
+  override val order = 13
   override val shortName = "fb"
 }
 
 case object SpringSeason extends BonusFamily {
   override val name = "Spring Season"
-  override val order = 13
+  override val order = 14
   override val shortName = "ss"
 }
 
 
 case object SummerSeason extends BonusFamily {
   override val name = "Summer Season"
-  override val order = 14
+  override val order = 15
   override val shortName = "su"
 }
 
 
 case object AutomnSeason extends BonusFamily {
   override val name = "Automn Season"
-  override val order = 15
+  override val order = 16
   override val shortName = "sa"
 }
 
 
 case object WinterSeason extends BonusFamily {
   override val name = "Winter Season"
-  override val order = 16
+  override val order = 17
   override val shortName = "sw"
 }
 
-case class Tile(val family: Family, val value: Int) {
+case class Tile(family: Family, value: Int) {
 
   // a tile value should be between 1 and 9
   require(family.validValue(value))

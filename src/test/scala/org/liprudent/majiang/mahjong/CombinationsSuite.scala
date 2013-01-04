@@ -18,7 +18,7 @@ class CombinationsSuite extends FunSuite {
       ContextualTile(b3, Discarded),
       PlayerContext(WestWind, EastWind))
     val actual = AllChows.find(hule)
-    val expected = Some(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)))
+    val expected = Result(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)))
     assert(actual === expected)
   }
 
@@ -29,7 +29,7 @@ class CombinationsSuite extends FunSuite {
       ContextualTile(b3, Discarded),
       PlayerContext(WestWind, EastWind))
     val actual = MeldedHand.find(hule)
-    val expected = Some(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)))
+    val expected = Result(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)))
     assert(actual === expected)
   }
 
@@ -40,7 +40,7 @@ class CombinationsSuite extends FunSuite {
       ContextualTile(b3, Discarded),
       PlayerContext(WestWind, EastWind))
     val actual = MixedDoubleChows.find(hule)
-    val expected = Some(List(Chow(b5, b6, b7), Chow(c5, c6, c7)))
+    val expected = Result(List(Chow(b5, b6, b7), Chow(c5, c6, c7)))
     assert(actual === expected)
   }
 
@@ -55,7 +55,7 @@ class CombinationsSuite extends FunSuite {
     )
 
     val actual = FlowerTiles.find(hule)
-    val expected = Some(List(Bonus(List(fb, sa))))
+    val expected = Result(List(Bonus(List(fb, sa))))
 
     assert(actual === expected)
 
@@ -71,7 +71,7 @@ class CombinationsSuite extends FunSuite {
       context)
 
     val actual = ClosedWait.find(hule)
-    val expected = Some(List(Chow(s7, s8, s9)))
+    val expected = Result(List(Chow(s7, s8, s9)))
 
     assert(actual === expected)
 
@@ -85,7 +85,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(closed, disclosed, lastTile, context)
 
     val actual = AllTypes.find(hule)
-    val expected = Some((closed ::: disclosed).sorted(OrdFigure))
+    val expected = Result((closed ::: disclosed).sorted(OrdFigure))
 
     assert(actual === expected)
   }
@@ -98,7 +98,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(closed, disclosed, lastTile, context)
 
     val actual = SeatWind.find(hule)
-    val expected = Some(List(Pung(ww)))
+    val expected = Result(List(Pung(ww)))
 
     assert(actual === expected)
   }
@@ -112,7 +112,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(closed, disclosed, lastTile, context)
 
     val actual = SingleWait.find(hule)
-    val expected = Some(List(Dui(dg)))
+    val expected = Result(List(Dui(dg)))
 
     assert(actual === expected)
   }
@@ -126,7 +126,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(closed, disclosed, lastTile, context)
 
     val actual = PungOfTerminalOrHonors.find(hule)
-    val expected = Some(List(Pung(b9)))
+    val expected = Result(List(List(Pung(b9)), List(Pung(ww))))
 
     assert(actual === expected)
 

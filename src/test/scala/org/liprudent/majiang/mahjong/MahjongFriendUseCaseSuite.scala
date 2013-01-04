@@ -298,12 +298,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(c9), Pung(ww), Dui(b2))
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
-        (List(Pung(ww)), PungOfTerminalOrHonors),
         (List(Pung(c9)), PungOfTerminalOrHonors),
-        (List(Pung(c9), Chow(b1, b2, b3), Dui(b2)), OneVoidedSuit)
+        (List(Pung(ww)), PungOfTerminalOrHonors),
+        (List(Pung(c8), Pung(c9), Chow(b1, b2, b3), Dui(b2)), OneVoidedSuit)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 3)
 
   }
 
