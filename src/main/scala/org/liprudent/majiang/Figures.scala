@@ -10,8 +10,6 @@ package object figures {
 
   sealed trait FigureProperties {
 
-    type FigureType <: Figure
-
     //number of tiles in this figure
     val size: Int
 

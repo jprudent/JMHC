@@ -648,24 +648,16 @@ object FiguresComputer {
 }
 
 /**
- * A hand represents the closed tiles of a player
- * <p/>
+ * A hand represents the closed tiles of a player. Those tiles can be rearranged, they are not melded.
+ *
  * Note: There is no remove method because in mahjong a tile is removed only after one is added.
- * So if you need to remove a tile, call <code>addRemove</code> method.
+ * So if you need to remove a tile, call `addRemove` method.
  * @param tileSet The tiles the hand is made of.
  * @param lastTileContext The context of the last tile
  */
 case class Hand(tileSet: TileSet, lastTileContext: ContextualTile) {
 
   require(tileSet.exists(t => t == lastTileContext.tile))
-
-  /**
-   * Add a new tile in hand
-   * @param contextualTile The new tile to add
-   * @return The new hand with the new tile added
-   */
-  def add(contextualTile: ContextualTile): Hand =
-    Hand(tileSet.added(contextualTile.tile), contextualTile)
 
   /**
    * add a new tile and remove one
@@ -677,8 +669,16 @@ case class Hand(tileSet: TileSet, lastTileContext: ContextualTile) {
     Hand(add(added).tileSet.removed(removed), added)
   }
 
+  /**
+   * Add a new tile in hand
+   *
+   * @param contextualTile The new tile to add
+   * @return The new hand with the new tile added
+   */
+  private def add(contextualTile: ContextualTile): Hand =
+    Hand(tileSet.added(contextualTile.tile), contextualTile)
 
-  override def toString: String = "Hand : " + tileSet.toString + "\nLast tile: " + lastTileContext
+  override lazy val toString: String = "Hand : " + tileSet.toString + "\nLast tile: " + lastTileContext
 
 }
 
