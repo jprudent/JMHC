@@ -3,7 +3,7 @@ package org.liprudent.majiang.mahjong
 import org.liprudent.majiang.tiles._
 import Tile._
 import org.liprudent.majiang.figures._
-import org.liprudent.majiang.HuLeFinder
+import org.liprudent.majiang.HuFinder
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Bonus
 import org.liprudent.majiang.figures.Dui
@@ -12,6 +12,38 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+/**
+ * Acceptance Tests
+ *
+ * here is a template :
+ * {{{
+    test(
+    """use case :
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List())
+    val givenMelded: List[Figure] = List()
+    val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded,false)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List()
+    val thenPoints =
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(),),
+        (List(),),
+        (List(),),
+        (List(),),
+        (List(),)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+ * }}}
+ */
 @RunWith(classOf[JUnitRunner])
 class MahjongFriendUseCaseSuite extends FunSuite {
 
@@ -20,7 +52,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif: dubious on One Voided Suit
     """.stripMargin) {
     val givenClosed = TileSet(List(b3, b3))
-    val givenDisclosed = List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9))
+    val givenMelded = List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9))
     val givenContextualTile = ContextualTile(b3, Discarded, false)
     val givenContext = PlayerContext(WestWind, EastWind)
 
@@ -33,14 +65,14 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       (List(Dui(b3)), SingleWait)
     )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenContext, thenClosed, thenCombinations, 11)
+    test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 11)
 
   }
 
   test("case Mixed Triple Chows - All Chows") {
     val givenClosed = TileSet(List(s2, s3, s4, s6, s7, s8, s9, s9))
     val givenContextualTile = ContextualTile(s9, Discarded, false)
-    val givenDisclosed = List(Chow(b6, b7, b8), Chow(c6, c7, c8))
+    val givenMelded = List(Chow(b6, b7, b8), Chow(c6, c7, c8))
     val givenContext = PlayerContext(WestWind, EastWind)
 
     val thenClosed: List[Figure with Product] = List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9))
@@ -49,7 +81,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
     )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
+    test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
   }
 
 
@@ -57,7 +89,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   test("case Upper Four - Flowers - Double Chow - Closed Wait") {
 
     val givenClosed = TileSet(List(s6, s6, s6, s7, s8, s9, c6, c6))
-    val givenDisclosed: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
+    val givenMelded: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
     val givenContextualTile: ContextualTile = ContextualTile(s8, Discarded, false)
     val givenBonus: Bonus = Bonus(List(fb, ss, sa))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -71,14 +103,14 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fb, ss, sa))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 17)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 17)
 
   }
 
   test("case All Types - SeatWind - Flower - Single Wait") {
 
     val givenClosed = TileSet(List(b2, b2, b2, c1, c2, c3, dg, dg))
-    val givenDisclosed = List(Pung(ww), Chow(s3, s4, s5))
+    val givenMelded = List(Pung(ww), Chow(s3, s4, s5))
     val givenContextualTile: ContextualTile = ContextualTile(dg, Discarded, false)
     val givenBonus: Bonus = Bonus(List(fo))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -92,13 +124,13 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fo))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 10)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 10)
 
   }
 
   test("case Knitted Straight - Fully Concealed Hand") {
     val givenClosed = TileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, c8, c8, c8, dr, dr))
-    val givenDisclosed = Nil
+    val givenMelded = Nil
     val givenContextualTile: ContextualTile = ContextualTile(b1, SelfDrawn, false)
     val givenBonus: Bonus = Bonus(List(fo))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -111,14 +143,14 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fo))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 17)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 17)
 
   }
 
   test("case Knitted Straight - All Types") {
 
     val givenClosed = TileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, dr, dr))
-    val givenDisclosed = List(Pung(ww))
+    val givenMelded = List(Pung(ww))
     val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, false)
     val givenBonus: Bonus = Bonus(List(fo))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -132,7 +164,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fo))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 21)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 21)
 
   }
 
@@ -141,7 +173,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif: dubious on OutsideHand
     """.stripMargin) {
     val givenClosed = TileSet(List(b1, b2, b3, b7, b8, b9, c7, c8, c9, s7, s8, s9, dr, dr))
-    val givenDisclosed = Nil
+    val givenMelded = Nil
     val givenContextualTile: ContextualTile = ContextualTile(b1, SelfDrawn, false)
     val givenBonus: Bonus = Bonus(Nil)
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -155,7 +187,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 18)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 18)
 
   }
 
@@ -165,7 +197,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : mahjong friends
     """.stripMargin) {
     val givenClosed = TileSet(List(s2, s2, s2, s5, s6, s4, we, we))
-    val givenDisclosed: List[Figure] = List(Pung(s1), Pung(s8))
+    val givenMelded: List[Figure] = List(Pung(s1), Pung(s8))
     val givenContextualTile: ContextualTile = ContextualTile(s4, SelfDrawn, false)
     val givenBonus: Bonus = Bonus(List(fp, fo, sw))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -179,7 +211,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fp, fo, sw))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
 
   }
 
@@ -188,7 +220,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : http://mahjong.forum2jeux.com/t265-livre-sur-les-regles-officielles-chinoises-v2
     """.stripMargin) {
     val givenClosed = TileSet(List(we, we, dr, dr, dg, dg, b1, b1, b9, b9, c1, c1, s9, s9))
-    val givenDisclosed: List[Figure] = List()
+    val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(s9, SelfDrawn, false)
     val givenBonus: Bonus = Bonus(Nil)
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -202,7 +234,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), FullyConcealedHand)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 66)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 66)
   }
 
   test(
@@ -213,7 +245,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |             So single wait is scored or closed wait is scored, not both.
     """.stripMargin) {
     val givenClosed = TileSet(List(s3, s4, s5, b1, b2, b3, b4, b5, b6, b2, b2))
-    val givenDisclosed: List[Figure] = List(Chow(c5, c6, c7))
+    val givenMelded: List[Figure] = List(Chow(c5, c6, c7))
     val givenContextualTile: ContextualTile = ContextualTile(b2, Discarded, false)
     val givenBonus: Bonus = Bonus(List(fp, fo, ss, sw))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -228,7 +260,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
 
   }
 
@@ -240,7 +272,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |             So single wait is scored or edge wait is scored, not both.
     """.stripMargin) {
     val givenClosed = TileSet(List(s4, s5, s6, b1, b2, b3, b6, b7, b8, b3, b3))
-    val givenDisclosed: List[Figure] = List(Chow(c5, c6, c7))
+    val givenMelded: List[Figure] = List(Chow(c5, c6, c7))
     val givenContextualTile: ContextualTile = ContextualTile(b3, Discarded, false)
     val givenBonus: Bonus = Bonus(List(fp, fo, ss, sw))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -254,7 +286,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
 
   }
 
@@ -264,7 +296,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |tricky part: Dragon Pung implies Pung Of Terminal Or Honor but only on a different pung
     """.stripMargin) {
     val givenClosed = TileSet(List(c1, c2, c3, ww, ww, ws, ws, ww))
-    val givenDisclosed: List[Figure] = List(Pung(dr), Pung(b9))
+    val givenMelded: List[Figure] = List(Pung(dr), Pung(b9))
     val givenContextualTile: ContextualTile = ContextualTile(ww, Discarded, false)
     val givenBonus: Bonus = Bonus(List(sa))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -280,7 +312,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(sa))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
 
   }
 
@@ -290,7 +322,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |tricky part: Pung of Terminals or Honor is scored twice (Pung(c9) and Pung(ww))
     """.stripMargin) {
     val givenClosed = TileSet(List(c9, c9, c9, ww, ww, ww, b2, b2))
-    val givenDisclosed: List[Figure] = List(Pung(c8), Chow(b1, b2, b3))
+    val givenMelded: List[Figure] = List(Pung(c8), Chow(b1, b2, b3))
     val givenContextualTile: ContextualTile = ContextualTile(ww, Discarded, false)
     val givenBonus: Bonus = Bonus(Nil)
     val givenContext = PlayerContext(EastWind, EastWind)
@@ -303,7 +335,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(c8), Pung(c9), Chow(b1, b2, b3), Dui(b2)), OneVoidedSuit)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 3)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 3)
 
   }
 
@@ -312,7 +344,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |Note: Mahjong and Friends scored single wait here but I'm not agree because both c2 and c5 are waited
     """.stripMargin) {
     val givenClosed = TileSet(List(s6, s7, s8, c3, c4, c5, c2, c2))
-    val givenDisclosed: List[Figure] = List(Chow(b2, b3, b4), Chow(s4, s5, s6))
+    val givenMelded: List[Figure] = List(Chow(b2, b3, b4), Chow(s4, s5, s6))
     val givenContextualTile: ContextualTile = ContextualTile(c2, SelfDrawn, false)
     val givenBonus: Bonus = Bonus(List(fp, fo, fc))
     val givenContext = PlayerContext(EastWind, EastWind)
@@ -328,7 +360,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Bonus(List(fp, fo, fc))), FlowerTiles)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
 
   }
 
@@ -337,7 +369,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
     """.stripMargin) {
     val givenClosed = TileSet(List(s9, s9))
-    val givenDisclosed: List[Figure] = List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9))
+    val givenMelded: List[Figure] = List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9))
     val givenContextualTile: ContextualTile = ContextualTile(s9, Discarded, false)
     val givenBonus: Bonus = Bonus(Nil)
     val givenContext = PlayerContext(EastWind, EastWind)
@@ -352,14 +384,38 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), NoHonors)
       )
 
-    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
 
   }
 
+  test(
+    """use case :
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s3, s4, s5, s3, s3))
+    val givenMelded: List[Figure] = List(Kong(c5), Kong(dg), Kong(wn))
+    val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, false)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Chow(s3), Dui(s3))
+    val thenPoints = 36
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Kong(dg), Kong(wn), Kong(c5)), ThreeKongs),
+        (List(Kong(dg)), DragonPung),
+        (List(Kong(wn)), PungOfTerminalOrHonors),
+        (List(Kong(c5), Chow(s3), Dui(s3)), OneVoidedSuit)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
 
   private def test(
                     givenClosed: TileSet,
-                    givenDisclosed: List[Figure],
+                    givenMelded: List[Figure],
                     givenContextualTile: ContextualTile,
                     givenBonus: Bonus,
                     givenContext: PlayerContext,
@@ -369,15 +425,15 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     ) {
 
     val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
-      givenDisclosed.sorted(OrdFigure),
-      givenBonus)
+      givenMelded.sorted(OrdFigure),
+      bonus = givenBonus)
 
-    val actual = HuLeFinder(pts, givenContext).find
+    val actual = HuFinder(pts, givenContext).find
 
     val expected = List(
       DetailedPoints(
         HuLe(thenClosed.sorted(OrdFigure),
-          givenDisclosed.sorted(OrdFigure),
+          givenMelded.sorted(OrdFigure),
           givenContextualTile,
           givenContext,
           givenBonus),
@@ -386,7 +442,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         })
     )
 
-    assert(actual.size > 0, "Not a valid HuLe : " + pts)
+    assert(actual.size == 1, "Not a valid HuLe : " + pts)
     assert(actual(0).huLe === expected(0).huLe)
     assert(actual === expected)
     assert(actual(0).total === thenTotal)
@@ -395,14 +451,14 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   private def test(
                     givenClosed: TileSet,
-                    givenDisclosed: List[Figure],
+                    givenMelded: List[Figure],
                     givenContextualTile: ContextualTile,
                     givenContext: PlayerContext,
                     thenClosed: List[Figure],
                     thenCombinations: List[(List[Figure], Combination)],
                     thenTotal: Int
                     ) {
-    test(givenClosed, givenDisclosed, givenContextualTile, Bonus(Nil), givenContext, thenClosed, thenCombinations, thenTotal)
+    test(givenClosed, givenMelded, givenContextualTile, Bonus(Nil), givenContext, thenClosed, thenCombinations, thenTotal)
   }
 
 }

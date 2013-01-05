@@ -178,6 +178,9 @@ package object figures {
       knitted2.asInstanceOf[Knitted].fam147.order - knitted1.asInstanceOf[Knitted].fam147.order
   }
 
+  abstract case class PungLike(val tile: Tile) extends Figure {
+    override def asList = (0 until properties.size map (i => tile)).toList
+  }
 
   /**
    * In various card games, particulary poker, a ''kong'' is called ''four of a kind''
@@ -185,12 +188,14 @@ package object figures {
    * In neutral language that would be called ''four times the same tile''
    *
    * @param tile The tile four times
+   *
+   * @note Kong extends `PungLike` because a kong is mostly seen as pung.
+   *       The difference resides when counting points.
    */
-  case class Kong(tile: Tile) extends Figure {
+  case class Kong(override val tile: Tile) extends PungLike(tile) {
 
     val properties = KongProperties
 
-    override def asList = List(tile, tile, tile, tile)
   }
 
   // TODO centralize in companion
@@ -212,11 +217,10 @@ package object figures {
    *
    * @param tile The tile three times
    */
-  case class Pung(tile: Tile) extends Figure {
+  case class Pung(override val tile: Tile) extends PungLike(tile) {
 
     val properties = PungProperties
 
-    override def asList = List(tile, tile, tile)
   }
 
   // TODO centralize in companion
@@ -280,6 +284,12 @@ package object figures {
     val order = 50
 
     def compare(x: Figure, y: Figure) = OrdChow.compare(x.asInstanceOf[Chow], y.asInstanceOf[Chow])
+
+    def apply(t: Tile) = {
+      require(t.isStraight, "a chow can only be made of Straight Tiles")
+      require(t.value <= 7, "last tile of a chow must be lesser than 9")
+      new Chow(t, Tile(t.family, t.value + 1), Tile(t.family, t.value + 2))
+    }
 
   }
 

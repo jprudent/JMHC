@@ -162,8 +162,9 @@ case class Tile(family: Family, value: Int) {
   // a tile value should be between 1 and 9
   require(family.validValue(value))
 
+  lazy val isStraight = family.isInstanceOf[SuitFamily]
 
-  lazy val isTerminal = family.isInstanceOf[SuitFamily] && (value == 9 || value == 1)
+  lazy val isTerminal = isStraight && (value == 9 || value == 1)
 
   lazy val isHonor = family.isInstanceOf[HonorFamily]
 
@@ -427,7 +428,13 @@ object TileSet {
   //  }
 }
 
+/**
+ * This class will find all possibles set of figures that can be made with a set of tiles
+ *
+ * @param tileSet
+ */
 case class FiguresComputer(tileSet: TileSet) {
+
 
   /**
    * an ordered list of possible pungs

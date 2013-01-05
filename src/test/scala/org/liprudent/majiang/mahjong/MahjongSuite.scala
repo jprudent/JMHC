@@ -9,60 +9,90 @@ import org.liprudent.majiang.figures._
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.tiles.ContextualTile
-import org.liprudent.majiang.{HuLeFinder, UniqueWait}
+import org.liprudent.majiang.{HuFinder, UniqueWait}
 
 @RunWith(classOf[JUnitRunner])
 class MahjongSuite extends FunSuite {
 
   trait Hands {
-    val valid = PlayerTiles(Hand(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), ContextualTile(b1, SelfDrawn, false)), Nil)
-    val noMahjong = PlayerTiles(Hand(List(b1, b2, b4, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), ContextualTile(b1, SelfDrawn, false)), Nil)
-    val invalid = PlayerTiles(Hand(List(b2), ContextualTile(b2, SelfDrawn, false)), valid.disclosed)
-    val allChows_mixedTripleChow = PlayerTiles(Hand(List(b9, b7, b8, c7, c8, c9, s7, s8, s9, b1, b2, b3, dr, dr), ContextualTile(b1, SelfDrawn, false)), Nil)
+    val b1ContextualTile = ContextualTile(b1, SelfDrawn, false)
+
+    val valid = PlayerTiles(
+      Hand(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
+      Nil
+    )
+
+    val noMahjong = PlayerTiles(
+      Hand(List(b1, b2, b4, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
+      Nil
+    )
+
+    val invalid = PlayerTiles(
+      Hand(List(b1), b1ContextualTile),
+      valid.melded
+    )
+
+    val kongs = PlayerTiles(
+      Hand(List(b1, b1, b1, b2, b2), b1ContextualTile),
+      List(Kong(b9), Kong(wn)),
+      List(Kong(dg))
+    )
+
+    val allChows_mixedTripleChow = PlayerTiles(
+      Hand(List(b9, b7, b8, c7, c8, c9, s7, s8, s9, b1, b2, b3, dr, dr), b1ContextualTile),
+      Nil
+    )
+
     val knittedStraight = PlayerTiles(
       Hand(List(b1, b4, b7, c2, c5, c8, s3, s6, s9), ContextualTile(b1, SelfDrawn, false)),
       List(Pung(c8), Dui(ww))
     )
+
     val knittedStraightLesserDragon5 = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c3, c6, c9, ww, we, ws, wn, dr), ContextualTile(b1, Discarded, false)),
+      Hand(List(b1, b4, b7, s2, s5, s8, c3, c6, c9, ww, we, ws, wn, dr), b1ContextualTile),
       Nil
     )
+
     val knittedStraightLesserDragon6 = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c6, c9, ww, we, ws, wn, dr, dg), ContextualTile(b1, Discarded, false)),
+      Hand(List(b1, b4, b7, s2, s5, s8, c6, c9, ww, we, ws, wn, dr, dg), b1ContextualTile),
       Nil
     )
+
     val greaterHonorsAndKnittedTiles = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c9, ww, we, ws, wn, dr, dg, dw), ContextualTile(b1, Discarded, false)),
+      Hand(List(b1, b4, b7, s2, s5, s8, c9, ww, we, ws, wn, dr, dg, dw), b1ContextualTile),
       Nil
     )
+
     val thirteenOrphans = PlayerTiles(
-      Hand(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), ContextualTile(b1, Discarded, false)),
+      Hand(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), b1ContextualTile),
       Nil
     )
+
     val sevenPairs = PlayerTiles(
-      Hand(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), ContextualTile(b1, Discarded, false)),
+      Hand(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), b1ContextualTile),
       Nil
     )
   }
 
   test("a mahjong has 14 tiles") {
     new Hands {
-      assert(HuLeFinder(invalid, PlayerContext(WestWind, WestWind)).quickValid == false)
-      assert(HuLeFinder(valid, PlayerContext(WestWind, WestWind)).quickValid == true)
-      assert(HuLeFinder(noMahjong, PlayerContext(WestWind, WestWind)).quickValid == true)
+      assert(HuFinder(invalid, PlayerContext(WestWind, WestWind)).quickValid == false)
+      assert(HuFinder(valid, PlayerContext(WestWind, WestWind)).quickValid == true)
+      assert(HuFinder(noMahjong, PlayerContext(WestWind, WestWind)).quickValid == true)
+      assert(HuFinder(kongs, PlayerContext(WestWind, WestWind)).quickValid == true, "There are 17 tiles but it's still valid")
     }
   }
 
   test("an invalid hand has no mahjong") {
     new Hands {
-      val actual = HuLeFinder(invalid, PlayerContext(WestWind, WestWind)).find
+      val actual = HuFinder(invalid, PlayerContext(WestWind, WestWind)).find
       assert(actual == Nil, actual)
     }
   }
 
   test("if there is no mahjong ... well there is no mahjong") {
     new Hands {
-      val actual = HuLeFinder(noMahjong, PlayerContext(WestWind, WestWind)).find
+      val actual = HuFinder(noMahjong, PlayerContext(WestWind, WestWind)).find
       assert(actual == Nil, actual)
     }
   }
@@ -73,12 +103,12 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder knitted straight lesser dragon (5): b1b4b7s2s5s8c3c6c9wwwewswndr") {
     new Hands {
-      val actual = HuLeFinder(knittedStraightLesserDragon5, PlayerContext(WestWind, WestWind)).find
+      val actual = HuFinder(knittedStraightLesserDragon5, PlayerContext(WestWind, WestWind)).find
       val expected = List(
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))),
             Nil,
-            ContextualTile(b1, Discarded, false),
+            b1ContextualTile,
             PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))), LesserHonorsAndKnittedTiles)
@@ -91,13 +121,13 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder knitted straight lesser dragon (6): b1b4b7s2s5s8c3c6c9wwwewswndr") {
     new Hands {
-      val actual = HuLeFinder(knittedStraightLesserDragon6, PlayerContext(WestWind, WestWind)).find
+      val actual = HuFinder(knittedStraightLesserDragon6, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))),
             Nil,
-            ContextualTile(b1, Discarded, false),
+            b1ContextualTile,
             PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))), LesserHonorsAndKnittedTiles)
@@ -110,13 +140,13 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder greater honors and knitted tiles") {
     new Hands {
-      val actual = HuLeFinder(greaterHonorsAndKnittedTiles, PlayerContext(WestWind, WestWind)).find
+      val actual = HuFinder(greaterHonorsAndKnittedTiles, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))),
             Nil,
-            ContextualTile(b1, Discarded, false),
+            b1ContextualTile,
             PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))), GreaterHonorsAndKnittedTiles)
@@ -129,13 +159,13 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder 13 orphans") {
     new Hands {
-      val actual = HuLeFinder(thirteenOrphans, PlayerContext(WestWind, WestWind)).find
+      val actual = HuFinder(thirteenOrphans, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(ThirteenOrphans(dr)),
             Nil,
-            ContextualTile(b1, Discarded, false),
+            b1ContextualTile,
             PlayerContext(WestWind, WestWind)),
           List(
             (List(ThirteenOrphans(dr)), ThirteenOrphansComb)
@@ -148,13 +178,13 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder 7 pairs") {
     new Hands {
-      val actual = HuLeFinder(sevenPairs, PlayerContext(WestWind, WestWind)).find
+      val actual = HuFinder(sevenPairs, PlayerContext(WestWind, WestWind)).find
 
       val expected = List(
         DetailedPoints(
           HuLe(List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)),
             Nil,
-            ContextualTile(b1, Discarded, false),
+            b1ContextualTile,
             PlayerContext(WestWind, WestWind)),
           List(
             (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)), SevenPairs),
@@ -169,7 +199,7 @@ class MahjongSuite extends FunSuite {
   test("isWellFormedMahjong") {
     new Hands {
       val validFigures = List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(dr))
-      assert(HuLeFinder.isWellFormedMahjong(validFigures, Nil))
+      assert(HuFinder.isWellFormedMahjong(validFigures, Nil))
     }
   }
 

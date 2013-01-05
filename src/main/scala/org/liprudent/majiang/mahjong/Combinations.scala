@@ -120,7 +120,7 @@ sealed trait WaitCombination extends Combination {
     if (m.lastTileContext.origin != Discarded) EmptyResult
     else {
       val tilesBeforeWinning: TileSet = TileSet(m.allClosedTiles).removed(m.lastTileContext.tile)
-      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.disclosed)
+      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.melded)
 
       waitingTiles match {
 
@@ -237,9 +237,10 @@ object PungOfTerminalOrHonors extends Combination {
 
 
   def find(m: HuLe): Result = {
-    val allPungsOfTerminalsOrWind = m.allPungs.filter {
-      case Pung(Tile(family, value)) if value == 1 || value == 9 || family.isInstanceOf[WindFamily] => true
-      case _ => false
+
+    def cond(tile: Tile) = tile.value == 1 || tile.value == 9 || tile.family.isInstanceOf[WindFamily]
+    val allPungsOfTerminalsOrWind = m.allPungsLike.filter {
+      pl => cond(pl.tile)
     }
 
     //each pung is scored
@@ -346,7 +347,7 @@ object SeatWind extends Combination {
   override val implied = List(PungOfTerminalOrHonors)
 
   def find(m: HuLe): Result =
-    m.allPungs.find(_.tile.family == m.context.seatWind) match {
+    m.allPungsLike.find(_.tile.family == m.context.seatWind) match {
       case None => EmptyResult
       case Some(pung) => Result(pung)
     }
@@ -381,13 +382,13 @@ object FullyConcealedHand extends Combination {
   val id = 56
   val points = 4
   val name = "Fully Concealed Hand"
-  val description = "Nothing disclosed, finish on self drawn"
+  val description = "Nothing melded, finish on self drawn"
 
 
   override val implied = List(SelfDrawnComb)
 
   def find(m: HuLe): Result =
-    m.lastTileContext.origin == SelfDrawn && m.disclosed.size == 0
+    m.lastTileContext.origin == SelfDrawn && m.melded.size == 0
     match {
       case true => Result(m.allFigures)
       case false => EmptyResult
@@ -427,7 +428,7 @@ object MeldedHand extends Combination {
 
 
   def find(m: HuLe): Result = {
-    val cond = m.allFigures.size == 5 && m.disclosed.size == 4 && m.lastTileContext.origin != SelfDrawn
+    val cond = m.allFigures.size == 5 && m.melded.size == 4 && m.lastTileContext.origin != SelfDrawn
     if (cond)
       Result(m.allFigures)
     else
@@ -623,6 +624,20 @@ object AllTerminalsAndHonors extends Combination {
   }
 }
 
+object ThreeKongs extends Combination {
+  val id = 17
+  val points = 32
+  val name = "Three Kongs"
+  val description = "Three Kongs"
+
+  def find(m: HuLe): Result = {
+    m.allKongs.size == 3 match {
+      case true => Result(m.allKongs)
+      case false => EmptyResult
+    }
+  }
+
+}
 
 object ThirteenOrphansComb extends Combination {
   val id = 7
