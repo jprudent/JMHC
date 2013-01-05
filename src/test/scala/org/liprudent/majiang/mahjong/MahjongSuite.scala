@@ -15,32 +15,32 @@ import org.liprudent.majiang.{HuLeFinder, UniqueWait}
 class MahjongSuite extends FunSuite {
 
   trait Hands {
-    val valid = PlayerTiles(Hand(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), ContextualTile(b1, SelfDrawn)), Nil)
-    val noMahjong = PlayerTiles(Hand(List(b1, b2, b4, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), ContextualTile(b1, SelfDrawn)), Nil)
-    val invalid = PlayerTiles(Hand(List(b2), ContextualTile(b2, SelfDrawn)), valid.disclosed)
-    val allChows_mixedTripleChow = PlayerTiles(Hand(List(b9, b7, b8, c7, c8, c9, s7, s8, s9, b1, b2, b3, dr, dr), ContextualTile(b1, SelfDrawn)), Nil)
+    val valid = PlayerTiles(Hand(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), ContextualTile(b1, SelfDrawn, false)), Nil)
+    val noMahjong = PlayerTiles(Hand(List(b1, b2, b4, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), ContextualTile(b1, SelfDrawn, false)), Nil)
+    val invalid = PlayerTiles(Hand(List(b2), ContextualTile(b2, SelfDrawn, false)), valid.disclosed)
+    val allChows_mixedTripleChow = PlayerTiles(Hand(List(b9, b7, b8, c7, c8, c9, s7, s8, s9, b1, b2, b3, dr, dr), ContextualTile(b1, SelfDrawn, false)), Nil)
     val knittedStraight = PlayerTiles(
-      Hand(List(b1, b4, b7, c2, c5, c8, s3, s6, s9), ContextualTile(b1, SelfDrawn)),
+      Hand(List(b1, b4, b7, c2, c5, c8, s3, s6, s9), ContextualTile(b1, SelfDrawn, false)),
       List(Pung(c8), Dui(ww))
     )
     val knittedStraightLesserDragon5 = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c3, c6, c9, ww, we, ws, wn, dr), ContextualTile(b1, Discarded)),
+      Hand(List(b1, b4, b7, s2, s5, s8, c3, c6, c9, ww, we, ws, wn, dr), ContextualTile(b1, Discarded, false)),
       Nil
     )
     val knittedStraightLesserDragon6 = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c6, c9, ww, we, ws, wn, dr, dg), ContextualTile(b1, Discarded)),
+      Hand(List(b1, b4, b7, s2, s5, s8, c6, c9, ww, we, ws, wn, dr, dg), ContextualTile(b1, Discarded, false)),
       Nil
     )
     val greaterHonorsAndKnittedTiles = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c9, ww, we, ws, wn, dr, dg, dw), ContextualTile(b1, Discarded)),
+      Hand(List(b1, b4, b7, s2, s5, s8, c9, ww, we, ws, wn, dr, dg, dw), ContextualTile(b1, Discarded, false)),
       Nil
     )
     val thirteenOrphans = PlayerTiles(
-      Hand(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), ContextualTile(b1, Discarded)),
+      Hand(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), ContextualTile(b1, Discarded, false)),
       Nil
     )
     val sevenPairs = PlayerTiles(
-      Hand(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), ContextualTile(b1, Discarded)),
+      Hand(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), ContextualTile(b1, Discarded, false)),
       Nil
     )
   }
@@ -78,7 +78,7 @@ class MahjongSuite extends FunSuite {
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))),
             Nil,
-            ContextualTile(b1, Discarded),
+            ContextualTile(b1, Discarded, false),
             PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))), LesserHonorsAndKnittedTiles)
@@ -97,7 +97,7 @@ class MahjongSuite extends FunSuite {
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))),
             Nil,
-            ContextualTile(b1, Discarded),
+            ContextualTile(b1, Discarded, false),
             PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))), LesserHonorsAndKnittedTiles)
@@ -116,7 +116,7 @@ class MahjongSuite extends FunSuite {
         DetailedPoints(
           HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))),
             Nil,
-            ContextualTile(b1, Discarded),
+            ContextualTile(b1, Discarded, false),
             PlayerContext(WestWind, WestWind)),
           List(
             (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))), GreaterHonorsAndKnittedTiles)
@@ -135,7 +135,7 @@ class MahjongSuite extends FunSuite {
         DetailedPoints(
           HuLe(List(ThirteenOrphans(dr)),
             Nil,
-            ContextualTile(b1, Discarded),
+            ContextualTile(b1, Discarded, false),
             PlayerContext(WestWind, WestWind)),
           List(
             (List(ThirteenOrphans(dr)), ThirteenOrphansComb)
@@ -154,7 +154,7 @@ class MahjongSuite extends FunSuite {
         DetailedPoints(
           HuLe(List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)),
             Nil,
-            ContextualTile(b1, Discarded),
+            ContextualTile(b1, Discarded, false),
             PlayerContext(WestWind, WestWind)),
           List(
             (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)), SevenPairs),

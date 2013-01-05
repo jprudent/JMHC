@@ -169,6 +169,8 @@ case class Tile(family: Family, value: Int) {
 
   lazy val isTerminalOrHonor = isTerminal || isHonor
 
+  lazy val isBonus = family.isInstanceOf[BonusFamily]
+
   /**
    * return true if family is same
    */
@@ -270,7 +272,7 @@ case object Discarded extends TileOrigin
 
 case object KongStole extends TileOrigin
 
-case class ContextualTile(tile: Tile, origin: TileOrigin)
+case class ContextualTile(tile: Tile, origin: TileOrigin, isLastTile: Boolean)
 
 ///////////////////////////////////////////////////////////////////////
 // HAND DEFINITIONS
@@ -303,6 +305,8 @@ object OrdListTileOccurence extends Ordering[List[TileOccurence]] {
  * Methods are provided to add and remove tiles
  * @param tocs The list of tiles this class handles
  */
+//TODO tocs is a way of representing tiles internally in TileSet. So this implementation detail should be masked from API
+//TODO action => tocs should be private
 case class TileSet(tocs: List[TileOccurence]) {
 
   require(tocs.forall {

@@ -9,10 +9,25 @@ package object figures {
   type Suit = List[Tile]
 
   sealed trait FigureProperties {
+
+    type FigureType <: Figure
+
+    //number of tiles in this figure
     val size: Int
+
+    //ordering
+    val order: Int
+
+    def compare(x: Figure, y: Figure): Int
+
   }
 
+  /**
+   * A figure is a '''representation''' of a valid tile arrangement.
+   */
   sealed trait Figure {
+
+    //TODO properties is an invariant, have to find a "trick" to express that
     val properties: FigureProperties
 
     //TODO rename asListOfTiles or toTiles
@@ -20,61 +35,215 @@ package object figures {
 
   }
 
+  /**
+   * An ordering implementation where `List[Figure]` is ordered this way:
+   * $ -[[org.liprudent.majiang.figures.ThirteenOrphans]]
+   * $ -[[org.liprudent.majiang.figures.SomeKnittedWithSomeDragons]]
+   * $ -[[org.liprudent.majiang.figures.Knitted]]
+   * $ -[[org.liprudent.majiang.figures.Kong]]
+   * $ -[[org.liprudent.majiang.figures.Pung]]
+   * $ -[[org.liprudent.majiang.figures.Chow]]
+   * $ -[[org.liprudent.majiang.figures.Dui]]
+   * $ -[[org.liprudent.majiang.figures.Bonus]]
+   * $ -[[org.liprudent.majiang.figures.SingleTile]]
+   *
+   * @note This actual responsability is holded by figures themself throught the property `order`
+   */
   implicit object OrdFigure extends Ordering[Figure] {
-    //result is reversed so the ordering is from greater to lesser
-    override def compare(x: Figure, y: Figure): Int = {
-      x match {
-        case x: ThirteenOrphans => y match {
-          case y: ThirteenOrphans => ThirteenOrphansProperties.compare(x, y)
-          case _ => -1
-        }
 
-        case x: SomeKnittedWithSomeDragons => y match {
-          case y: ThirteenOrphans => 1
-          case y: SomeKnittedWithSomeDragons => SomeKnittedWithSomeDragonsProperties.compare(x, y)
-          case _ => -1
-        }
+    override def compare(f1: Figure, f2: Figure): Int = {
 
-        case x: Knitted => y match {
-          case y: ThirteenOrphans => 1
-          case y: SomeKnittedWithSomeDragons => 1
-          case y: Knitted => KnittedProperties.compare(x, y)
-          case _ => -1
-        }
-        case x: Pung => y match {
-          case y: ThirteenOrphans => 1
-          case y: SomeKnittedWithSomeDragons => 1
-          case y: Knitted => 1
-          case y: Pung => PungProperties.compare(x, y)
-          case _ => -1
-        }
-        case x: Chow => y match {
-          case y: ThirteenOrphans => 1
-          case y: SomeKnittedWithSomeDragons => 1
-          case y: Knitted => 1
-          case y: Pung => 1
-          case y: Chow => OrdChow.compare(x, y)
-          case _ => -1
-        }
-        case x: Dui => y match {
-          case y: ThirteenOrphans => 1
-          case y: SomeKnittedWithSomeDragons => 1
-          case y: Knitted => 1
-          case y: Pung => 1
-          case y: Chow => 1
-          case y: Dui => DuiProperties.compare(x, y)
-          case _ => -1
+      val diff = f1.properties.order - f2.properties.order
 
-        }
-        case x: Bonus => y match {
-          case y: Bonus => OrdBonus.compare(x, y)
-          case _ => 1
-        }
+      diff match {
+        case 0 => f1.properties.compare(f1, f2)
+        case n => n
       }
+
     }
   }
 
 
+  /**
+   * Thirteen orphans is a special figure of 14 tiles matching this exact pattern:
+   * b1,b9,c1,c9,s1,s9,we,wn,ww,ws,dr,dg,dw + another one of these
+   *
+   * @param extraTile is the extra tile to form a pair. Must be terminal or honor.
+   */
+  case class ThirteenOrphans(extraTile: Tile) extends Figure {
+
+    require(extraTile.isTerminalOrHonor)
+
+    val properties = ThirteenOrphansProperties
+
+    override def asList = (extraTile :: properties.fixedTiles).sorted
+  }
+
+  // TODO centralize in companion
+  object ThirteenOrphansProperties extends FigureProperties {
+
+    val size = 14
+
+    val order = 0
+
+    def compare(x: Figure, y: Figure) =
+      Tile.ord.compare(x.asInstanceOf[ThirteenOrphans].extraTile, y.asInstanceOf[ThirteenOrphans].extraTile)
+
+    val fixedTiles = List(
+      Tile.b1, Tile.b9,
+      Tile.c1, Tile.c9,
+      Tile.s1, Tile.s9,
+      Tile.we, Tile.wn, Tile.ww, Tile.ws,
+      Tile.dr, Tile.dg, Tile.dw).sorted
+  }
+
+
+  /**
+   * Special figure of 14 tiles matching complete or partial knitted tiles with distinct honors.
+   *
+   * @param knitted The complete or partial knitted tiles. Must be straight tiles
+   * @param honors The list of distincts honors.
+   * @see org.liprudent.majiang.figures.Knitted
+   *
+   */
+  case class SomeKnittedWithSomeDragons(knitted: List[Tile], honors: List[Tile]) extends Figure {
+
+    require(knitted.size + honors.size == 14, "must be 14 tiles")
+
+    require(knitted.forall(!_.isHonor), "wrong kind of tiles for knitted tiles")
+    require(knitted == knitted.sorted, "sorted required for knitted tiles")
+    require(TileSet(knitted).tocs.size == knitted.size, "no pair, no pung allowed in knitted tiles")
+
+    require(honors.forall(_.isHonor), "wrong kind of tiles for honors")
+    require(honors == honors.sorted, "sorted required for honors")
+    require(TileSet(honors).tocs.size == honors.size, "no pair, no pung allowed in honors")
+
+    val properties = SomeKnittedWithSomeDragonsProperties
+
+    lazy val groupedKnitted: List[List[Tile]] = knitted.groupBy(_.family).values.toList
+
+    override def asList = honors ::: knitted
+
+  }
+
+  // TODO centralize in companion
+  object SomeKnittedWithSomeDragonsProperties extends FigureProperties {
+
+    val size = 14
+
+    val order = 10
+
+    def compare(x: Figure, y: Figure) =
+    // the more dragons you have, the strongest you are
+      x.asInstanceOf[SomeKnittedWithSomeDragons].honors.size - y.asInstanceOf[SomeKnittedWithSomeDragons].honors.size
+  }
+
+
+  /**
+   * Knitted tiles is a special figure of 9 tiles matching the pattern:<br>
+   * 1, 4, 7 in family one<br>
+   * 2, 5, 8 in family two<br>
+   * 3, 6, 9 in family three<br>
+   * For instance : b1, c2, s3, b4, c5, s6, b7, c8, s9
+   *
+   * @param fam147 Family of 1, 4, 7
+   * @param fam258 Family of 2, 5, 8
+   * @param fam369 Family of 3, 6, 9
+   */
+  case class Knitted(fam147: SuitFamily, fam258: SuitFamily, fam369: SuitFamily) extends Figure {
+
+    require(fam147 != fam258 && fam147 != fam369 && fam258 != fam369)
+
+    val properties = KnittedProperties
+
+    override def asList = List(
+      Tile(fam147, 1),
+      Tile(fam147, 4),
+      Tile(fam147, 7),
+      Tile(fam258, 2),
+      Tile(fam258, 5),
+      Tile(fam258, 8),
+      Tile(fam369, 3),
+      Tile(fam369, 6),
+      Tile(fam369, 9)
+    )
+  }
+
+  // TODO centralize in companion
+  object KnittedProperties extends FigureProperties {
+
+    val size = 9
+
+    val order = 20
+
+    def compare(knitted1: Figure, knitted2: Figure) =
+      knitted2.asInstanceOf[Knitted].fam147.order - knitted1.asInstanceOf[Knitted].fam147.order
+  }
+
+
+  /**
+   * In various card games, particulary poker, a ''kong'' is called ''four of a kind''
+   *
+   * In neutral language that would be called ''four times the same tile''
+   *
+   * @param tile The tile four times
+   */
+  case class Kong(tile: Tile) extends Figure {
+
+    val properties = KongProperties
+
+    override def asList = List(tile, tile, tile, tile)
+  }
+
+  // TODO centralize in companion
+  object KongProperties extends FigureProperties {
+
+    val size = 4
+
+    val order = 30
+
+    def compare(kong1: Figure, kong2: Figure) =
+      Tile.ord.compare(kong1.asInstanceOf[Kong].tile, kong2.asInstanceOf[Kong].tile)
+  }
+
+
+  /**
+   * In various card games, particulary poker, a ''pung'' is called ''three of a kind''
+   *
+   * In neutral language that would be called ''three times the same tile''
+   *
+   * @param tile The tile three times
+   */
+  case class Pung(tile: Tile) extends Figure {
+
+    val properties = PungProperties
+
+    override def asList = List(tile, tile, tile)
+  }
+
+  // TODO centralize in companion
+  object PungProperties extends FigureProperties {
+
+    val size = 3
+
+    val order = 40
+
+    def compare(pung1: Figure, pung2: Figure) =
+      Tile.ord.compare(pung1.asInstanceOf[Pung].tile, pung2.asInstanceOf[Pung].tile)
+  }
+
+
+  /**
+   * A Chow is a straight of 3 consecutive tiles of the same family.
+   *
+   * For example: b1,b2,b3
+   *
+   * @param t1 First tile of the straight
+   * @param t2 Second tile of the straight
+   * @param t3 Third tile of the straight
+   *
+   * @todo simplify construction with the first tile only. Other tiles can be implied.
+   */
   case class Chow(t1: Tile, t2: Tile, t3: Tile) extends Figure {
 
     require(t1.previousOf(t2) && t2.previousOf(t3))
@@ -98,137 +267,93 @@ package object figures {
       t1.sameFamily(y.t1)
   }
 
+
+  //TODO centralize in the companion object
   object OrdChow extends Ordering[Chow] {
+
     override def compare(chow1: Chow, chow2: Chow) = Tile.ord.compare(chow1.t1, chow2.t1)
+
   }
 
   object Chow extends FigureProperties {
+
     val size = 3
 
+    val order = 50
+
+    def compare(x: Figure, y: Figure) = OrdChow.compare(x.asInstanceOf[Chow], y.asInstanceOf[Chow])
+
   }
 
 
-  case class Dui(t: Tile) extends Figure {
+  /**
+   * Dui means Pair in Mandarin Chinese.
+   * In neutral language, we would say ''two times the same card''
+   *
+   * @param tile the tile two times
+   *
+   * @note Why I didn't call this class Pair ? Since Pair is also a classname in scala library, I had to find a new
+   *       name to avoid qualifying classname.
+   */
+  case class Dui(tile: Tile) extends Figure {
+
     val properties = DuiProperties
 
-    override def asList = List(t, t)
+    override def asList = List(tile, tile)
+
   }
 
-
-  object DuiProperties extends Ordering[Dui] with FigureProperties {
+  // TODO centralize in companion
+  object DuiProperties extends FigureProperties {
 
     val size = 2
 
-    def compare(dui1: Dui, dui2: Dui) = Tile.ord.compare(dui1.t, dui2.t)
+    val order = 60
+
+    def compare(dui1: Figure, dui2: Figure) =
+      Tile.ord.compare(dui1.asInstanceOf[Dui].tile, dui2.asInstanceOf[Dui].tile)
 
   }
 
-
-  case class Pung(t: Tile) extends Figure {
-    val properties = PungProperties
-
-    override def asList = List(t, t, t)
-  }
-
-
-  object PungProperties extends Ordering[Pung] with FigureProperties {
-
-    val size = 3
-
-    def compare(pung1: Pung, pung2: Pung) = Tile.ord.compare(pung1.t, pung2.t)
-  }
-
-  case class Knitted(fam147: SuitFamily, fam258: SuitFamily, fam369: SuitFamily) extends Figure {
-
-    require(fam147 != fam258 && fam147 != fam369 && fam258 != fam369)
-
-    val properties = KnittedProperties
-
-    override def asList = List(
-      Tile(fam147, 1),
-      Tile(fam147, 4),
-      Tile(fam147, 7),
-      Tile(fam258, 2),
-      Tile(fam258, 5),
-      Tile(fam258, 8),
-      Tile(fam369, 3),
-      Tile(fam369, 6),
-      Tile(fam369, 9)
-    )
-  }
-
-  object KnittedProperties extends Ordering[Knitted] with FigureProperties {
-
-    val size = 9
-
-    def compare(knitted1: Knitted, knitted2: Knitted) =
-      knitted2.fam147.order - knitted1.fam147.order
-  }
-
-  case class SomeKnittedWithSomeDragons(knitted: List[Tile], dragons: List[Tile]) extends Figure {
-
-    require(knitted.forall(_.family.isInstanceOf[SuitFamily]), "wrong kind")
-    require(dragons.forall(!_.family.isInstanceOf[SuitFamily]), "wrong kind")
-    require(knitted == knitted.sorted, "sorted required")
-    require(dragons == dragons.sorted, "sorted required")
-    require(TileSet(knitted).tocs.size == knitted.size, "no pair, no pung allowed")
-    require(TileSet(dragons).tocs.size == dragons.size, "no pair, no pung allowed")
-
-    val properties = SomeKnittedWithSomeDragonsProperties
-
-    lazy val groupedKnitted: List[List[Tile]] = knitted.groupBy(_.family).values.toList
-
-    override def asList = dragons ::: knitted
-
-  }
-
-  object SomeKnittedWithSomeDragonsProperties extends Ordering[SomeKnittedWithSomeDragons] with FigureProperties {
-
-    val size = 14
-
-    def compare(x: SomeKnittedWithSomeDragons, y: SomeKnittedWithSomeDragons) =
-    // the more dragons you have, the strongest you are
-      x.dragons.size - y.dragons.size
-  }
-
-  case class ThirteenOrphans(extraDragon: Tile) extends Figure {
-
-    assert(extraDragon.family.isInstanceOf[HonorFamily])
-
-    val properties = ThirteenOrphansProperties
-
-    override def asList = (extraDragon :: properties.fixedTiles).sorted
-  }
-
-  object ThirteenOrphansProperties extends Ordering[ThirteenOrphans] with FigureProperties {
-
-    val size = 14
-
-    override def compare(x: ThirteenOrphans, y: ThirteenOrphans) =
-      Tile.ord.compare(x.extraDragon, y.extraDragon)
-
-    val fixedTiles = List(
-      Tile.b1, Tile.b9,
-      Tile.c1, Tile.c9,
-      Tile.s1, Tile.s9,
-      Tile.we, Tile.wn, Tile.ww, Tile.ws,
-      Tile.dr, Tile.dg, Tile.dw).sorted
-  }
-
+  /**
+   * Bonus is a set of bonus tiles (flowers and seasons).
+   *
+   * @param bonus List of flowers and seasons
+   *
+   * @see [[org.liprudent.majiang.tiles.BonusFamily]]
+   */
   case class Bonus(bonus: List[Tile]) extends Figure {
 
-    require(bonus.forall(_.family.isInstanceOf[BonusFamily]))
-    require(bonus == bonus.sorted)
+    require(bonus.forall(_.isBonus), "Only bonus tiles are accepted")
+    require(bonus == bonus.sorted, "Tiles should be sorted")
 
+    // TODO centralize in companion
     val properties = new FigureProperties {
       val size: Int = bonus.size
+      val order = 70
+
+      override def compare(x: Figure, y: Figure) =
+        x.asInstanceOf[Bonus].bonus.size - y.asInstanceOf[Bonus].bonus.size
     }
 
     override def asList = bonus
+
   }
 
-  object OrdBonus extends Ordering[Bonus] {
-    override def compare(x: Bonus, y: Bonus) = x.bonus.size - y.bonus.size
+  //TODO this is used to hold the result of LastTile combination
+  //TODO the proper way to implement it is to create 2 bounded contexts:
+  //TODO one for input and result of mahjong hand finder
+  //TODO another for point computer results
+  case class SingleTile(t: Tile) extends Figure {
+    val properties = new FigureProperties {
+      val size: Int = 1
+      val order = 80
+
+      def compare(x: Figure, y: Figure) =
+        Tile.ord.compare(x.asInstanceOf[SingleTile].t, y.asInstanceOf[SingleTile].t)
+    }
+
+    override def asList = List(t)
   }
 
 }

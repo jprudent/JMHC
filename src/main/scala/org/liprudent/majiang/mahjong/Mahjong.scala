@@ -64,7 +64,7 @@ package object mahjong {
     lazy val allClosedStraightFamilyFigures: List[Figure] =
       allFigures.filter(_.asList.forall(_.family.isInstanceOf[SuitFamily]))
 
-    lazy val allDragonPungs: List[Pung] = allPungs.filter(_.t.family.isInstanceOf[DragonFamily])
+    lazy val allDragonPungs: List[Pung] = allPungs.filter(_.tile.family.isInstanceOf[DragonFamily])
 
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
     lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten

@@ -346,7 +346,7 @@ object SeatWind extends Combination {
   override val implied = List(PungOfTerminalOrHonors)
 
   def find(m: HuLe): Result =
-    m.allPungs.find(_.t.family == m.context.seatWind) match {
+    m.allPungs.find(_.tile.family == m.context.seatWind) match {
       case None => EmptyResult
       case Some(pung) => Result(pung)
     }
@@ -362,6 +362,18 @@ object DragonPung extends Combination {
   def find(m: HuLe): Result =
   // all dragon pung is scored
     Result(m.allDragonPungs.map(List(_)))
+}
+
+object LastTile extends Combination {
+  val id = 58
+  val points = 4
+  val name = "Last Tile"
+  val description = "Finish with the fourth tile when all other three are visible"
+
+
+  def find(m: HuLe): Result =
+    if (m.lastTileContext.isLastTile) Result(SingleTile(m.lastTileContext.tile))
+    else EmptyResult
 }
 
 
@@ -568,7 +580,7 @@ object GreaterHonorsAndKnittedTiles extends Combination {
 
   def find(m: HuLe): Result = {
     val allKnittedWith7Dragons = m.closed.filter(figure =>
-      figure.isInstanceOf[SomeKnittedWithSomeDragons] && figure.asInstanceOf[SomeKnittedWithSomeDragons].dragons.size == 7
+      figure.isInstanceOf[SomeKnittedWithSomeDragons] && figure.asInstanceOf[SomeKnittedWithSomeDragons].honors.size == 7
     )
     Result(allKnittedWith7Dragons)
   }
