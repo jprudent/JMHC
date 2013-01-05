@@ -1,9 +1,6 @@
 package org.liprudent.majiang.mahjong
 
 import org.liprudent.majiang.tiles._
-import org.scalatest.FunSuite
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import Tile._
 import org.liprudent.majiang.figures._
 import org.liprudent.majiang.HuLeFinder
@@ -11,6 +8,9 @@ import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Bonus
 import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.tiles.ContextualTile
+import org.junit.runner.RunWith
+import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class MahjongFriendUseCaseSuite extends FunSuite {
@@ -307,6 +307,53 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """|verif : Mahjong Friends
+      |Note: Mahjong and Friends scored single wait here but I'm not agree because both c2 and c5 are waited
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s6, s7, s8, c3, c4, c5, c2, c2))
+    val givenDisclosed: List[Figure] = List(Chow(b2, b3, b4), Chow(s4, s5, s6))
+    val givenContextualTile: ContextualTile = ContextualTile(c2, SelfDrawn)
+    val givenBonus: Bonus = Bonus(List(fp, fo, fc))
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Chow(c3, c4, c5), Chow(s6, s7, s8), Dui(c2))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6)), MixedShiftedChow),
+        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8)), AllChows),
+        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8), Dui(c2)), AllSimples),
+        //(List(Dui(c2)), SingleWait),
+        (List(Dui(c2)), SelfDrawnComb),
+        (List(Bonus(List(fp, fo, fc))), FlowerTiles)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
+
+  }
+
+  test(
+    """|verif : Mahjong Friends
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s9, s9))
+    val givenDisclosed: List[Figure] = List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9))
+    val givenContextualTile: ContextualTile = ContextualTile(s9, Discarded)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(s9))
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), MeldedHand),
+        (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), OutsideHand),
+        (List(Chow(b1, b2, b3), Chow(b1, b2, b3)), PureDoubleChows),
+        (List(Pung(s1)), PungOfTerminalOrHonors),
+        (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), NoHonors)
+      )
+
+    test(givenClosed, givenDisclosed, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
+
+  }
 
   private def test(
                     givenClosed: TileSet,

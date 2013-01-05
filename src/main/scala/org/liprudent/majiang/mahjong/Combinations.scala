@@ -190,6 +190,20 @@ object EdgeWait extends Combination with WaitCombination {
 
 }
 
+object NoHonors extends Combination {
+  val id = 78
+  val points = 1
+  val name = "No Honors"
+  val description = "No dragons nor winds"
+
+  def find(m: HuLe): Result = {
+    if (m.allTiles.exists(_.isHonor)) EmptyResult
+    else Result(m.allFigures)
+  }
+
+}
+
+
 object OneVoidedSuit extends Combination {
   val id = 75
   val points = 1
@@ -262,17 +276,50 @@ object MixedDoubleChows extends Combination {
 
 
   def find(m: HuLe): Result = {
-    println(m.allChows)
     val allMixedChows: List[Figures] =
       for {chow1 <- m.allChows
-           chow2 <- m.allChows if OrdChow.compare(chow1, chow2) <= -1 && chow1.hasSameValues(chow2)
-      } yield (List(chow1, chow2))
+           chow2 <- m.allChows if chow1 != chow2 && chow1.hasSameValues(chow2)
+      } yield (List(chow1, chow2).sorted(OrdChow))
 
     //all mixed double chow is scored
-    Result(allMixedChows)
+    Result(allMixedChows.toSet.toList)
   }
 
 }
+
+object PureDoubleChows extends Combination {
+  val id = 69
+  val points = 1
+  val name = "Pure Double Chows"
+  val description = "Two identical chows in the same family"
+
+
+  def find(m: HuLe): Result = {
+    val allPureChows: List[Figures] =
+      for {chow1 <- m.allChows if m.allChows.count(_ == chow1) == 2
+      } yield (List(chow1, chow1).sorted(OrdChow))
+
+    //all pure double chow is scored
+    Result(allPureChows.toSet.toList)
+  }
+
+}
+
+object AllSimples extends Combination {
+  val id = 68
+  val points = 2
+  val name = "All Simples"
+  val description = "Only 2, 3, 4, 5, 6, 7, 8"
+
+  override val excluded = List(NoHonors)
+
+  def find(m: HuLe): Result =
+    if (m.allTiles.exists(_.isTerminalOrHonor))
+      EmptyResult
+    else
+      Result(m.allFigures)
+}
+
 
 object AllChows extends Combination {
   val id = 63
@@ -280,6 +327,7 @@ object AllChows extends Combination {
   val name = "All Chows"
   val description = "All Chows but one Pair"
 
+  override val excluded = List(NoHonors)
 
   def find(m: HuLe): Result =
     if (m.allDuis.size == 1 && m.allChows.size == 4)
@@ -340,6 +388,7 @@ object OutsideHand extends Combination {
   val name = "Outside Hand"
   val description = "At least 1 honor or 1 terminal in each figure"
 
+  override val excluded = List(SingleWait)
 
   def find(m: HuLe): Result = {
 
@@ -411,8 +460,8 @@ object MixedShiftedChow extends Combination {
 
   def find(m: HuLe): Result = {
     val allShiftedChows = for {chow1 <- m.allChows
-                               chow2 <- m.allChows if  chow2.t1.value == chow1.t1.value + 1 && chow2.t1.family != chow1.t1.family
-                               chow3 <- m.allChows if  chow3.t1.value == chow2.t1.value + 1 && chow3.t1.family != chow1.t2.family && chow3.t1.family != chow1.t1.family
+                               chow2 <- m.allChows if chow2.t1.value == chow1.t1.value + 1 && chow2.t1.family != chow1.t1.family
+                               chow3 <- m.allChows if chow3.t1.value == chow2.t1.value + 1 && chow3.t1.family != chow1.t2.family && chow3.t1.family != chow1.t1.family
     } yield (List(chow1, chow2, chow3).sorted(OrdChow))
 
     //Every mixed shifted chow is scored
@@ -470,6 +519,7 @@ object UpperFour extends Combination {
   val name = "Upper Four"
   val description = "Only 9,8,7,6"
 
+  override val excluded = List(NoHonors)
 
   def find(m: HuLe): Result = {
     m.allTiles.forall(t => t.family.isInstanceOf[SuitFamily] && t.value >= 6) match {
