@@ -841,6 +841,23 @@ object LesserHonorsAndKnittedTiles extends Combination {
   }
 }
 
+object ThreeConcealedPungs extends Combination {
+  val id = 32
+  val points = 16
+  val name = "Three concealed pungs"
+  val description = "Three concealed pungs"
+
+  override val excluded = List(TwoConcealedPungs)
+
+  def find(m: HuLe): Result = {
+    m.allConcealedPungLike.size == 3 match {
+      case true => Result(m.allConcealedPungLike)
+      case false => EmptyResult
+    }
+  }
+}
+
+
 object PureShiftedChow extends Combination {
   val id = 30
   val points = 16

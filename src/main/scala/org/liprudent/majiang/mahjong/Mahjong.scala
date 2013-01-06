@@ -187,6 +187,7 @@ package object mahjong {
       UpperFour,
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
+      ThreeConcealedPungs,
       PureShiftedChow,
       FullFlush,
       GreaterHonorsAndKnittedTiles,
