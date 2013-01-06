@@ -717,11 +717,28 @@ object MixedTripleChow extends Combination {
   }
 }
 
+object LowerFour extends Combination {
+  val id = 37
+  val points = 12
+  val name = "Lower Four"
+  val description = "Only 1, 2, 3, 4"
+
+  override val excluded = List(NoHonors)
+
+  def find(m: HuLe): Result = {
+    m.allTiles.forall(t => t.family.isInstanceOf[SuitFamily] && t.value <= 4) match {
+      case false => EmptyResult
+      case true => Result(m.allFigures)
+    }
+  }
+}
+
+
 object UpperFour extends Combination {
   val id = 36
   val points = 12
   val name = "Upper Four"
-  val description = "Only 9,8,7,6"
+  val description = "Only 9, 8, 7, 6"
 
   override val excluded = List(NoHonors)
 

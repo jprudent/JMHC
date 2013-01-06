@@ -177,6 +177,7 @@ package object mahjong {
       HalfFlush,
       MixedShiftedPung,
       MixedTripleChow,
+      LowerFour,
       UpperFour,
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
