@@ -265,13 +265,30 @@ object Tile {
 
 }
 
+/**
+ * Origin of the last tile added in player's hand
+ */
 trait TileOrigin
 
+/**
+ * Origin of the tile when the player self drawn the tile
+ */
 case object SelfDrawn extends TileOrigin
 
+/**
+ * Origin of the tile when a foe discarded a tile and player use it to create a melded figure or declare Hu
+ */
 case object Discarded extends TileOrigin
 
+/**
+ * Origin of the tile when a foe declare a melded kong and the very tile that transforms the pung to a kong is robbed
+ */
 case object KongRobbed extends TileOrigin
+
+/**
+ * Origin of the tile when player declared a kong and need a replacement tile
+ */
+case object ReplacedTile extends TileOrigin
 
 case class ContextualTile(tile: Tile, origin: TileOrigin, isLastTile: Boolean)
 
@@ -664,8 +681,6 @@ object FiguresComputer {
  */
 case class Hand(tileSet: TileSet, lastTileContext: ContextualTile) {
 
-  require(tileSet.exists(t => t == lastTileContext.tile))
-
   /**
    * add a new tile and remove one
    * @param added ContextualTile to add
@@ -696,4 +711,3 @@ object Hand {
   }
 
 }
-

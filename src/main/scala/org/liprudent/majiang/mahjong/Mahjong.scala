@@ -36,6 +36,8 @@ package object mahjong {
 
     require(melded.sorted(OrdFigure) == melded, "melded not sorted")
 
+    require(hand.tileSet.toTiles.contains(hand.lastTileContext.tile) ||
+      concealedKongs.exists(_.tile == hand.lastTileContext.tile))
 
     lazy val numberOfTiles = hand.tileSet.size + disclosedSize + concealedKongsSize
 
@@ -169,6 +171,7 @@ package object mahjong {
       AllPungs,
       TwoConcealedKongs,
       RobbingTheKong,
+      OutWithRemplacementTile,
       LastTile,
       TwoMeldedKongs,
       FullyConcealedHand,

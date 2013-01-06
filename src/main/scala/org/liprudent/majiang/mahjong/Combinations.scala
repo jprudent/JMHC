@@ -709,10 +709,23 @@ object RobbingTheKong extends Combination {
   val name = "Robbing the kong"
   val description = "Finish by robbing the tile of another player which transform a pung to a kong"
 
-  override val excluded = List(TwoConcealedPungs)
-
   def find(m: HuLe): Result = {
     m.lastTileContext.origin == KongRobbed match {
+      case true => Result(SingleTile(m.lastTileContext.tile))
+      case false => EmptyResult
+    }
+  }
+
+}
+
+object OutWithRemplacementTile extends Combination {
+  val id = 48
+  val points = 8
+  val name = "Out with replacement tile"
+  val description = "Finish with the tile that replace the kong tile"
+
+  def find(m: HuLe): Result = {
+    m.lastTileContext.origin == ReplacedTile match {
       case true => Result(SingleTile(m.lastTileContext.tile))
       case false => EmptyResult
     }
