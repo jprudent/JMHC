@@ -436,6 +436,7 @@ object AllChows extends Combination {
       EmptyResult
 }
 
+
 object SeatWind extends Combination {
   val id = 61
   val points = 2
@@ -563,6 +564,22 @@ object OutsideHand extends Combination {
 
     match {
       case true => Result(m.allFigures)
+      case false => EmptyResult
+    }
+  }
+}
+
+object TwoDragonPungs extends Combination {
+  val id = 54
+  val points = 6
+  val name = "Two dragon pungs"
+  val description = "Two dragon pungs"
+
+  override val excluded = List(DragonPung)
+
+  def find(m: HuLe): Result = {
+    m.allDragonPungsLike.size == 2 match {
+      case true => Result(m.allDragonPungsLike)
       case false => EmptyResult
     }
   }

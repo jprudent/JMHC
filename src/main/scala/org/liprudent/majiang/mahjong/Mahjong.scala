@@ -170,6 +170,7 @@ package object mahjong {
       TwoMeldedKongs,
       FullyConcealedHand,
       OutsideHand,
+      TwoDragonPungs,
       MeldedHand,
       AllTypes,
       MixedShiftedChow,

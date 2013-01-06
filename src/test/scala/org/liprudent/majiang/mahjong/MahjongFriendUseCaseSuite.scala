@@ -623,6 +623,58 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   }
 
 
+  test(
+    """use case : Two Dragons Pungs
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s1, s1))
+    val givenMelded: List[Figure] = List(Pung(dr), Pung(dg), Chow(c1), Chow(c4))
+    val givenContextualTile: ContextualTile = ContextualTile(s1, Discarded, false)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(s1))
+    val thenPoints = 14
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(dr), Pung(dg), Chow(c1), Chow(c4), Dui(s1)), MeldedHand),
+        (List(Pung(dr), Pung(dg)), TwoDragonPungs),
+        (List(Chow(c1), Chow(c4)), ShortStraight),
+        (List(Chow(c1), Chow(c4), Dui(s1)), OneVoidedSuit)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Two Concealed Pungs
+      |verif : Mahjong Friends
+      |tricky part: Two concealed pungs and a third with discarded tile
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s7, s7, s7, c1, c1, c1, dr, dr, dr, ws, ws))
+    val givenMelded: List[Figure] = List(Pung(s4))
+    val givenContextualTile: ContextualTile = ContextualTile(s7, Discarded, false)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Pung(c1), Pung(s7), Pung(dr), Dui(ws))
+    val thenPoints = 12
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(c1), Pung(s4), Pung(s7), Pung(dr)), AllPungs),
+        (List(Pung(dr)), DragonPung),
+        (List(Pung(c1), Pung(dr)), TwoConcealedPungs),
+        (List(Pung(c1)), PungOfTerminalOrHonors),
+        (List(Pung(c1), Pung(s4), Pung(s7)), OneVoidedSuit)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+
+
   private def test(
                     givenClosed: TileSet,
                     givenMelded: List[Figure],
