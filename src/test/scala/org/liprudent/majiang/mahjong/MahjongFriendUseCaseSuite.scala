@@ -41,8 +41,8 @@ import org.scalatest.junit.JUnitRunner
         (List(),)
       )
 
-    test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext, thenClosed,
-thenCombinations, Points)
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+thenCombinations, thenPoints)
 
   }
  * }}}
@@ -798,7 +798,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """.stripMargin) {
     val givenClosed = TileSet(List(c1, c2, c3, c4, c4))
     val givenMelded: List[Figure] = List(Chow(c6), Chow(s2))
-    val givenContextualTile: ContextualTile = ContextualTile(b2, ReplacedTile, NotLastTile)
+    val givenContextualTile: ContextualTile = ContextualTile(c4, ReplacedTile, NotLastTile)
     val givenConcealedKongs = List(Kong(b2))
     val givenBonus: Bonus = Bonus(Nil)
     val givenContext = PlayerContext(EastWind, EastWind)
@@ -808,7 +808,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenPoints = 11
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
-        (List(SingleTile(b2)), OutWithRemplacementTile),
+        (List(SingleTile(c4)), OutWithRemplacementTile),
         (List(Kong(b2)), ConcealedKong),
         (allFigures, NoHonors)
       )
@@ -879,6 +879,35 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """use case : Last Tile Draw
+      |verif : Partly Mahjong Friends, My Head for LastTileDraw
+      |dubious: I didn't score Self Drawn because of LastTileDraw. It seems common sense to me
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(ws, ws))
+    val givenMelded: List[Figure] = List(Kong(dr), Pung(ww), Pung(dg), Pung(dw))
+    val givenContextualTile: ContextualTile = ContextualTile(ws, SelfDrawn, LastTileDraw)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(ws))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 162
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Kong(dr), Pung(dg), Pung(dw)), BigThreeDragons), //88
+        (allFigures, AllHonors), //64
+        (List(SingleTile(ws)), LastTileDrawComb), // 8
+        (List(Kong(dr)), MeldedKong), // 1
+        (List(Dui(ws)), SingleWait) //1
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
 
   private def test(
                     givenClosed: TileSet,

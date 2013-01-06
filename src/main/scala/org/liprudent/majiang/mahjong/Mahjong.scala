@@ -197,7 +197,10 @@ package object mahjong {
       SevenPairs,
       AllTerminalsAndHonors,
       ThreeKongs,
-      ThirteenOrphansComb)
+      AllHonors,
+      ThirteenOrphansComb,
+      BigThreeDragons
+    )
 
     def apply(huLe: HuLe): DetailedPoints = {
       val res: List[Result] = combinations.map(combination => combination.find(huLe))
@@ -234,7 +237,7 @@ package object mahjong {
     protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
       def mutuallyExcludes() = ref._2.excludes(toExclude._2)
 
-      def implies() = ref._2.imply(toExclude._2)
+      def implies() = ref._2.implies(toExclude._2)
 
       def same() = ref._2 == toExclude._2
 

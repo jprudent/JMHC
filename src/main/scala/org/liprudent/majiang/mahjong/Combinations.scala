@@ -54,22 +54,32 @@ sealed trait Combination {
   val implied = List[Combination]()
 
   /**
-   * A list of mutually excluded combinations
+   * A list of mutually excluded combinations. If a combination excludes another, they cannot be scored both.
    * Example: When scoring, Wait on the Pair and Edge Wait are mutually excluded
    */
   val excluded = List[Combination]()
 
   /**
-   * Check wether x implies y.
+   * Check wether this combination implies y recursively.
    *
    * @param y the other combination
-   * @return true if y is implied by x. false otherwise
+   * @return true if y is implied by this combination. false otherwise
+   * @see [[org.liprudent.majiang.mahjong.Combination# e x c l u d e s ( o r g.l i p r u d e n t.m a j i a n g.m a h j o n g.C o m b i n a t i o n )]]
    */
-  def imply(y: Combination) = implied.exists(_ == y)
+  def implies(y: Combination): Boolean =
+    implied.exists(_ == y) || implied.exists(_.implies(y))
 
-  def excludes(y: Combination) = excluded.exists(_ == y)
+  /**
+   * Check wether this combination excludes y recursively
+   *
+   * @param y the other combination
+   * @return true if y is implied by this combination. false otherwise
+   * @see [[org.liprudent.majiang.mahjong.Combination# i m p l i e s ( o r g.l i p r u d e n t.m a j i a n g.m a h j o n g.C o m b i n a t i o n )]]
+   */
+  def excludes(y: Combination): Boolean =
+    excluded.exists(_ == y) || excluded.exists(_.excludes(y))
 
-  override lazy val toString = "n°%d, %d points, %s".format(id, points, name)
+  override lazy val toString = "n?%d, %d points, %s".format(id, points, name)
 }
 
 object FlowerTiles extends Combination {
@@ -118,21 +128,18 @@ sealed trait WaitCombination extends Combination {
 
   def find(m: HuLe): Result = {
 
-    if (m.lastTileContext.origin != Discarded) EmptyResult
-    else {
-      val tilesBeforeWinning: TileSet = TileSet(m.allClosedTiles).removed(m.lastTileContext.tile)
-      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.melded, m.concealedKongs)
+    val tilesBeforeWinning: TileSet = TileSet(m.allClosedTiles).removed(m.lastTileContext.tile)
+    val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.melded, m.concealedKongs)
 
-      waitingTiles match {
+    waitingTiles match {
 
-        //a single waiting tile
-        case w :: Nil => {
-          val waitingFigures = m.closed.filter(figure => matchingWait(figure, w))
-          Result(waitingFigures)
-        }
-
-        case _ => EmptyResult
+      //a single waiting tile
+      case w :: Nil => {
+        val waitingFigures = m.closed.filter(figure => matchingWait(figure, w))
+        Result(waitingFigures)
       }
+
+      case _ => EmptyResult
     }
   }
 }
@@ -554,8 +561,6 @@ object OutsideHand extends Combination {
   val name = "Outside Hand"
   val description = "At least 1 honor or 1 terminal in each figure"
 
-  override val excluded = List(SingleWait)
-
   def find(m: HuLe): Result = {
 
     m.allFigures.forall(figure => figure match {
@@ -797,14 +802,14 @@ object MixedTripleChow extends Combination {
   override val implied = List(MixedDoubleChows)
 
   def find(m: HuLe): Result = {
-    //FIXME j'ai comme un doute que ça match 3 chows dans 2 familles
+    //FIXME j'ai comme un doute que ?a match 3 chows dans 2 familles
     val resolved: List[Figure] = m.allChows
       .groupBy(_.t1.value) // Map[Int, List[Chow]
       .values.toList // List[List[Chow]]
       .filter(_.size == 3) //FIXME ???
       .flatten // List[Chow]
 
-    //TODO dans le cas où 4 chows identique, combien de fois faut-il compter cette combinaison ???
+    //TODO dans le cas o? 4 chows identique, combien de fois faut-il compter cette combinaison ???
     Result(resolved)
 
   }
@@ -985,7 +990,7 @@ object AllTerminalsAndHonors extends Combination {
   val description = "only 1, 9 and honors"
 
 
-  override val implied = List(OutsideHand)
+  override val excluded = List(OutsideHand)
 
   def find(m: HuLe): Result = {
     m.allTiles.forall {
@@ -1014,6 +1019,24 @@ object ThreeKongs extends Combination {
 
 }
 
+object AllHonors extends Combination {
+  val id = 11
+  val points = 64
+  val name = "All Honors"
+  val description = "Only winds and dragons"
+
+  override val excluded = List(AllTerminalsAndHonors, AllPungs, PungOfTerminalOrHonors)
+
+  def find(m: HuLe): Result = {
+    m.allTiles.forall(!_.isStraight) match {
+      case true => Result(m.allFigures)
+      case false => EmptyResult
+    }
+  }
+
+}
+
+
 object ThirteenOrphansComb extends Combination {
   val id = 7
   val points = 88
@@ -1029,3 +1052,21 @@ object ThirteenOrphansComb extends Combination {
     Result(allThirteenOrphans)
   }
 }
+
+object BigThreeDragons extends Combination {
+  val id = 2
+  val points = 88
+  val name = "Big three dragons"
+  val description = "Three pungs of dragon"
+
+  override val excluded = List(DragonPung)
+
+  def find(m: HuLe): Result = {
+    m.allDragonPungsLike.size == 3 match {
+      case true => Result(m.allDragonPungsLike)
+      case false => EmptyResult
+    }
+
+  }
+}
+
