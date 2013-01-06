@@ -996,7 +996,7 @@ object LesserHonorsAndKnittedTiles extends Combination {
 }
 
 object ThreeConcealedPungs extends Combination {
-  val id = 32
+  val id = 33
   val points = 16
   val name = "Three concealed pungs"
   val description = "Three concealed pungs"
@@ -1006,6 +1006,42 @@ object ThreeConcealedPungs extends Combination {
   def find(m: HuLe): Result = {
     m.allConcealedPungLike.size == 3 match {
       case true => Result(m.allConcealedPungLike)
+      case false => EmptyResult
+    }
+  }
+}
+
+object TriplePungs extends Combination {
+  val id = 32
+  val points = 16
+  val name = "Triple Pungs"
+  val description = "Three identical pungs in three family"
+
+  override val excluded = List(DoublePung)
+
+  def find(m: HuLe): Result = {
+    val allTriplePung =
+      for {
+        p1 <- m.allStraightPungLike
+        p2 <- m.allStraightPungLike if Tile.ord.compare(p1.tile, p2.tile) < 0 && p2.tile.value == p1.tile.value
+        p3 <- m.allStraightPungLike if Tile.ord.compare(p2.tile, p3.tile) < 0 && p3.tile.value == p2.tile.value
+      } yield (List(p1, p2, p3).sorted(OrdFigure))
+
+    Result(allTriplePung)
+  }
+}
+
+object AllFive extends Combination {
+  val id = 31
+  val points = 16
+  val name = "All Five"
+  val description = "5s in each figures"
+
+  override val excluded = List(AllSimples)
+
+  def find(m: HuLe): Result = {
+    m.standardHand && m.allFigures.forall(_.asList.exists(_.value == 5)) match {
+      case true => Result(m.allFigures)
       case false => EmptyResult
     }
   }

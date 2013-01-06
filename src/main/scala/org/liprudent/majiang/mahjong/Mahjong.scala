@@ -101,6 +101,12 @@ package object mahjong {
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
     lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
 
+
+    /**
+     * A standard hand is made of 5 figures. It excludes Knitted, Seven Pairs, ...
+     */
+    lazy val standardHand = allFigures.size == 5
+
   }
 
 
@@ -194,6 +200,8 @@ package object mahjong {
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
       ThreeConcealedPungs,
+      TriplePungs,
+      AllFive,
       PureShiftedChow,
       FullFlush,
       GreaterHonorsAndKnittedTiles,
