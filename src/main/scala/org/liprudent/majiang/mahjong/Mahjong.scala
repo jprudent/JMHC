@@ -188,6 +188,7 @@ package object mahjong {
       MixedTripleChow,
       ReversibleTiles,
       MixedStraight,
+      BigThreeWind,
       LowerFour,
       UpperFour,
       KnittedStraight,

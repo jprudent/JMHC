@@ -989,6 +989,67 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """use case : Big Three Winds
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b5, b5, b5, c9, c9))
+    val givenMelded: List[Figure] = List(Pung(wn), Pung(ww), Pung(ws))
+    val givenContextualTile: ContextualTile = ContextualTile(b5, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(WestWind, NorthWind)
+
+    val thenClosed = List(Pung(b5), Dui(c9))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 23
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(wn), Pung(ww), Pung(ws)), BigThreeWind),
+        (List(Pung(b5), Pung(wn), Pung(ww), Pung(ws)), AllPungs),
+        (List(Pung(wn)), PrevalentWind),
+        (List(Pung(ww)), SeatWind),
+        (List(Pung(b5), Dui(c9)), OneVoidedSuit)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Big Three Winds - Pung of Terminal
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b5, b5, c9, c9, c9))
+    val givenMelded: List[Figure] = List(Pung(wn), Pung(ww), Pung(ws))
+    val givenContextualTile: ContextualTile = ContextualTile(b5, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(WestWind, NorthWind)
+
+    val thenClosed = List(Pung(c9), Dui(b5))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 25
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(wn), Pung(ww), Pung(ws)), BigThreeWind),
+        (List(Pung(c9), Pung(wn), Pung(ww), Pung(ws)), AllPungs),
+        (List(Pung(wn)), PrevalentWind),
+        (List(Pung(ww)), SeatWind),
+        (List(Pung(c9)), PungOfTerminalOrHonors),
+        (List(Pung(c9), Dui(b5)), OneVoidedSuit),
+        (List(Dui(b5)), SingleWait)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
+
   private def test(
                     givenClosed: TileSet,
                     givenMelded: List[Figure],

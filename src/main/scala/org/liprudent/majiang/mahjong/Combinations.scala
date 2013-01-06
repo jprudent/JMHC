@@ -874,7 +874,7 @@ object MixedTripleChow extends Combination {
 }
 
 object ReversibleTiles extends Combination {
-  val id = 41
+  val id = 40
   val points = 8
   val name = "Reversible Tiles"
   val description = "Only 1,2,3,4,5,8,9 stone, 2,4,5,6,8,9 Bamboos, White Dragon"
@@ -899,7 +899,7 @@ object ReversibleTiles extends Combination {
 
 
 object MixedStraight extends Combination {
-  val id = 38
+  val id = 39
   val points = 8
   val name = "Mixed Straight"
   val description = "Three consecutive chows in three family"
@@ -916,6 +916,24 @@ object MixedStraight extends Combination {
   }
 }
 
+object BigThreeWind extends Combination {
+  val id = 38
+  val points = 12
+  val name = "Big Three Winds"
+  val description = "3 pungs of each wind"
+
+  override val implied = List(PungOfTerminalOrHonors)
+
+  def find(m: HuLe): Result = {
+
+    val winds = List(we, wn, ww, ws)
+
+    val allWindPungs = m.allPungsLike.filter(p => winds.contains(p.tile))
+
+    if (allWindPungs.size == 3) Result(allWindPungs)
+    else EmptyResult
+  }
+}
 
 object LowerFour extends Combination {
   val id = 37
