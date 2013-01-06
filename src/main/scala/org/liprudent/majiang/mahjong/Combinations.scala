@@ -263,6 +263,26 @@ object PungOfTerminalOrHonors extends Combination {
   }
 }
 
+object TwoTerminalChows extends Combination {
+  val id = 72
+  val points = 1
+  val name = "Two terminal chows"
+  val description = "1, 2, 3 and 7, 8, 9 in one family"
+
+
+  def find(m: HuLe): Result = {
+    val allTwoTerminalChows: List[Figures] =
+      for {
+        c1 <- m.allChows if c1.t1.value == 1
+        c2 <- m.allChows if c2.sameFamily(c1) && c2.t3.value == 9
+      } yield (List(c1, c2))
+
+    Result(allTwoTerminalChows)
+
+  }
+}
+
+
 object ShortStraight extends Combination {
   val id = 71
   val points = 1
@@ -471,6 +491,7 @@ object MeldedHand extends Combination {
   val name = "Melded Hand"
   val description = "4 figures melded, and finish on discard"
 
+  override val excluded = List(SingleWait)
 
   def find(m: HuLe): Result = {
     val cond = m.allFigures.size == 5 && m.melded.size == 4 && m.lastTileContext.origin != SelfDrawn

@@ -143,6 +143,7 @@ package object mahjong {
       OneVoidedSuit,
       MeldedKong,
       PungOfTerminalOrHonors,
+      TwoTerminalChows,
       ShortStraight,
       MixedDoubleChows,
       PureDoubleChows,

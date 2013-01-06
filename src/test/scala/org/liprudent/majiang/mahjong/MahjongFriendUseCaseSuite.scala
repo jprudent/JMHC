@@ -61,11 +61,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), MeldedHand),
       (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)), AllChows),
       (List(Chow(b5, b6, b7), Chow(c5, c6, c7)), MixedDoubleChows),
-      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), OneVoidedSuit),
-      (List(Dui(b3)), SingleWait)
+      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), OneVoidedSuit)
+      //implied by MeldedHand (List(Dui(b3)), SingleWait)
     )
 
-    test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 11)
+    test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
 
   }
 
@@ -184,10 +184,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow),
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), OutsideHand),
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), FullyConcealedHand),
-        (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
+        (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows),
+        (List(Chow(b1, b2, b3), Chow(b7, b8, b9)), TwoTerminalChows)
       )
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 18)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 19)
 
   }
 
@@ -470,6 +471,31 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(s1)), PungOfTerminalOrHonors),
         (List(Kong(b3)), MeldedKong),
         (List(Pung(s1)), SelfDrawnComb)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Two Terminal Chows
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s4, s4))
+    val givenMelded: List[Figure] = List(Pung(s6), Chow(b2), Chow(s1), Chow(s7))
+    val givenContextualTile: ContextualTile = ContextualTile(s4, Discarded, false)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(s4))
+    val thenPoints = 9
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), MeldedHand),
+        (List(Chow(s1), Chow(s7)), TwoTerminalChows),
+        (List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), OneVoidedSuit),
+        (List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), NoHonors)
       )
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
