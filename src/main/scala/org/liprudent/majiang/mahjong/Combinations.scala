@@ -400,6 +400,26 @@ object DoublePung extends Combination {
   }
 }
 
+object TileHog extends Combination {
+  val id = 64
+  val points = 2
+  val name = "Tile Hog"
+  val description = "4 identical tiles in at least 2 figures"
+
+  def find(m: HuLe): Result = {
+    val allFiguresButKong = m.allFigures.filterNot(_.isInstanceOf[Kong])
+    val allTilesButKong = allFiguresButKong.map(f => f.asList).flatten
+    val allTileHogs = TileSet(allTilesButKong).tocs.filter {
+      case (tile, occurence) if occurence == 4 => true
+      case _ => false
+    }.map {
+      case (tile, occurence) => allFiguresButKong.filter(_.asList.contains(tile))
+    }
+
+    Result(allTileHogs)
+  }
+}
+
 
 object AllChows extends Combination {
   val id = 63
@@ -723,6 +743,47 @@ object LesserHonorsAndKnittedTiles extends Combination {
     Result(allKnittedWithDragons)
   }
 }
+
+object PureShiftedChow extends Combination {
+  val id = 30
+  val points = 16
+  val name = "Pure shifted chows"
+  val description = "3 chows shifted by one or two tiles in the same family"
+
+  def find(m: HuLe): Result = {
+    val chowsByFamily = m.allChows.groupBy(_.t1.family)
+    def matchingPureShiftedChow(chows: List[Chow]): List[List[Chow]] = {
+      for {
+        c1 <- chows
+        c2 <- chows if c2.t1.value == c1.t1.value + 1 || c2.t1.value == c1.t1.value + 2
+        c3 <- chows if c3.t1.value == c2.t1.value + (c2.t1.value - c1.t1.value)
+      } yield (List(c1, c2, c3))
+    }
+
+    val allPureShiftedChows = chowsByFamily.map {
+      case (family, chows) => matchingPureShiftedChow(chows)
+    }.filterNot(_ == Nil).flatten.toList
+
+    Result(allPureShiftedChows)
+  }
+}
+
+
+object FullFlush extends Combination {
+  val id = 22
+  val points = 24
+  val name = "Full Flush"
+  val description = "Only tiles of the same straight family"
+
+
+  def find(m: HuLe): Result = {
+    m.allTiles.groupBy(tile => tile.family).size == 1 match {
+      case true => Result(m.allFigures)
+      case false => EmptyResult
+    }
+  }
+}
+
 
 object GreaterHonorsAndKnittedTiles extends Combination {
   val id = 20

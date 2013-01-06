@@ -188,6 +188,7 @@ class MahjongSuite extends FunSuite {
             PlayerContext(WestWind, WestWind)),
           List(
             (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4), Dui(we), Dui(ww), Dui(ww)), SevenPairs),
+            (List(Dui(ww), Dui(ww)), TileHog),
             (List(Dui(b1), Dui(b2), Dui(b8), Dui(s4)), OneVoidedSuit)
           )
         )

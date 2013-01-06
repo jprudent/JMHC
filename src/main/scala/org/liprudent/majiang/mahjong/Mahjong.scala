@@ -160,6 +160,7 @@ package object mahjong {
       ConcealedKong,
       TwoConcealedPungs,
       DoublePung,
+      TileHog,
       AllChows,
       SeatWind,
       PrevalentWind,
@@ -178,6 +179,8 @@ package object mahjong {
       UpperFour,
       KnittedStraight,
       LesserHonorsAndKnittedTiles,
+      PureShiftedChow,
+      FullFlush,
       GreaterHonorsAndKnittedTiles,
       SevenPairs,
       AllTerminalsAndHonors,
@@ -217,11 +220,20 @@ package object mahjong {
 
 
     protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
-      val ret = ref._2.excludes(toExclude._2) || (
-        ref._2.imply(toExclude._2) &&
-          toExclude._1.forall(fig => ref._1.contains(fig))
-        )
+      def mutuallyExcludes() = ref._2.excludes(toExclude._2)
+
+      def implies() = ref._2.imply(toExclude._2)
+
+      def same() = ref._2 == toExclude._2
+
+      def toExcludeContainedInRef() = toExclude._1.forall(fig => ref._1.contains(fig))
+
+      val ret =
+        mutuallyExcludes() ||
+          ((implies() || same()) && toExcludeContainedInRef())
+
       if (ret) println(ref + "excludes" + toExclude)
+
       ret
     }
   }

@@ -43,6 +43,10 @@ import org.scalatest.junit.JUnitRunner
 
   }
  * }}}
+ * TODO:
+ * $ - Two or more TileHogs
+ * $ - 1 concealed pung, and finish with the third tile of a second pung => Two Concealed Pungs is not scored
+ * $ - Two pure shifted chows
  */
 @RunWith(classOf[JUnitRunner])
 class MahjongFriendUseCaseSuite extends FunSuite {
@@ -140,10 +144,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       List(
         (List(Knitted(Bamboo, Character, Stone)), KnittedStraight),
         (List(Knitted(Bamboo, Character, Stone), Pung(c8), Dui(dr)), FullyConcealedHand),
+        (List(Knitted(Bamboo, Character, Stone), Pung(c8)), TileHog),
         (List(Bonus(List(fo))), FlowerTiles)
       )
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 17)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 19)
 
   }
 
@@ -560,6 +565,63 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     assert(actual(0).total === thenTotal)
 
   }
+
+  test(
+    """use case : Tile Hog - Pure Shifted Chow
+      |verif : Mahjong Friends
+      |tricky part: Non identical principal
+    """.stripMargin) {
+    val givenClosed = TileSet(List(c8, c8))
+    val givenMelded: List[Figure] = List(Chow(c3), Chow(c3), Chow(c4), Chow(c5))
+    val givenContextualTile: ContextualTile = ContextualTile(c8, Discarded, false)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(c8))
+    val thenPoints = 53
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), FullFlush),
+        (List(Chow(c3), Chow(c4), Chow(c5)), PureShiftedChow),
+        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), MeldedHand),
+        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5)), AllChows),
+        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5)), TileHog),
+        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), AllSimples),
+        (List(Chow(c3), Chow(c3)), PureDoubleChows)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Last Tile
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(c1, c1, c1, s4, s5, s2, s2, s3))
+    val givenMelded: List[Figure] = List(Kong(c9), Pung(s3))
+    val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, true)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Pung(c1), Chow(s3), Dui(s2))
+    val thenPoints = 11
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(SingleTile(s3)), LastTile),
+        (List(Pung(s3), Chow(s3)), TileHog),
+        (List(Kong(c9)), PungOfTerminalOrHonors),
+        (List(Pung(c1)), PungOfTerminalOrHonors),
+        (List(Kong(c9)), MeldedKong),
+        (List(Kong(c9), Pung(c1), Pung(s3), Chow(s3), Dui(s2)), OneVoidedSuit),
+        (List(Kong(c9), Pung(c1), Pung(s3), Chow(s3), Dui(s2)), NoHonors)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+
 
   private def test(
                     givenClosed: TileSet,

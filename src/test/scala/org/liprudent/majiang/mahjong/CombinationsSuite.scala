@@ -132,6 +132,21 @@ class CombinationsSuite extends FunSuite {
 
   }
 
+  test("Pure shifted chows") {
+    val closed: List[Figure] = List(Chow(c1), Chow(c2), Chow(c3), Chow(c4), Dui(c5))
+    val disclosed: List[Figure] = List()
+    val lastTile: ContextualTile = ContextualTile(c5, Discarded, false)
+    val context = PlayerContext(WestWind, EastWind)
+
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = PureShiftedChow.find(hule)
+    val expected = Result(List(List(Chow(c1), Chow(c2), Chow(c3)), List(Chow(c2), Chow(c3), Chow(c4))))
+
+    assert(actual === expected)
+
+  }
+
 
 }
 
