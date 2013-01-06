@@ -174,6 +174,7 @@ package object mahjong {
       OutWithRemplacementTile,
       LastTileClaimComb,
       LastTileDrawComb,
+      ChickenHand,
       LastTile,
       TwoMeldedKongs,
       FullyConcealedHand,

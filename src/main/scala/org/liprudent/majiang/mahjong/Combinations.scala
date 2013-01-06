@@ -767,6 +767,63 @@ object LastTileDrawComb extends Combination {
   }
 }
 
+object ChickenHand extends Combination {
+  val id = 43
+  val points = 8
+  val name = "Chicken Hand"
+  val description = "0 point hand, except flowers"
+
+  override val excluded = List(SelfDrawnComb)
+
+  def find(m: HuLe): Result = {
+    val allForbidenThings: List[Combination] = List(
+      ThirteenOrphansComb,
+      SevenPairs,
+      LesserHonorsAndKnittedTiles,
+      KnittedStraight,
+      MixedStraight,
+      //TODO reversible tiles
+      MixedShiftedPung,
+      LastTileDrawComb,
+      LastTileClaimComb,
+      OutWithRemplacementTile,
+      RobbingTheKong,
+      AllPungs,
+      HalfFlush,
+      MixedShiftedChow,
+      AllTypes,
+      MeldedHand,
+      OutsideHand,
+      FullyConcealedHand,
+      LastTile,
+      DragonPung,
+      ConcealedHand,
+      AllChows,
+      TileHog,
+      DoublePung,
+      TwoConcealedPungs,
+      ConcealedKong,
+      AllSimples,
+      PureDoubleChows,
+      MixedDoubleChows,
+      ShortStraight,
+      TwoTerminalChows,
+      PungOfTerminalOrHonors,
+      MeldedKong,
+      OneVoidedSuit,
+      NoHonors,
+      EdgeWait,
+      ClosedWait,
+      SingleWait,
+      SelfDrawnComb)
+
+    val noPoints = allForbidenThings.forall(_.find(m) == EmptyResult)
+
+    if (noPoints) Result(m.allFigures)
+    else EmptyResult
+  }
+}
+
 
 object MixedShiftedPung extends Combination {
   val id = 42
