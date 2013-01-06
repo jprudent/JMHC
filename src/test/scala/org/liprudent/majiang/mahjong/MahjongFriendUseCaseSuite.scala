@@ -49,6 +49,7 @@ import org.scalatest.junit.JUnitRunner
  * $ - Two or more TileHogs
  * $ - 1 concealed pung, and finish with the third tile of a second pung => Two Concealed Pungs is not scored
  * $ - Two pure shifted chows
+ * $ - One concealed kong and one melded kong should score 6
  */
 @RunWith(classOf[JUnitRunner])
 class MahjongFriendUseCaseSuite extends FunSuite {
@@ -518,8 +519,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenPoints = 17
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
-        (List(Pung(b1), Pung(b4), Pung(b7), Pung(dg), Dui(dw)), HalfFlush),
         (List(Pung(b1), Pung(b4), Pung(b7), Pung(dg)), AllPungs),
+        (List(Pung(b1), Pung(b4), Pung(b7), Pung(dg), Dui(dw)), HalfFlush),
         (List(Pung(dg)), DragonPung),
         (List(Pung(b4), Pung(b7)), TwoConcealedPungs),
         (List(Pung(b1)), PungOfTerminalOrHonors)
@@ -730,6 +731,33 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       )
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Two concealed kongs
+      |verif : My head
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(c1, c1))
+    val givenMelded: List[Figure] = List(Chow(b2), Chow(s7))
+    val givenContextualTile: ContextualTile = ContextualTile(c1, Discarded, false)
+    val givenConcealedKongs = List(Kong(b2), Kong(c3))
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(c1))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 10
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Kong(b2), Kong(c3)), TwoConcealedKongs),
+        (allFigures, NoHonors),
+        (List(Dui(c1)), SingleWait)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
 
   }
 

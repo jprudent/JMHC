@@ -498,19 +498,6 @@ object DragonPung extends Combination {
     Result(m.allDragonPungsLike.map(List(_)))
 }
 
-object AllPungs extends Combination {
-  val id = 59
-  val points = 6
-  val name = "All Pungs"
-  val description = "All Pungs and one pair"
-
-
-  def find(m: HuLe): Result = {
-    if (m.allPungsLike.size == 4) Result(m.allPungsLike)
-    else EmptyResult
-  }
-
-}
 
 object LastTile extends Combination {
   val id = 58
@@ -683,6 +670,37 @@ object HalfFlush extends Combination {
       case false => EmptyResult
     }
   }
+}
+
+object AllPungs extends Combination {
+  val id = 49
+  val points = 6
+  val name = "All Pungs"
+  val description = "All Pungs and one pair"
+
+
+  def find(m: HuLe): Result = {
+    if (m.allPungsLike.size == 4) Result(m.allPungsLike)
+    else EmptyResult
+  }
+
+}
+
+object TwoConcealedKongs extends Combination {
+  val id = 48
+  val points = 8
+  val name = "Two concealed kongs"
+  val description = "Two concealed kong"
+
+  override val excluded = List(TwoConcealedPungs)
+
+  def find(m: HuLe): Result = {
+    m.concealedKongs.size == 2 match {
+      case true => Result(m.concealedKongs)
+      case false => EmptyResult
+    }
+  }
+
 }
 
 

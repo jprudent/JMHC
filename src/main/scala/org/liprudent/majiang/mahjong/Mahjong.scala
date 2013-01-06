@@ -167,6 +167,7 @@ package object mahjong {
       PrevalentWind,
       DragonPung,
       AllPungs,
+      TwoConcealedKongs,
       LastTile,
       TwoMeldedKongs,
       FullyConcealedHand,
