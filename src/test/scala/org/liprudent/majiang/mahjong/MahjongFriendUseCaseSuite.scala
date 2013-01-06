@@ -50,6 +50,8 @@ import org.scalatest.junit.JUnitRunner
  * $ - 1 concealed pung, and finish with the third tile of a second pung => Two Concealed Pungs is not scored
  * $ - Two pure shifted chows
  * $ - One concealed kong and one melded kong should score 6
+ * $ - robbing the kong and unique wait ?
+ * $ - robbing the kong and last tile ?
  */
 @RunWith(classOf[JUnitRunner])
 class MahjongFriendUseCaseSuite extends FunSuite {
@@ -761,6 +763,31 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """use case : Robbing the kong
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b3, b4, c2, c3, c4, c6, c6, b5))
+    val givenMelded: List[Figure] = List(Pung(dw), Chow(c6))
+    val givenContextualTile: ContextualTile = ContextualTile(b5, KongRobbed, false)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Chow(b3), Chow(c2), Dui(c6))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 11
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(SingleTile(b5)), RobbingTheKong),
+        (List(Pung(dw)), DragonPung),
+        (List(Chow(b3), Chow(c2), Chow(c6), Dui(c6)), OneVoidedSuit)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
 
   private def test(
                     givenClosed: TileSet,

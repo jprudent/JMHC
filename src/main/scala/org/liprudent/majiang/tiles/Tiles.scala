@@ -271,7 +271,7 @@ case object SelfDrawn extends TileOrigin
 
 case object Discarded extends TileOrigin
 
-case object KongStole extends TileOrigin
+case object KongRobbed extends TileOrigin
 
 case class ContextualTile(tile: Tile, origin: TileOrigin, isLastTile: Boolean)
 

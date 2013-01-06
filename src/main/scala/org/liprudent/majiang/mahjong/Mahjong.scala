@@ -168,6 +168,7 @@ package object mahjong {
       DragonPung,
       AllPungs,
       TwoConcealedKongs,
+      RobbingTheKong,
       LastTile,
       TwoMeldedKongs,
       FullyConcealedHand,
