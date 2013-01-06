@@ -186,6 +186,7 @@ package object mahjong {
       HalfFlush,
       MixedShiftedPung,
       MixedTripleChow,
+      ReversibleTiles,
       MixedStraight,
       LowerFour,
       UpperFour,

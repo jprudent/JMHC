@@ -3,6 +3,7 @@ package org.liprudent.majiang.mahjong
 import org.liprudent.majiang.figures._
 import org.liprudent.majiang.tiles.Types.Figures
 import org.liprudent.majiang.tiles._
+import org.liprudent.majiang.tiles.Tile._
 import org.liprudent.majiang.UniqueWait
 import org.liprudent.majiang.figures.ThirteenOrphans
 import org.liprudent.majiang.figures.Knitted
@@ -400,8 +401,8 @@ object DoublePung extends Combination {
     val allDoublePung =
       for {
         p1 <- m.allStraightPungLike
-        p2 <- m.allStraightPungLike if Tile.ord.compare(p1.tile, p2.tile) > 0 && p2.tile.value == p1.tile.value
-      } yield (List(p1, p2))
+        p2 <- m.allStraightPungLike if Tile.ord.compare(p1.tile, p2.tile) < 0 && p2.tile.value == p1.tile.value
+      } yield (List(p1, p2).sorted(OrdFigure))
 
     Result(allDoublePung)
   }
@@ -871,6 +872,31 @@ object MixedTripleChow extends Combination {
 
   }
 }
+
+object ReversibleTiles extends Combination {
+  val id = 41
+  val points = 8
+  val name = "Reversible Tiles"
+  val description = "Only 1,2,3,4,5,8,9 stone, 2,4,5,6,8,9 Bamboos, White Dragon"
+
+
+  override val excluded = List(OneVoidedSuit)
+
+  def find(m: HuLe): Result = {
+    val allowedTiles = List(
+      s1, s2, s3, s4, s5, s6, s7, s8, s9,
+      b2, b4, b5, b6, b8, b9,
+      dw
+    )
+
+    m.allTiles.forall(allowedTiles.contains(_)) match {
+      case true => Result(m.allFigures)
+      case false => EmptyResult
+    }
+
+  }
+}
+
 
 object MixedStraight extends Combination {
   val id = 38
