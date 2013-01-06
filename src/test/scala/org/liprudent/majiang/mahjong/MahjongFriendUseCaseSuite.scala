@@ -437,7 +437,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
           givenMelded.sorted(OrdFigure),
           givenContextualTile,
           givenContext,
-          givenBonus),
+          bonus = givenBonus),
         thenCombinations.map {
           case (figures, combination) => (figures.sorted(OrdFigure), combination)
         })

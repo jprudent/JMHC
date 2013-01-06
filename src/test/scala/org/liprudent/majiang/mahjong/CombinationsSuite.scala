@@ -51,7 +51,7 @@ class CombinationsSuite extends FunSuite {
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
       ContextualTile(b3, Discarded, false),
       PlayerContext(WestWind, EastWind),
-      Bonus(List(fb, sa))
+      bonus = Bonus(List(fb, sa))
     )
 
     val actual = FlowerTiles.find(hule)

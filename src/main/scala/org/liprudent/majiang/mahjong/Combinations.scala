@@ -355,6 +355,18 @@ object AllSimples extends Combination {
       Result(m.allFigures)
 }
 
+object ConcealedKong extends Combination {
+  val id = 67
+  val points = 2
+  val name = "Concealed Kong"
+  val description = "One concealed kong"
+
+  def find(m: HuLe): Result = {
+    if (m.concealedKongs.size == 1) Result(m.concealedKongs)
+    else EmptyResult
+  }
+}
+
 
 object AllChows extends Combination {
   val id = 63

@@ -15,7 +15,7 @@ import org.liprudent.majiang.{HuFinder, UniqueWait}
 class MahjongSuite extends FunSuite {
 
   trait Hands {
-    val b1ContextualTile = ContextualTile(b1, SelfDrawn, false)
+    val b1ContextualTile = ContextualTile(b1, Discarded, false)
 
     val valid = PlayerTiles(
       Hand(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
@@ -86,14 +86,14 @@ class MahjongSuite extends FunSuite {
   test("an invalid hand has no mahjong") {
     new Hands {
       val actual = HuFinder(invalid, PlayerContext(WestWind, WestWind)).find
-      assert(actual == Nil, actual)
+      assert(actual === Nil)
     }
   }
 
   test("if there is no mahjong ... well there is no mahjong") {
     new Hands {
       val actual = HuFinder(noMahjong, PlayerContext(WestWind, WestWind)).find
-      assert(actual == Nil, actual)
+      assert(actual === Nil)
     }
   }
 

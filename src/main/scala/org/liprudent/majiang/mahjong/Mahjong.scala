@@ -69,23 +69,27 @@ package object mahjong {
                    melded: Figures,
                    lastTileContext: ContextualTile,
                    context: PlayerContext,
+                   concealedKongs: List[Kong] = noKongs,
                    bonus: Bonus = Bonus(Nil)) {
 
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(melded == melded.sorted(OrdFigure), "not sorted")
 
-    lazy val allFigures = (closed ::: melded).sorted(OrdFigure)
+    lazy val allFigures = (closed ::: melded ::: concealedKongs).sorted(OrdFigure)
 
     lazy val allMeldedKongs: List[Kong] = melded.filter(_.isInstanceOf[Kong]).asInstanceOf[List[Kong]]
-    lazy val allKongs: List[Kong] = allFigures.filter(_.isInstanceOf[Kong]).asInstanceOf[List[Kong]]
-    lazy val allPungsLike: List[PungLike] = allKongs ::: allFigures.filter(_.isInstanceOf[Pung]).asInstanceOf[List[Pung]]
+    lazy val allKongs: List[Kong] = (allMeldedKongs ::: concealedKongs).sorted(OrdFigure)
+
+    lazy val allPungsLike: List[PungLike] = allFigures.filter(_.isInstanceOf[PungLike]).asInstanceOf[List[PungLike]]
+
+    lazy val allDragonPungs: List[PungLike] = allPungsLike.filter(_.tile.family.isInstanceOf[DragonFamily])
+
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
+
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
 
     lazy val allClosedStraightFamilyFigures: List[Figure] =
       allFigures.filter(_.asList.forall(_.isStraight))
-
-    lazy val allDragonPungs: List[PungLike] = allPungsLike.filter(_.tile.family.isInstanceOf[DragonFamily])
 
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
     lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
@@ -148,6 +152,7 @@ package object mahjong {
       MixedDoubleChows,
       PureDoubleChows,
       AllSimples,
+      ConcealedKong,
       AllChows,
       SeatWind,
       PrevalentWind,
@@ -229,7 +234,7 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
         .filter(closedCombination => HuFinder.isWellFormedMahjong(closedCombination, ptiles.melded))
         .map(closedCombination =>
         HulePointsComputer(
-          HuLe(closedCombination, ptiles.melded, ptiles.hand.lastTileContext, context, ptiles.bonus)))
+          HuLe(closedCombination, ptiles.melded, ptiles.hand.lastTileContext, context, ptiles.concealedKongs, ptiles.bonus)))
         .toList
     }
   }
