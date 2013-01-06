@@ -268,7 +268,7 @@ object Tile {
 /**
  * Origin of the last tile added in player's hand
  */
-trait TileOrigin
+sealed trait TileOrigin
 
 /**
  * Origin of the tile when the player self drawn the tile
@@ -290,7 +290,32 @@ case object KongRobbed extends TileOrigin
  */
 case object ReplacedTile extends TileOrigin
 
-case class ContextualTile(tile: Tile, origin: TileOrigin, isLastTile: Boolean)
+/**
+ * Situation about last tile
+ */
+sealed trait LastTileSituation
+
+/**
+ * This is not a last tile situation
+ */
+case object NotLastTile extends LastTileSituation
+
+/**
+ * 3 tiles of a kind are visible and player finished with the fourth
+ */
+case object LastTileOfKind extends LastTileSituation
+
+/**
+ * Player declares Hu with the last discarded tile of the game
+ */
+case object LastTileClaim extends LastTileSituation
+
+/**
+ * Player declares Hu with the last tile of the wall
+ */
+case object LastTileDraw extends LastTileSituation
+
+case class ContextualTile(tile: Tile, origin: TileOrigin, lastTileSituation: LastTileSituation)
 
 ///////////////////////////////////////////////////////////////////////
 // HAND DEFINITIONS

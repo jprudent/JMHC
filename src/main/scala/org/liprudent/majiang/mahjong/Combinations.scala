@@ -507,7 +507,7 @@ object LastTile extends Combination {
 
 
   def find(m: HuLe): Result =
-    if (m.lastTileContext.isLastTile) Result(SingleTile(m.lastTileContext.tile))
+    if (m.lastTileContext.lastTileSituation == LastTileOfKind) Result(SingleTile(m.lastTileContext.tile))
     else EmptyResult
 }
 
@@ -719,7 +719,7 @@ object RobbingTheKong extends Combination {
 }
 
 object OutWithRemplacementTile extends Combination {
-  val id = 48
+  val id = 46
   val points = 8
   val name = "Out with replacement tile"
   val description = "Finish with the tile that replace the kong tile"
@@ -730,7 +730,6 @@ object OutWithRemplacementTile extends Combination {
       case false => EmptyResult
     }
   }
-
 }
 
 

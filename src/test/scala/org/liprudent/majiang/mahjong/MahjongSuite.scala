@@ -15,7 +15,7 @@ import org.liprudent.majiang.{HuFinder, UniqueWait}
 class MahjongSuite extends FunSuite {
 
   trait Hands {
-    val b1ContextualTile = ContextualTile(b1, Discarded, false)
+    val b1ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
 
     val valid = PlayerTiles(
       Hand(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
@@ -44,7 +44,7 @@ class MahjongSuite extends FunSuite {
     )
 
     val knittedStraight = PlayerTiles(
-      Hand(List(b1, b4, b7, c2, c5, c8, s3, s6, s9), ContextualTile(b1, SelfDrawn, false)),
+      Hand(List(b1, b4, b7, c2, c5, c8, s3, s6, s9), ContextualTile(b1, SelfDrawn, NotLastTile)),
       List(Pung(c8), Dui(ww))
     )
 

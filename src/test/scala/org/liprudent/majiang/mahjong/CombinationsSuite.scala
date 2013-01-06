@@ -15,7 +15,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
-      ContextualTile(b3, Discarded, false),
+      ContextualTile(b3, Discarded, NotLastTile),
       PlayerContext(WestWind, EastWind))
     val actual = AllChows.find(hule)
     val expected = Result(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)))
@@ -26,7 +26,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
-      ContextualTile(b3, Discarded, false),
+      ContextualTile(b3, Discarded, NotLastTile),
       PlayerContext(WestWind, EastWind))
     val actual = MeldedHand.find(hule)
     val expected = Result(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)))
@@ -37,7 +37,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
-      ContextualTile(b3, Discarded, false),
+      ContextualTile(b3, Discarded, NotLastTile),
       PlayerContext(WestWind, EastWind))
     val actual = MixedDoubleChows.find(hule)
     val expected = Result(List(Chow(b5, b6, b7), Chow(c5, c6, c7)))
@@ -49,7 +49,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(
       List(Dui(b3)),
       List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
-      ContextualTile(b3, Discarded, false),
+      ContextualTile(b3, Discarded, NotLastTile),
       PlayerContext(WestWind, EastWind),
       bonus = Bonus(List(fb, sa))
     )
@@ -63,7 +63,7 @@ class CombinationsSuite extends FunSuite {
 
   test("closed wait") {
     val disclosed: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
-    val contextualTile: ContextualTile = ContextualTile(s8, Discarded, false)
+    val contextualTile: ContextualTile = ContextualTile(s8, Discarded, NotLastTile)
     val context = PlayerContext(WestWind, EastWind)
     val hule = HuLe(List(Pung(s6), Chow(s7, s8, s9), Dui(c6)),
       disclosed,
@@ -80,7 +80,7 @@ class CombinationsSuite extends FunSuite {
   test("all types") {
     val closed = List(Pung(b2), Chow(c1, c2, c3), Dui(dg))
     val disclosed = List(Pung(ww), Chow(s3, s4, s5))
-    val lastTile: ContextualTile = ContextualTile(dg, Discarded, false)
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded, NotLastTile)
     val context = PlayerContext(WestWind, EastWind)
     val hule = HuLe(closed, disclosed, lastTile, context)
 
@@ -93,7 +93,7 @@ class CombinationsSuite extends FunSuite {
   test("seat wind") {
     val closed = List(Pung(b2), Chow(c1, c2, c3), Dui(dg))
     val disclosed = List(Pung(ww), Chow(s3, s4, s5))
-    val lastTile: ContextualTile = ContextualTile(dg, Discarded, false)
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded, NotLastTile)
     val context = PlayerContext(WestWind, EastWind)
     val hule = HuLe(closed, disclosed, lastTile, context)
 
@@ -106,7 +106,7 @@ class CombinationsSuite extends FunSuite {
   test("single wait") {
     val closed = List(Pung(b2), Chow(c1, c2, c3), Dui(dg))
     val disclosed = List(Pung(ww), Chow(s3, s4, s5))
-    val lastTile: ContextualTile = ContextualTile(dg, Discarded, false)
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded, NotLastTile)
     val context = PlayerContext(WestWind, EastWind)
 
     val hule = HuLe(closed, disclosed, lastTile, context)
@@ -120,7 +120,7 @@ class CombinationsSuite extends FunSuite {
   test("Pung of terminal or honor") {
     val closed: List[Figure] = List(Pung(ww), Chow(c1, c2, c3), Dui(ws))
     val disclosed: List[Figure] = List(Pung(b9), Pung(dr))
-    val lastTile: ContextualTile = ContextualTile(ww, Discarded, false)
+    val lastTile: ContextualTile = ContextualTile(ww, Discarded, NotLastTile)
     val context = PlayerContext(WestWind, EastWind)
 
     val hule = HuLe(closed, disclosed, lastTile, context)
@@ -135,7 +135,7 @@ class CombinationsSuite extends FunSuite {
   test("Pure shifted chows") {
     val closed: List[Figure] = List(Chow(c1), Chow(c2), Chow(c3), Chow(c4), Dui(c5))
     val disclosed: List[Figure] = List()
-    val lastTile: ContextualTile = ContextualTile(c5, Discarded, false)
+    val lastTile: ContextualTile = ContextualTile(c5, Discarded, NotLastTile)
     val context = PlayerContext(WestWind, EastWind)
 
     val hule = HuLe(closed, disclosed, lastTile, context)
