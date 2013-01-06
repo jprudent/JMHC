@@ -367,6 +367,22 @@ object ConcealedKong extends Combination {
   }
 }
 
+object TwoConcealedPungs extends Combination {
+  val id = 66
+  val points = 2
+  val name = "Two concealed pungs"
+  val description = "Two concealed pungs or kongs"
+
+  def find(m: HuLe): Result = {
+    if (m.allConcealedPungLike.size == 2) {
+      Result(m.allConcealedPungLike)
+    } else {
+      EmptyResult
+    }
+  }
+}
+
+
 object DoublePung extends Combination {
   val id = 65
   val points = 2
@@ -376,8 +392,8 @@ object DoublePung extends Combination {
   def find(m: HuLe): Result = {
     val allDoublePung =
       for {
-        p1 <- m.allStraightPung
-        p2 <- m.allStraightPung if Tile.ord.compare(p1.tile, p2.tile) > 0 && p2.tile.value == p1.tile.value
+        p1 <- m.allStraightPungLike
+        p2 <- m.allStraightPungLike if Tile.ord.compare(p1.tile, p2.tile) > 0 && p2.tile.value == p1.tile.value
       } yield (List(p1, p2))
 
     Result(allDoublePung)
@@ -442,7 +458,7 @@ object DragonPung extends Combination {
 
   def find(m: HuLe): Result =
   // all dragon pung is scored
-    Result(m.allDragonPungs.map(List(_)))
+    Result(m.allDragonPungsLike.map(List(_)))
 }
 
 object AllPungs extends Combination {

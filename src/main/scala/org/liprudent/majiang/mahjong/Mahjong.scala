@@ -82,7 +82,7 @@ package object mahjong {
 
     lazy val allPungsLike: List[PungLike] = allFigures.filter(_.isInstanceOf[PungLike]).asInstanceOf[List[PungLike]]
 
-    lazy val allDragonPungs: List[PungLike] = allPungsLike.filter(_.tile.family.isInstanceOf[DragonFamily])
+    lazy val allDragonPungsLike: List[PungLike] = allPungsLike.filter(_.tile.family.isInstanceOf[DragonFamily])
 
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
 
@@ -91,7 +91,10 @@ package object mahjong {
     lazy val allClosedStraightFamilyFigures: List[Figure] =
       allFigures.filter(_.asList.forall(_.isStraight))
 
-    lazy val allStraightPung = allPungsLike.filter(_.tile.isStraight)
+    lazy val allStraightPungLike = allPungsLike.filter(_.tile.isStraight)
+
+    lazy val allConcealedPungLike = allPungsLike.filterNot(p => melded.contains(p) ||
+      (lastTileContext.origin != SelfDrawn && p.tile == lastTileContext.tile))
 
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
     lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
@@ -155,6 +158,7 @@ package object mahjong {
       PureDoubleChows,
       AllSimples,
       ConcealedKong,
+      TwoConcealedPungs,
       DoublePung,
       AllChows,
       SeatWind,
