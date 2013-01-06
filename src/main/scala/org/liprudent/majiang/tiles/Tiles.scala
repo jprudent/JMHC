@@ -315,7 +315,14 @@ case object LastTileClaim extends LastTileSituation
  */
 case object LastTileDraw extends LastTileSituation
 
-case class ContextualTile(tile: Tile, origin: TileOrigin, lastTileSituation: LastTileSituation)
+case class ContextualTile(tile: Tile, origin: TileOrigin, lastTileSituation: LastTileSituation) {
+
+  require((lastTileSituation == LastTileClaim && origin == Discarded) || lastTileSituation != LastTileClaim,
+    "when last tile situation is LastTileClaim, then origin is Discarded")
+
+  require((lastTileSituation == LastTileDraw && origin == SelfDrawn) || lastTileSituation != LastTileDraw,
+    "when last tile situation is LastTileDraw, then origin is SelfDrawn")
+}
 
 ///////////////////////////////////////////////////////////////////////
 // HAND DEFINITIONS

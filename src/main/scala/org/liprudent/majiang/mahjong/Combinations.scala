@@ -732,6 +732,36 @@ object OutWithRemplacementTile extends Combination {
   }
 }
 
+object LastTileClaimComb extends Combination {
+  val id = 45
+  val points = 8
+  val name = "Last tile claim"
+  val description = "Finish with a claim of the last discarded tile of the game"
+
+  def find(m: HuLe): Result = {
+    m.lastTileContext.lastTileSituation == LastTileClaim match {
+      case true => Result(SingleTile(m.lastTileContext.tile))
+      case false => EmptyResult
+    }
+  }
+}
+
+object LastTileDrawComb extends Combination {
+  val id = 44
+  val points = 8
+  val name = "Last tile draw"
+  val description = "Finish with a claim of the last discarded tile of the game"
+
+  override val excluded = List(SelfDrawnComb)
+
+  def find(m: HuLe): Result = {
+    m.lastTileContext.lastTileSituation == LastTileDraw match {
+      case true => Result(SingleTile(m.lastTileContext.tile))
+      case false => EmptyResult
+    }
+  }
+}
+
 
 object MixedShiftedPung extends Combination {
   val id = 42
@@ -779,6 +809,25 @@ object MixedTripleChow extends Combination {
 
   }
 }
+
+object MixedStraight extends Combination {
+  val id = 38
+  val points = 8
+  val name = "Mixed Straight"
+  val description = "Three consecutive chows in three family"
+
+  def find(m: HuLe): Result = {
+    val allMixedStraight =
+      for {
+        chow1 <- m.allChows if chow1.t1.value == 1
+        chow2 <- m.allChows if !chow1.sameFamily(chow2) && chow2.t1.value == 4
+        chow3 <- m.allChows if !chow2.sameFamily(chow3) && !chow1.sameFamily(chow3) && chow3.t1.value == 7
+      } yield (List(chow1, chow2, chow3).sorted(OrdFigure))
+
+    Result(allMixedStraight)
+  }
+}
+
 
 object LowerFour extends Combination {
   val id = 37

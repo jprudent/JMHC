@@ -24,7 +24,7 @@ import org.scalatest.junit.JUnitRunner
     """.stripMargin) {
     val givenClosed = TileSet(List())
     val givenMelded: List[Figure] = List()
-    val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded,false)
+    val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, NotLastTile)
     val givenConcealedKongs = List()
     val givenBonus: Bonus = Bonus(Nil)
     val givenContext = PlayerContext(EastWind, EastWind)
@@ -41,7 +41,8 @@ import org.scalatest.junit.JUnitRunner
         (List(),)
       )
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext, thenClosed,
+thenCombinations, Points)
 
   }
  * }}}
@@ -52,6 +53,7 @@ import org.scalatest.junit.JUnitRunner
  * $ - One concealed kong and one melded kong should score 6
  * $ - robbing the kong and unique wait ?
  * $ - robbing the kong and last tile ?
+ * $ - out on last tile claim and last tile draw ? Should I score both ?
  */
 @RunWith(classOf[JUnitRunner])
 class MahjongFriendUseCaseSuite extends FunSuite {
@@ -845,6 +847,35 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
       thenPoints)
+
+  }
+
+  test(
+    """use case : Last Tile Claim
+      |verif : My Head
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s4, s5, s6, c1, c2, c3, b7, b7))
+    val givenMelded: List[Figure] = List(Chow(b1), Chow(b7))
+    val givenContextualTile: ContextualTile = ContextualTile(c2, Discarded, LastTileClaim)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Chow(c1), Chow(s4), Dui(b7))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 21
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Chow(b7), Chow(c1), Chow(s4)), MixedStraight),
+        (List(SingleTile(c2)), LastTileClaimComb),
+        (List(Chow(b1), Chow(b7), Chow(c1), Chow(s4)), AllChows),
+        (List(Chow(b1), Chow(c1)), MixedDoubleChows),
+        (List(Chow(b1), Chow(b7)), TwoTerminalChows),
+        (List(Chow(c1)), ClosedWait)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
 
   }
 
