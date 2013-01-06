@@ -76,6 +76,7 @@ package object mahjong {
 
     lazy val allFigures = (closed ::: melded).sorted(OrdFigure)
 
+    lazy val allMeldedKongs: List[Kong] = melded.filter(_.isInstanceOf[Kong]).asInstanceOf[List[Kong]]
     lazy val allKongs: List[Kong] = allFigures.filter(_.isInstanceOf[Kong]).asInstanceOf[List[Kong]]
     lazy val allPungsLike: List[PungLike] = allKongs ::: allFigures.filter(_.isInstanceOf[Pung]).asInstanceOf[List[Pung]]
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
@@ -140,6 +141,7 @@ package object mahjong {
       EdgeWait,
       NoHonors,
       OneVoidedSuit,
+      MeldedKong,
       PungOfTerminalOrHonors,
       ShortStraight,
       MixedDoubleChows,
@@ -147,13 +149,17 @@ package object mahjong {
       AllSimples,
       AllChows,
       SeatWind,
+      PrevalentWind,
       DragonPung,
+      AllPungs,
+      LastTile,
       FullyConcealedHand,
       OutsideHand,
       MeldedHand,
       AllTypes,
       MixedShiftedChow,
       HalfFlush,
+      MixedShiftedPung,
       MixedTripleChow,
       UpperFour,
       KnittedStraight,
@@ -197,10 +203,12 @@ package object mahjong {
 
 
     protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
-      ref._2.excludes(toExclude._2) || (
+      val ret = ref._2.excludes(toExclude._2) || (
         ref._2.imply(toExclude._2) &&
           toExclude._1.forall(fig => ref._1.contains(fig))
         )
+      if (ret) println(ref + "excludes" + toExclude)
+      ret
     }
   }
 

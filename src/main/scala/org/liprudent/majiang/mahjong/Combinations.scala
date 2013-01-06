@@ -49,7 +49,7 @@ sealed trait Combination {
    * List of implied combinations by this one.
    * A combination implies another based on the same figures or a subset of figures
    * example: "Seat Wind" implies "Pung of honor or extremity" if it's a pung of Wind West
-   * if it's a Pung of Wind West and a Pung of 9 bamboos this is not an exclusion
+   * if it's a Pung of Wind West and a Pung of 9 bamboos this is not an implication
    */
   val implied = List[Combination]()
 
@@ -60,8 +60,9 @@ sealed trait Combination {
   val excluded = List[Combination]()
 
   /**
-   * Check wether x implies y
-   * @param y the other combination with those figures
+   * Check wether x implies y.
+   *
+   * @param y the other combination
    * @return true if y is implied by x. false otherwise
    */
   def imply(y: Combination) = implied.exists(_ == y)
@@ -191,7 +192,7 @@ object EdgeWait extends Combination with WaitCombination {
 }
 
 object NoHonors extends Combination {
-  val id = 78
+  val id = 76
   val points = 1
   val name = "No Honors"
   val description = "No dragons nor winds"
@@ -225,6 +226,19 @@ object OneVoidedSuit extends Combination {
       case true => Result(m.allClosedStraightFamilyFigures)
       case false => EmptyResult
     }
+  }
+}
+
+object MeldedKong extends Combination {
+  val id = 74
+  val points = 1
+  val name = "Melded Kong"
+  val description = "One melded kong"
+
+
+  def find(m: HuLe): Result = {
+    if (m.allMeldedKongs.size == 1) Result(m.allMeldedKongs)
+    else EmptyResult
   }
 }
 
@@ -353,6 +367,23 @@ object SeatWind extends Combination {
     }
 }
 
+object PrevalentWind extends Combination {
+  val id = 60
+  val points = 2
+  val name = "Prevalent Wind"
+  val description = "1 pung of round wind"
+
+
+  override val implied = List(PungOfTerminalOrHonors)
+
+  def find(m: HuLe): Result =
+    m.allPungsLike.find(_.tile.family == m.context.prevalentWind) match {
+      case None => EmptyResult
+      case Some(pung) => Result(pung)
+    }
+}
+
+
 object DragonPung extends Combination {
   val id = 59
   val points = 2
@@ -363,6 +394,20 @@ object DragonPung extends Combination {
   def find(m: HuLe): Result =
   // all dragon pung is scored
     Result(m.allDragonPungs.map(List(_)))
+}
+
+object AllPungs extends Combination {
+  val id = 59
+  val points = 6
+  val name = "All Pungs"
+  val description = "All Pungs and one pair"
+
+
+  def find(m: HuLe): Result = {
+    if (m.allPungsLike.size == 4) Result(m.allPungsLike)
+    else EmptyResult
+  }
+
 }
 
 object LastTile extends Combination {
@@ -502,6 +547,30 @@ object HalfFlush extends Combination {
   }
 }
 
+
+object MixedShiftedPung extends Combination {
+  val id = 42
+  val points = 8
+  val name = "Mixed Shifted Pung"
+  val description = "Three consecutive pungs in three families"
+
+  def find(m: HuLe): Result = {
+
+    val straightPungs = m.allPungsLike.filter(_.tile.isStraight)
+
+    def cond(p1: PungLike, p2: PungLike) =
+      p1.tile.family != p2.tile.family && p2.tile.value == p1.tile.value + 1
+
+    val allMixedShiftedPungs: List[Figures] =
+      for {p1 <- straightPungs
+           p2 <- straightPungs if cond(p1, p2)
+           p3 <- straightPungs if cond(p2, p3)
+      } yield (List(p1, p2, p3).sorted(OrdFigure))
+
+    Result(allMixedShiftedPungs)
+
+  }
+}
 
 object MixedTripleChow extends Combination {
   val id = 41
