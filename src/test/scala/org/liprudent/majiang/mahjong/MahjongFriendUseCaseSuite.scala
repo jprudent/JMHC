@@ -908,6 +908,56 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       thenCombinations, thenPoints)
 
   }
+  test(
+    """use case : Chicken Hand
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s4, s5, s7, s7, s7, b1, b2, b3, we, we, s3))
+    val givenMelded: List[Figure] = List(Chow(c7))
+    val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Pung(s7), Chow(b1), Chow(s3), Dui(we))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 8
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (allFigures, ChickenHand)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Chicken Hand with flower
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b6, b7, c4, c5, c6, ww, ww, b5))
+    val givenMelded: List[Figure] = List(Pung(c7), Chow(s1))
+    val givenContextualTile: ContextualTile = ContextualTile(b5, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(List(fp, ss))
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Chow(b5), Chow(c4), Dui(ww))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 10
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (allFigures, ChickenHand),
+        (List(Bonus(List(fp, ss))), FlowerTiles)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
 
   private def test(
                     givenClosed: TileSet,
