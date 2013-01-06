@@ -91,6 +91,8 @@ package object mahjong {
     lazy val allClosedStraightFamilyFigures: List[Figure] =
       allFigures.filter(_.asList.forall(_.isStraight))
 
+    lazy val allStraightPung = allPungsLike.filter(_.tile.isStraight)
+
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
     lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
 
@@ -153,12 +155,14 @@ package object mahjong {
       PureDoubleChows,
       AllSimples,
       ConcealedKong,
+      DoublePung,
       AllChows,
       SeatWind,
       PrevalentWind,
       DragonPung,
       AllPungs,
       LastTile,
+      TwoMeldedKongs,
       FullyConcealedHand,
       OutsideHand,
       MeldedHand,
@@ -231,7 +235,7 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
     else {
       val computer = FiguresComputer(ptiles.hand.tileSet)
       computer.allFiguresCombinations
-        .filter(closedCombination => HuFinder.isWellFormedMahjong(closedCombination, ptiles.melded))
+        .filter(closedCombination => HuFinder.isWellFormedMahjong(closedCombination, ptiles.melded, ptiles.concealedKongs))
         .map(closedCombination =>
         HulePointsComputer(
           HuLe(closedCombination, ptiles.melded, ptiles.hand.lastTileContext, context, ptiles.concealedKongs, ptiles.bonus)))
@@ -246,8 +250,8 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
 }
 
 object HuFinder {
-  def isWellFormedMahjong(closed: Figures, disclosed: Figures): Boolean = {
-    val all = closed ::: disclosed
+  def isWellFormedMahjong(closed: Figures, disclosed: Figures, concealedKongs: List[Kong]): Boolean = {
+    val all = closed ::: disclosed ::: concealedKongs
     //classical mahjong hand
     classicalMahjondHand(all) ||
       //knitted staight hand
@@ -298,13 +302,13 @@ object HuFinder {
 
 object UniqueWait {
 
-  def waitingTiles(closed: TileSet, disclosed: List[Figure]): List[Tile] = {
+  def waitingTiles(closed: TileSet, disclosed: List[Figure], concealedKongs: List[Kong]): List[Tile] = {
 
 
     def satisfy(tile: Tile): Boolean = {
       val added: TileSet = closed.added(tile)
       val allCombinations = FiguresComputer(added).allFiguresCombinations
-      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed)).size > 0
+      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed, concealedKongs)).size > 0
     }
 
     val tilesToTry = Tile.allButBonus.filter(tile => closed.occurence(tile) < 4)

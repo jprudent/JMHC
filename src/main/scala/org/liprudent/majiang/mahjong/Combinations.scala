@@ -121,7 +121,7 @@ sealed trait WaitCombination extends Combination {
     if (m.lastTileContext.origin != Discarded) EmptyResult
     else {
       val tilesBeforeWinning: TileSet = TileSet(m.allClosedTiles).removed(m.lastTileContext.tile)
-      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.melded)
+      val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.melded, m.concealedKongs)
 
       waitingTiles match {
 
@@ -367,6 +367,23 @@ object ConcealedKong extends Combination {
   }
 }
 
+object DoublePung extends Combination {
+  val id = 65
+  val points = 2
+  val name = "Double Pung"
+  val description = "Two identical pung in two families"
+
+  def find(m: HuLe): Result = {
+    val allDoublePung =
+      for {
+        p1 <- m.allStraightPung
+        p2 <- m.allStraightPung if Tile.ord.compare(p1.tile, p2.tile) > 0 && p2.tile.value == p1.tile.value
+      } yield (List(p1, p2))
+
+    Result(allDoublePung)
+  }
+}
+
 
 object AllChows extends Combination {
   val id = 63
@@ -452,6 +469,25 @@ object LastTile extends Combination {
   def find(m: HuLe): Result =
     if (m.lastTileContext.isLastTile) Result(SingleTile(m.lastTileContext.tile))
     else EmptyResult
+}
+
+object TwoMeldedKongs extends Combination {
+  val id = 57
+  val points = 4
+  val name = "Two melded kongs"
+  val description = "Two melded kongs or one melded and one concealed kongs"
+
+  override val excluded = List(MeldedKong)
+
+  def find(m: HuLe): Result = {
+    if (m.allMeldedKongs.size == 2 || (m.allMeldedKongs.size == 1 && m.concealedKongs.size == 1)) {
+      Result((m.allMeldedKongs ::: m.concealedKongs).sorted(OrdFigure))
+    }
+    else {
+      EmptyResult
+    }
+  }
+
 }
 
 

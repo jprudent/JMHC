@@ -414,41 +414,6 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
-  private def test(
-                    givenClosed: TileSet,
-                    givenMelded: List[Figure],
-                    givenContextualTile: ContextualTile,
-                    givenBonus: Bonus,
-                    givenContext: PlayerContext,
-                    thenClosed: List[Figure],
-                    thenCombinations: List[(List[Figure], Combination)],
-                    thenTotal: Int
-                    ) {
-
-    val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
-      givenMelded.sorted(OrdFigure),
-      bonus = givenBonus)
-
-    val actual = HuFinder(pts, givenContext).find
-
-    val expected = List(
-      DetailedPoints(
-        HuLe(thenClosed.sorted(OrdFigure),
-          givenMelded.sorted(OrdFigure),
-          givenContextualTile,
-          givenContext,
-          bonus = givenBonus),
-        thenCombinations.map {
-          case (figures, combination) => (figures.sorted(OrdFigure), combination)
-        })
-    )
-
-    assert(actual.size == 1, "Not a valid HuLe : " + pts)
-    assert(actual(0).huLe === expected(0).huLe)
-    assert(actual === expected)
-    assert(actual(0).total === thenTotal)
-
-  }
 
   test(
     """use case : Mixed Shifted Pungs - All Pungs - Prevalent Wind
@@ -502,6 +467,87 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """use case : Concealed Kong - Double Pung
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b6, b6, c8, c8, c8))
+    val givenMelded: List[Figure] = List(Kong(s8), Pung(s9))
+    val givenConcealedKong = List(Kong(c6))
+    val givenContextualTile: ContextualTile = ContextualTile(c8, Discarded, false)
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Pung(c8), Dui(b6))
+    val thenPoints = 27
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Kong(c6), Kong(s8), Pung(c8), Pung(s9), Dui(b6)), UpperFour),
+        (List(Kong(c6), Kong(s8), Pung(c8), Pung(s9)), AllPungs),
+        (List(Kong(c6), Kong(s8)), TwoMeldedKongs),
+        (List(Kong(s8), Pung(c8)), DoublePung),
+        (List(Kong(c6)), ConcealedKong),
+        (List(Pung(s9)), PungOfTerminalOrHonors)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext,
+      thenClosed, thenCombinations, thenPoints)
+
+  }
+
+  private def test(
+                    givenClosed: TileSet,
+                    givenMelded: List[Figure],
+                    givenConcealedKongs: List[Kong],
+                    givenContextualTile: ContextualTile,
+                    givenBonus: Bonus,
+                    givenContext: PlayerContext,
+                    thenClosed: List[Figure],
+                    thenCombinations: List[(List[Figure], Combination)],
+                    thenTotal: Int
+                    ) {
+
+    val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
+      givenMelded.sorted(OrdFigure),
+      givenConcealedKongs,
+      givenBonus)
+
+    val actual = HuFinder(pts, givenContext).find
+
+    val expected = List(
+      DetailedPoints(
+        HuLe(thenClosed.sorted(OrdFigure),
+          givenMelded.sorted(OrdFigure),
+          givenContextualTile,
+          givenContext,
+          givenConcealedKongs,
+          givenBonus),
+        thenCombinations.map {
+          case (figures, combination) => (figures.sorted(OrdFigure), combination)
+        })
+    )
+
+    assert(actual.size == 1, "Not a valid HuLe : " + pts)
+    assert(actual(0).huLe === expected(0).huLe)
+    assert(actual === expected)
+    assert(actual(0).total === thenTotal)
+
+  }
+
+  private def test(
+                    givenClosed: TileSet,
+                    givenMelded: List[Figure],
+                    givenContextualTile: ContextualTile,
+                    givenBonus: Bonus,
+                    givenContext: PlayerContext,
+                    thenClosed: List[Figure],
+                    thenCombinations: List[(List[Figure], Combination)],
+                    thenTotal: Int
+                    ) {
+    test(givenClosed, givenMelded, noKongs, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenTotal)
+  }
+
 
   private def test(
                     givenClosed: TileSet,
@@ -512,7 +558,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     thenCombinations: List[(List[Figure], Combination)],
                     thenTotal: Int
                     ) {
-    test(givenClosed, givenMelded, givenContextualTile, Bonus(Nil), givenContext, thenClosed, thenCombinations, thenTotal)
+    test(givenClosed, givenMelded, noKongs, givenContextualTile, Bonus(Nil), givenContext, thenClosed, thenCombinations, thenTotal)
   }
 
 }
