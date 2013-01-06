@@ -25,10 +25,12 @@ import org.scalatest.junit.JUnitRunner
     val givenClosed = TileSet(List())
     val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded,false)
+    val givenConcealedKongs = List()
     val givenBonus: Bonus = Bonus(Nil)
     val givenContext = PlayerContext(EastWind, EastWind)
 
     val thenClosed = List()
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints =
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
@@ -699,6 +701,35 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       )
 
     test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Concealed Hand - Last Tile
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(s7, s9, b3, b4, b5, b6, b7, b8, c6, c7, c8, c5, c5, s8))
+    val givenMelded: List[Figure] = List()
+    val givenContextualTile: ContextualTile = ContextualTile(s8, Discarded, true)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Chow(b3), Chow(b6), Chow(c6), Chow(s7), Dui(c5))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 11
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(SingleTile(s8)), LastTile),
+        (allFigures, ConcealedHand),
+        (List(Chow(b3), Chow(b6), Chow(c6), Chow(s7)), AllChows),
+        (List(Chow(b6), Chow(c6)), MixedDoubleChows),
+        (List(Chow(b3), Chow(b6)), ShortStraight),
+        (List(Chow(s7)), ClosedWait)
+      )
+
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
 
   }
 

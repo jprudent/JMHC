@@ -162,6 +162,7 @@ package object mahjong {
       DoublePung,
       TileHog,
       AllChows,
+      ConcealedHand,
       SeatWind,
       PrevalentWind,
       DragonPung,

@@ -437,6 +437,22 @@ object AllChows extends Combination {
 }
 
 
+object ConcealedHand extends Combination {
+  val id = 62
+  val points = 2
+  val name = "Concealed Hand"
+  val description = "Nothing melded but finish on a discard"
+
+  def find(m: HuLe): Result = {
+
+    m.melded == Nil && m.lastTileContext.origin == Discarded match {
+      case true => Result(m.allFigures)
+      case false => EmptyResult
+    }
+  }
+}
+
+
 object SeatWind extends Combination {
   val id = 61
   val points = 2
@@ -769,8 +785,7 @@ object LesserHonorsAndKnittedTiles extends Combination {
   val name = "Lesser Honors and Knitted Tiles"
   val description = "6 unique honors and incomplete knitted straight OR 5 unique honors and complete knitted straight"
 
-
-  override val implied = List(AllTypes)
+  override val excluded = List(AllTypes, ConcealedHand)
 
   def find(m: HuLe): Result = {
     val allKnittedWithDragons = m.closed.filter(_.isInstanceOf[SomeKnittedWithSomeDragons])
@@ -825,8 +840,7 @@ object GreaterHonorsAndKnittedTiles extends Combination {
   val name = "Greater Honors and Knitted Tiles"
   val description = "The 7 unique honors and incomplete knitted tiles"
 
-
-  override val implied = List(LesserHonorsAndKnittedTiles, AllTypes)
+  override val excluded = List(LesserHonorsAndKnittedTiles, AllTypes, ConcealedHand)
 
   def find(m: HuLe): Result = {
     val allKnittedWith7Dragons = m.closed.filter(figure =>
@@ -843,8 +857,7 @@ object SevenPairs extends Combination {
   val name = "Seven Pairs"
   val description = "7 pairs"
 
-
-  override val implied = List(SingleWait)
+  override val excluded = List(ConcealedHand, SingleWait)
 
   def find(m: HuLe): Result =
     if (m.closed.size == 7 && m.closed.forall(_.isInstanceOf[Dui]))
@@ -894,8 +907,7 @@ object ThirteenOrphansComb extends Combination {
   val name = "Thirteen Orphans"
   val description = "1 and 9 in three families and 7 distinct honors plus 1 extra honor"
 
-
-  override val implied = List(AllTerminalsAndHonors)
+  override val excluded = List(AllTerminalsAndHonors, ConcealedHand)
 
   def find(m: HuLe): Result = {
     val allThirteenOrphans = m.closed.filter {
