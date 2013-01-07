@@ -28,21 +28,21 @@ object Family {
 }
 
 //TODO rename as StraightFamily
-sealed abstract class SuitFamily extends Family {
+sealed abstract class StraightFamily extends Family {
   override def validValue(value: Int) = value >= 1 && value <= 9
 }
 
-case object Bamboo extends SuitFamily {
+case object Bamboo extends StraightFamily {
   override val name = "Bamboo"
   override val order = 0
 }
 
-case object Character extends SuitFamily {
+case object Character extends StraightFamily {
   override val name = "Character"
   override val order = 1
 }
 
-case object Stone extends SuitFamily {
+case object Stone extends StraightFamily {
   override val name = "Stone"
   override val order = 2
 }
@@ -162,13 +162,21 @@ case class Tile(family: Family, value: Int) {
   // a tile value should be between 1 and 9
   require(family.validValue(value))
 
-  lazy val isStraight = family.isInstanceOf[SuitFamily]
+  lazy val isStraight = family.isInstanceOf[StraightFamily]
 
   lazy val isTerminal = isStraight && (value == 9 || value == 1)
 
   lazy val isHonor = family.isInstanceOf[HonorFamily]
 
+  lazy val isWind = family.isInstanceOf[WindFamily]
+
   lazy val isTerminalOrHonor = isTerminal || isHonor
+
+  lazy val isTerminalOrWind = isTerminal || isWind
+
+  lazy val isFirst = value == 1
+
+  lazy val isLast = value == 9
 
   lazy val isBonus = family.isInstanceOf[BonusFamily]
 
@@ -186,7 +194,7 @@ case class Tile(family: Family, value: Int) {
   def nextOf(tile: Tile) = tile.previousOf(this)
 
   override def toString = family match {
-    case t: SuitFamily => family.name.substring(0, 1).toLowerCase + value
+    case t: StraightFamily => family.name.substring(0, 1).toLowerCase + value
     case t: HonorFamily => t.shortName
     case t: BonusFamily => t.shortName
   }
@@ -194,7 +202,7 @@ case class Tile(family: Family, value: Int) {
 
 object Tile {
 
-  def apply(family: SuitFamily, value: Int) = new Tile(family, value)
+  def apply(family: StraightFamily, value: Int) = new Tile(family, value)
 
   def apply(family: HonorFamily) = new Tile(family, 0xF00D)
 
@@ -534,12 +542,12 @@ case class FiguresComputer(tileSet: TileSet) {
     if (tileSet.size != 14) Nil
 
     else {
-      val honors = tileSet.filter(!_.family.isInstanceOf[SuitFamily])
+      val honors = tileSet.filter(!_.family.isInstanceOf[StraightFamily])
       if (hasTwins(honors) || honors.size < 5) {
         Nil
       }
       else {
-        val knitted = tileSet.filter(_.family.isInstanceOf[SuitFamily])
+        val knitted = tileSet.filter(_.family.isInstanceOf[StraightFamily])
         val knittedComputer: FiguresComputer = FiguresComputer(tileSet)
         if (knitted.size != 14 - honors.size || hasChowsOrTwins(knittedComputer)) {
           Nil

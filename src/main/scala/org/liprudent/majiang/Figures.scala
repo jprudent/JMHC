@@ -148,7 +148,7 @@ package object figures {
    * @param fam258 Family of 2, 5, 8
    * @param fam369 Family of 3, 6, 9
    */
-  case class Knitted(fam147: SuitFamily, fam258: SuitFamily, fam369: SuitFamily) extends Figure {
+  case class Knitted(fam147: StraightFamily, fam258: StraightFamily, fam369: StraightFamily) extends Figure {
 
     require(fam147 != fam258 && fam147 != fam369 && fam258 != fam369)
 
@@ -267,6 +267,10 @@ package object figures {
 
     def sameFamily(y: Chow) =
       t1.sameFamily(y.t1)
+
+    lazy val isStartingChow = t1.isFirst
+
+    lazy val isEndingChow = t3.isLast
   }
 
 

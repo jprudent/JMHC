@@ -19,15 +19,33 @@ object Result {
 
   def apply(figure: Figure) = Fan(List(List(figure)))
 
-  def apply(figures: Figures) = figures match {
-    case Nil => EmptyResult
-    case _ => Fan(List(figures))
-  }
+  def apply(figures: Figures) =
+    figures match {
+      case Nil => EmptyResult
+      case _ => Fan(List(figures))
+    }
 
   //NOTE : The implicit parameter is here to bypass type erasure problems (same signature as above)
-  def apply(multipleMatch: List[Figures])(implicit dummy: DummyImplicit) = multipleMatch match {
-    case Nil => EmptyResult
-    case _ => Fan(multipleMatch)
+  def apply(multipleMatch: List[Figures])(implicit dummy: DummyImplicit) =
+    multipleMatch match {
+      case Nil => EmptyResult
+      case _ => Fan(multipleMatch)
+    }
+
+}
+
+object SomeResult {
+  def apply(figures: Figures)(cond: Boolean): Result =
+    apply(List(figures)) {
+      cond
+    }
+
+
+  def apply(figures: List[Figures])(cond: Boolean)(implicit dummy: DummyImplicit): Result = {
+    cond match {
+      case true => Result(figures)
+      case false => EmptyResult
+    }
   }
 }
 
@@ -85,12 +103,21 @@ sealed trait Combination {
 
 object Combination {
 
-  def findTwoTerminalChows(chows: List[Chow]): List[List[Chow]] = {
+  def findTwoChows(chows: List[Chow])
+                  (cond1: (Chow) => Boolean)
+                  (cond2: (Chow, Chow) => Boolean): List[List[Chow]] = {
     for {
-      c1 <- chows if c1.t1.value == 1
-      c2 <- chows if c2.sameFamily(c1) && c2.t3.value == 9
-    } yield (List(c1, c2))
+      c1 <- chows if cond1(c1)
+      c2 <- chows if cond2(c1, c2)
+    } yield (List(c1, c2).sorted(OrdChow))
+
   }
+
+  def findTwoTerminalChows(chows: List[Chow]) =
+    findTwoChows(chows)(_.isStartingChow) {
+      (c1, c2) => c2.sameFamily(c1) && c2.isEndingChow
+    }
+
 
 }
 
@@ -231,21 +258,10 @@ object OneVoidedSuit extends Combination {
   val description = "1 family (bamboo, stone, characted) is absent"
 
 
-  def find(m: HuLe): Result = {
-    val numberOfFamilies = m.allTiles.groupBy(tile => tile.family match {
-      case f: HonorFamily => "honors"
-      case f => f.name
-    }).filter {
-      case (family, tiles) if family == "honors" => false
-      case _ => true
+  def find(m: HuLe): Result =
+    SomeResult(m.allClosedStraightFamilyFigures) {
+      m.numberOfStraightFamily == 2
     }
-      .keySet.size
-
-    numberOfFamilies == 2 match {
-      case true => Result(m.allClosedStraightFamilyFigures)
-      case false => EmptyResult
-    }
-  }
 }
 
 object MeldedKong extends Combination {
@@ -255,10 +271,10 @@ object MeldedKong extends Combination {
   val description = "One melded kong"
 
 
-  def find(m: HuLe): Result = {
-    if (m.allMeldedKongs.size == 1) Result(m.allMeldedKongs)
-    else EmptyResult
-  }
+  def find(m: HuLe): Result =
+    SomeResult(m.allMeldedKongs) {
+      m.allMeldedKongs.size == 1
+    }
 }
 
 
@@ -269,17 +285,12 @@ object PungOfTerminalOrHonors extends Combination {
   val description = "Pung of 1 or 9 or winds"
 
 
-  def find(m: HuLe): Result = {
+  def find(m: HuLe): Result =
 
-    def cond(tile: Tile) = tile.value == 1 || tile.value == 9 || tile.family.isInstanceOf[WindFamily]
-    val allPungsOfTerminalsOrWind = m.allPungsLike.filter {
-      pl => cond(pl.tile)
-    }
+  //each pung is scored
+    Result(m.allPungsLikeOfTerminalOrWind.map(List(_)))
 
-    //each pung is scored
-    Result(allPungsOfTerminalsOrWind.map(List(_)))
 
-  }
 }
 
 object TwoTerminalChows extends Combination {
@@ -289,11 +300,8 @@ object TwoTerminalChows extends Combination {
   val description = "1, 2, 3 and 7, 8, 9 in one family"
 
 
-  def find(m: HuLe): Result = {
-
+  def find(m: HuLe): Result =
     Result(Combination.findTwoTerminalChows(m.allChows))
-
-  }
 }
 
 
@@ -628,7 +636,7 @@ object AllTypes extends Combination {
 
     def hasFamily(family: Family, figures: Figures) =
       figures.exists(figure => figure match {
-        case f: Knitted if family.isInstanceOf[SuitFamily] => true
+        case f: Knitted if family.isInstanceOf[StraightFamily] => true
         case f: SomeKnittedWithSomeDragons => true
         case f => f.asList.forall(_.family == family)
       })
@@ -949,7 +957,7 @@ object LowerFour extends Combination {
   override val excluded = List(NoHonors)
 
   def find(m: HuLe): Result = {
-    m.allTiles.forall(t => t.family.isInstanceOf[SuitFamily] && t.value <= 4) match {
+    m.allTiles.forall(t => t.family.isInstanceOf[StraightFamily] && t.value <= 4) match {
       case false => EmptyResult
       case true => Result(m.allFigures)
     }
@@ -966,7 +974,7 @@ object UpperFour extends Combination {
   override val excluded = List(NoHonors)
 
   def find(m: HuLe): Result = {
-    m.allTiles.forall(t => t.family.isInstanceOf[SuitFamily] && t.value >= 6) match {
+    m.allTiles.forall(t => t.family.isInstanceOf[StraightFamily] && t.value >= 6) match {
       case false => EmptyResult
       case true => Result(m.allFigures)
     }

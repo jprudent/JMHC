@@ -98,9 +98,25 @@ package object mahjong {
     lazy val allConcealedPungLike = allPungsLike.filterNot(p => melded.contains(p) ||
       (lastTileContext.origin != SelfDrawn && p.tile == lastTileContext.tile))
 
+    lazy val allPungsLikeOfTerminalOrWind = allPungsLike.filter {
+      _.tile.isTerminalOrWind
+    }
+
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
     lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
 
+    lazy val numberOfStraightFamily = numberOfStraightFamilyIn(allTiles)
+
+    def numberOfStraightFamilyIn(tiles: List[Tile]): Int = {
+      tiles.groupBy(tile => tile.family match {
+        case f: HonorFamily => "honors"
+        case f => f.name
+      }).filter {
+        case (family, tiles) if family == "honors" => false
+        case _ => true
+      }
+        .keySet.size
+    }
 
     /**
      * A standard hand is made of 5 figures. It excludes Knitted, Seven Pairs, ...
