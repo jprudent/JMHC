@@ -83,6 +83,17 @@ sealed trait Combination {
   override lazy val toString = "n?%d, %d points, %s".format(id, points, name)
 }
 
+object Combination {
+
+  def findTwoTerminalChows(chows: List[Chow]): List[List[Chow]] = {
+    for {
+      c1 <- chows if c1.t1.value == 1
+      c2 <- chows if c2.sameFamily(c1) && c2.t3.value == 9
+    } yield (List(c1, c2))
+  }
+
+}
+
 object FlowerTiles extends Combination {
   val id = 81
   val points = 1
@@ -279,13 +290,8 @@ object TwoTerminalChows extends Combination {
 
 
   def find(m: HuLe): Result = {
-    val allTwoTerminalChows: List[Figures] =
-      for {
-        c1 <- m.allChows if c1.t1.value == 1
-        c2 <- m.allChows if c2.sameFamily(c1) && c2.t3.value == 9
-      } yield (List(c1, c2))
 
-    Result(allTwoTerminalChows)
+    Result(Combination.findTwoTerminalChows(m.allChows))
 
   }
 }
@@ -335,7 +341,6 @@ object PureDoubleChows extends Combination {
   val points = 1
   val name = "Pure Double Chows"
   val description = "Two identical chows in the same family"
-
 
   def find(m: HuLe): Result = {
     val allPureChows: List[Figures] =
@@ -1069,6 +1074,36 @@ object PureShiftedChow extends Combination {
     }.filterNot(_ == Nil).flatten.toList
 
     Result(allPureShiftedChows)
+  }
+}
+
+object ThreeSuitedTerminalChows extends Combination {
+  val id = 29
+  val points = 16
+  val name = "Three Suited Terminal Chows"
+  val description = "1,2,3,7,8,9 in two family and a pair of 5 in the third"
+
+  override val excluded = List(AllChows, MixedDoubleChows, PureDoubleChows, TwoTerminalChows)
+
+  def find(m: HuLe): Result = {
+    //quick fail
+    if (m.allPungsLike.size != 0 || !m.standardHand) return EmptyResult
+
+    val groupedChows = m.allChows.groupBy(_.t1.family)
+
+    val terminalChows = groupedChows.map {
+      case (family, chows) => Combination.findTwoTerminalChows(chows)
+    }.filterNot(_ == Nil)
+
+    def hasPairOf5InThirdFamily() = {
+      m.allDuis.exists(d => d.tile.value == 5 && !m.allChows.map(_.t1.family).toSet.exists(_ == d.tile.family))
+    }
+
+    if (terminalChows.size == 2 && hasPairOf5InThirdFamily())
+      Result(m.allFigures)
+    else
+      EmptyResult
+
   }
 }
 

@@ -203,6 +203,7 @@ package object mahjong {
       TriplePungs,
       AllFive,
       PureShiftedChow,
+      ThreeSuitedTerminalChows,
       FullFlush,
       GreaterHonorsAndKnittedTiles,
       SevenPairs,

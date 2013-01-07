@@ -44,6 +44,39 @@ class CombinationsSuite extends FunSuite {
     assert(actual === expected)
   }
 
+  test("Three suited terminal chow") {
+    val hule = HuLe(
+      List(Dui(b5)),
+      List(Chow(c1), Chow(c7), Chow(s1), Chow(s7)),
+      ContextualTile(b5, Discarded, NotLastTile),
+      PlayerContext(WestWind, EastWind))
+    val actual = ThreeSuitedTerminalChows.find(hule)
+    val expected = Result(List(Chow(c1), Chow(c7), Chow(s1), Chow(s7), Dui(b5)))
+    assert(actual === expected)
+  }
+
+  test("Three suited terminal invalid, not three family") {
+    val hule = HuLe(
+      List(Dui(c5)),
+      List(Chow(c1), Chow(c7), Chow(s1), Chow(s7)),
+      ContextualTile(b5, Discarded, NotLastTile),
+      PlayerContext(WestWind, EastWind))
+    val actual = ThreeSuitedTerminalChows.find(hule)
+    val expected = EmptyResult
+    assert(actual === expected)
+  }
+
+  test("Three suited terminal invalid, no pair of 5") {
+    val hule = HuLe(
+      List(Dui(b4)),
+      List(Chow(c1), Chow(c7), Chow(s1), Chow(s7)),
+      ContextualTile(b5, Discarded, NotLastTile),
+      PlayerContext(WestWind, EastWind))
+    val actual = ThreeSuitedTerminalChows.find(hule)
+    val expected = EmptyResult
+    assert(actual === expected)
+  }
+
   test("flower tiles") {
 
     val hule = HuLe(
