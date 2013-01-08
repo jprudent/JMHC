@@ -197,6 +197,8 @@ case class Tile(family: Family, value: Int) {
 
   def nextOf(tile: Tile) = tile.previousOf(this)
 
+  def <(t: Tile) = Tile.ord.lt(this, t)
+
   override def toString = family match {
     case t: StraightFamily => family.name.substring(0, 1).toLowerCase + value
     case t: HonorFamily => t.shortName

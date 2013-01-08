@@ -125,6 +125,13 @@ package object mahjong {
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
 
 
+    /* SPECIAL FIGURES */
+
+    lazy val allKnittedTiles = closed.filter(_.isInstanceOf[Knitted])
+
+    lazy val allKnittedWithDragons = closed.filter(_.isInstanceOf[SomeKnittedWithSomeDragons])
+
+
     /* TILES */
 
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
