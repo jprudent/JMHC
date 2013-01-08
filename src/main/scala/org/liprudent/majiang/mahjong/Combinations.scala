@@ -108,7 +108,7 @@ object Combination {
                   (cond2: (Chow, Chow) => Boolean): List[List[Chow]] = {
     for {
       c1 <- chows if cond1(c1)
-      c2 <- chows if cond2(c1, c2)
+      c2 <- chows.dropWhile(_ != c1).tail if cond2(c1, c2)
     } yield (List(c1, c2).sorted(OrdChow))
 
   }
@@ -116,6 +116,21 @@ object Combination {
   def findTwoTerminalChows(chows: List[Chow]) =
     findTwoChows(chows)(_.isStartingChow) {
       (c1, c2) => c2.sameFamily(c1) && c2.isEndingChow
+    }
+
+  def findShortStraights(chows: List[Chow]) =
+    findTwoChows(chows)(_ => true) {
+      (c1, c2) => c2.sameFamily(c1) && c1.isConsequitive(c2)
+    }
+
+  def findMixedDoubleChows(chows: List[Chow]) =
+    findTwoChows(chows)(_ => true) {
+      (c1, c2) => c1.family < c2.family && c1.hasSameValues(c2)
+    }
+
+  def findPureDoubleChows(chows: List[Chow]) =
+    findTwoChows(chows)(_ => true) {
+      (c1, c2) => c1 == c2
     }
 
 
@@ -299,11 +314,9 @@ object TwoTerminalChows extends Combination {
   val name = "Two terminal chows"
   val description = "1, 2, 3 and 7, 8, 9 in one family"
 
-
   def find(m: HuLe): Result =
     Result(Combination.findTwoTerminalChows(m.allChows))
 }
-
 
 object ShortStraight extends Combination {
   val id = 71
@@ -311,19 +324,11 @@ object ShortStraight extends Combination {
   val name = "Short Straight"
   val description = "2 consequitives chows in same family"
 
-
-  def find(m: HuLe): Result = {
-    val allShortStraight: List[Figures] =
-      for {chow1 <- m.allChows
-           chow2 <- m.allChows if chow1.sameFamily(chow2) && chow1.isConsequitive(chow2)
-      } yield (List(chow1, chow2))
-
-    //all short straight is scored
-    Result(allShortStraight)
-  }
+  def find(m: HuLe): Result =
+  //all short straight is scored
+    Result(Combination.findShortStraights(m.allChows))
 
 }
-
 
 object MixedDoubleChows extends Combination {
   val id = 70
@@ -331,16 +336,9 @@ object MixedDoubleChows extends Combination {
   val name = "Mixed Double Chows"
   val description = "2 identical chows in two families"
 
-
-  def find(m: HuLe): Result = {
-    val allMixedChows: List[Figures] =
-      for {chow1 <- m.allChows
-           chow2 <- m.allChows if chow1 != chow2 && chow1.hasSameValues(chow2)
-      } yield (List(chow1, chow2).sorted(OrdChow))
-
-    //all mixed double chow is scored
-    Result(allMixedChows.toSet.toList)
-  }
+  def find(m: HuLe): Result =
+  //all mixed double chow is scored
+    Result(Combination.findMixedDoubleChows(m.allChows))
 
 }
 
@@ -351,12 +349,8 @@ object PureDoubleChows extends Combination {
   val description = "Two identical chows in the same family"
 
   def find(m: HuLe): Result = {
-    val allPureChows: List[Figures] =
-      for {chow1 <- m.allChows if m.allChows.count(_ == chow1) == 2
-      } yield (List(chow1, chow1).sorted(OrdChow))
-
     //all pure double chow is scored
-    Result(allPureChows.toSet.toList)
+    Result(Combination.findPureDoubleChows(m.allChows))
   }
 
 }

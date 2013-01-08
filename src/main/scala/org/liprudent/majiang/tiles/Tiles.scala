@@ -17,6 +17,8 @@ sealed abstract class Family {
   def validValue(v: Int): Boolean
 
   def order: Int
+
+  def <(f: Family) = Family.ord.lt(this, f)
 }
 
 object Family {

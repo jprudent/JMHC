@@ -244,7 +244,7 @@ package object figures {
    * @param t2 Second tile of the straight
    * @param t3 Third tile of the straight
    *
-   * @todo simplify construction with the first tile only. Other tiles can be implied.
+   *           TODO simplify construction with the first tile only. Other tiles can be implied.
    */
   case class Chow(t1: Tile, t2: Tile, t3: Tile) extends Figure {
 
@@ -271,6 +271,8 @@ package object figures {
     lazy val isStartingChow = t1.isFirst
 
     lazy val isEndingChow = t3.isLast
+
+    lazy val family = t1.family
   }
 
 
