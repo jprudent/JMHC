@@ -120,6 +120,19 @@ object Combination {
 
   }
 
+  def findThreeFigures[FigureType <: Figure]
+  (figures: List[FigureType])
+  (cond1: (FigureType) => Boolean)
+  (cond2: (FigureType, FigureType) => Boolean)
+  (cond3: (FigureType, FigureType, FigureType) => Boolean): List[List[FigureType]] = {
+    for {
+      f1 <- figures if cond1(f1)
+      f2 <- figures if cond2(f1, f2)
+      f3 <- figures if cond3(f1, f2, f3)
+    } yield (List(f1, f2, f3).sorted(OrdFigure))
+
+  }
+
   def findTwoTerminalChows(chows: List[Chow]) =
     findTwoFigures(chows)(_.isStartingChow) {
       (c1, c2) => c2.sameFamily(c1) && c2.isEndingChow
@@ -143,6 +156,13 @@ object Combination {
   def findMixedDoublePung(pungs: List[PungLike]) =
     findTwoFigures(pungs)(_ => true) {
       (p1, p2) => !p1.sameFamily(p2) && p1.sameValue(p2)
+    }
+
+  def findMixedShiftedChow(chows: List[Chow]) =
+    findThreeFigures(chows)(_ => true) {
+      (c1, c2) => c2.t1.value == c1.t1.value + 1 && !c1.sameFamily(c2)
+    } {
+      (c1, c2, c3) => c3.t1.value == c2.t1.value + 1 && !c1.sameFamily(c3) && !c2.sameFamily(c3)
     }
 
 }
@@ -592,7 +612,6 @@ object AllTypes extends Combination {
   val name = "All Types"
   val description = "5 figures in all families (bamboo, character, stone, wind, honor)"
 
-
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
       def hasFamily(family: Family, figures: Figures) =
@@ -606,8 +625,8 @@ object AllTypes extends Combination {
         List(EastWind, NorthWind, WestWind, SouthWind),
         List(RedDragon, WhiteDragon, GreenDragon))
         .forall(listFamily => listFamily.exists(family => hasFamily(family, m.allFigures)))
-    }
 
+    }
 
 }
 
@@ -617,17 +636,11 @@ object MixedShiftedChow extends Combination {
   val name = "Mixed Shifted Chow"
   val description = "3 chows in 3 families shifted by 2 tiles"
 
-  def find(m: HuLe): Result = {
-    val allShiftedChows = for {chow1 <- m.allChows
-                               chow2 <- m.allChows if chow2.t1.value == chow1.t1.value + 1 && chow2.t1.family != chow1.t1.family
-                               chow3 <- m.allChows if chow3.t1.value == chow2.t1.value + 1 && chow3.t1.family != chow1.t2.family && chow3.t1.family != chow1.t1.family
-    } yield (List(chow1, chow2, chow3).sorted(OrdChow))
+  def find(m: HuLe): Result =
+  //Every mixed shifted chow is scored
+    Result(Combination.findMixedShiftedChow(m.allChows))
 
-    //Every mixed shifted chow is scored
-    Result(allShiftedChows)
-  }
 }
-
 
 object HalfFlush extends Combination {
   val id = 50
@@ -636,16 +649,14 @@ object HalfFlush extends Combination {
   val description = "all tiles of the same type (bamboos, character or stone) plus some honors "
 
 
-  def find(m: HuLe): Result = {
-    val (honors, straight) = m.allTiles.partition(_.family.isInstanceOf[HonorFamily])
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
 
-    honors.size > 0 &&
-      straight.map(_.family).toSet.size == 1
-    match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+      val (honors, straight) = m.allTiles.partition(_.family.isInstanceOf[HonorFamily])
+
+      honors.size > 0 &&
+        straight.map(_.family).toSet.size == 1
     }
-  }
 }
 
 object AllPungs extends Combination {
@@ -654,11 +665,10 @@ object AllPungs extends Combination {
   val name = "All Pungs"
   val description = "All Pungs and one pair"
 
-
-  def find(m: HuLe): Result = {
-    if (m.allPungsLike.size == 4) Result(m.allPungsLike)
-    else EmptyResult
-  }
+  def find(m: HuLe): Result =
+    SomeResult(m.allPungsLike) {
+      m.allPungsLike.size == 4
+    }
 
 }
 
@@ -671,9 +681,8 @@ object TwoConcealedKongs extends Combination {
   override val excluded = List(TwoConcealedPungs)
 
   def find(m: HuLe): Result = {
-    m.concealedKongs.size == 2 match {
-      case true => Result(m.concealedKongs)
-      case false => EmptyResult
+    SomeResult(m.concealedKongs) {
+      m.concealedKongs.size == 2
     }
   }
 
@@ -686,9 +695,8 @@ object RobbingTheKong extends Combination {
   val description = "Finish by robbing the tile of another player which transform a pung to a kong"
 
   def find(m: HuLe): Result = {
-    m.lastTileContext.origin == KongRobbed match {
-      case true => Result(SingleTile(m.lastTileContext.tile))
-      case false => EmptyResult
+    SomeResult(SingleTile(m.lastTileContext.tile)) {
+      m.lastTileContext.origin == KongRobbed
     }
   }
 
@@ -700,12 +708,10 @@ object OutWithRemplacementTile extends Combination {
   val name = "Out with replacement tile"
   val description = "Finish with the tile that replace the kong tile"
 
-  def find(m: HuLe): Result = {
-    m.lastTileContext.origin == ReplacedTile match {
-      case true => Result(SingleTile(m.lastTileContext.tile))
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(SingleTile(m.lastTileContext.tile)) {
+      m.lastTileContext.origin == ReplacedTile
     }
-  }
 }
 
 object LastTileClaimComb extends Combination {
@@ -714,12 +720,10 @@ object LastTileClaimComb extends Combination {
   val name = "Last tile claim"
   val description = "Finish with a claim of the last discarded tile of the game"
 
-  def find(m: HuLe): Result = {
-    m.lastTileContext.lastTileSituation == LastTileClaim match {
-      case true => Result(SingleTile(m.lastTileContext.tile))
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(SingleTile(m.lastTileContext.tile)) {
+      m.lastTileContext.lastTileSituation == LastTileClaim
     }
-  }
 }
 
 object LastTileDrawComb extends Combination {
