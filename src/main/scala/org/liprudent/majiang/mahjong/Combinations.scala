@@ -405,15 +405,9 @@ object DoublePung extends Combination {
   val name = "Double Pung"
   val description = "Two identical pung in two families"
 
-  def find(m: HuLe): Result = {
-    val allDoublePung =
-      for {
-        p1 <- m.allStraightPungLike
-        p2 <- m.allStraightPungLike if Tile.ord.compare(p1.tile, p2.tile) < 0 && p2.tile.value == p1.tile.value
-      } yield (List(p1, p2).sorted(OrdFigure))
+  def find(m: HuLe): Result =
+    Result(Combination.findMixedDoublePung(m.allStraightPungLike))
 
-    Result(allDoublePung)
-  }
 }
 
 object TileHog extends Combination {
