@@ -187,6 +187,8 @@ case class Tile(family: Family, value: Int) {
    */
   def sameFamily(tile: Tile) = tile.family == family
 
+  def sameValue(tile: Tile) = tile.value == value
+
   /**
    * return true if the `tile` is the previous one in the same family
    * example: Tile(Bamboo,1).isPreviousOf(Tile(Bamboo,2)) should be true

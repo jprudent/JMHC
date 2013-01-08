@@ -125,7 +125,7 @@ object Combination {
 
   def findMixedDoubleChows(chows: List[Chow]) =
     findTwoFigures(chows)(_ => true) {
-      (c1, c2) => c1.family < c2.family && c1.hasSameValues(c2)
+      (c1, c2) => c1.family < c2.family && c1.sameValues(c2)
     }
 
   def findPureDoubleChows(chows: List[Chow]) =
@@ -133,6 +133,10 @@ object Combination {
       (c1, c2) => c1 == c2
     }
 
+  def findMixedDoublePung(pungs: List[PungLike]) =
+    findTwoFigures(pungs)(_ => true) {
+      (p1, p2) => !p1.sameFamily(p2) && p1.sameValue(p2)
+    }
 
 }
 

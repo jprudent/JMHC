@@ -179,6 +179,11 @@ package object figures {
   }
 
   abstract case class PungLike(val tile: Tile) extends Figure {
+
+    def sameFamily(p: PungLike) = tile.sameFamily(p.tile)
+
+    def sameValue(p: PungLike) = tile.sameValue(p.tile)
+
     override def asList = (0 until properties.size map (i => tile)).toList
   }
 
@@ -259,7 +264,7 @@ package object figures {
 
     override def asList = List(t1, t2, t3)
 
-    def hasSameValues(y: Chow) =
+    def sameValues(y: Chow) =
       y.t1.value == t1.value
 
     def isConsequitive(y: Chow) =
