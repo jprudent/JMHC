@@ -103,33 +103,33 @@ sealed trait Combination {
 
 object Combination {
 
-  def findTwoChows(chows: List[Chow])
-                  (cond1: (Chow) => Boolean)
-                  (cond2: (Chow, Chow) => Boolean): List[List[Chow]] = {
+  def findTwoFigures[FigureType <: Figure](figures: List[FigureType])
+                                          (cond1: (FigureType) => Boolean)
+                                          (cond2: (FigureType, FigureType) => Boolean): List[List[FigureType]] = {
     for {
-      c1 <- chows if cond1(c1)
-      c2 <- chows.dropWhile(_ != c1).tail if cond2(c1, c2)
-    } yield (List(c1, c2).sorted(OrdChow))
+      f1 <- figures if cond1(f1)
+      f2 <- figures.dropWhile(_ != f1).tail if cond2(f1, f2)
+    } yield (List(f1, f2).sorted(OrdFigure))
 
   }
 
   def findTwoTerminalChows(chows: List[Chow]) =
-    findTwoChows(chows)(_.isStartingChow) {
+    findTwoFigures(chows)(_.isStartingChow) {
       (c1, c2) => c2.sameFamily(c1) && c2.isEndingChow
     }
 
   def findShortStraights(chows: List[Chow]) =
-    findTwoChows(chows)(_ => true) {
+    findTwoFigures(chows)(_ => true) {
       (c1, c2) => c2.sameFamily(c1) && c1.isConsequitive(c2)
     }
 
   def findMixedDoubleChows(chows: List[Chow]) =
-    findTwoChows(chows)(_ => true) {
+    findTwoFigures(chows)(_ => true) {
       (c1, c2) => c1.family < c2.family && c1.hasSameValues(c2)
     }
 
   def findPureDoubleChows(chows: List[Chow]) =
-    findTwoChows(chows)(_ => true) {
+    findTwoFigures(chows)(_ => true) {
       (c1, c2) => c1 == c2
     }
 
@@ -364,10 +364,9 @@ object AllSimples extends Combination {
   override val excluded = List(NoHonors)
 
   def find(m: HuLe): Result =
-    if (m.allTiles.exists(_.isTerminalOrHonor))
-      EmptyResult
-    else
-      Result(m.allFigures)
+    SomeResult(m.allFigures) {
+      !m.allTiles.exists(_.isTerminalOrHonor)
+    }
 }
 
 object ConcealedKong extends Combination {
@@ -376,10 +375,11 @@ object ConcealedKong extends Combination {
   val name = "Concealed Kong"
   val description = "One concealed kong"
 
-  def find(m: HuLe): Result = {
-    if (m.concealedKongs.size == 1) Result(m.concealedKongs)
-    else EmptyResult
-  }
+  def find(m: HuLe): Result =
+    SomeResult(m.concealedKongs) {
+      m.concealedKongs.size == 1
+    }
+
 }
 
 object TwoConcealedPungs extends Combination {
@@ -388,13 +388,10 @@ object TwoConcealedPungs extends Combination {
   val name = "Two concealed pungs"
   val description = "Two concealed pungs or kongs"
 
-  def find(m: HuLe): Result = {
-    if (m.allConcealedPungLike.size == 2) {
-      Result(m.allConcealedPungLike)
-    } else {
-      EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allConcealedPungLike) {
+      m.allConcealedPungLike.size == 2
     }
-  }
 }
 
 
