@@ -19,6 +19,12 @@ object Result {
 
   def apply(figure: Figure) = Fan(List(List(figure)))
 
+  def apply(optFigure: Option[Figure]) =
+    optFigure match {
+      case Some(figure) => Fan(List(List(figure)))
+      case None => EmptyResult
+    }
+
   def apply(figures: Figures) =
     figures match {
       case Nil => EmptyResult
@@ -35,11 +41,12 @@ object Result {
 }
 
 object SomeResult {
-  def apply(figures: Figures)(cond: Boolean): Result =
-    apply(List(figures)) {
-      cond
-    }
 
+  def apply(figure: Figure)(cond: Boolean): Result =
+    apply(List(List(figure)))(cond)
+
+  def apply(figures: Figures)(cond: Boolean): Result =
+    apply(List(figures))(cond)
 
   def apply(figures: List[Figures])(cond: Boolean)(implicit dummy: DummyImplicit): Result = {
     cond match {
@@ -430,7 +437,6 @@ object TileHog extends Combination {
   }
 }
 
-
 object AllChows extends Combination {
   val id = 63
   val points = 2
@@ -440,12 +446,10 @@ object AllChows extends Combination {
   override val excluded = List(NoHonors)
 
   def find(m: HuLe): Result =
-    if (m.allDuis.size == 1 && m.allChows.size == 4)
-      Result(m.allChows)
-    else
-      EmptyResult
+    SomeResult(m.allChows) {
+      m.allDuis.size == 1 && m.allChows.size == 4
+    }
 }
-
 
 object ConcealedHand extends Combination {
   val id = 62
@@ -453,15 +457,11 @@ object ConcealedHand extends Combination {
   val name = "Concealed Hand"
   val description = "Nothing melded but finish on a discard"
 
-  def find(m: HuLe): Result = {
-
-    m.melded == Nil && m.lastTileContext.origin == Discarded match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.melded == Nil && m.lastTileContext.origin == Discarded
     }
-  }
 }
-
 
 object SeatWind extends Combination {
   val id = 61
@@ -469,14 +469,10 @@ object SeatWind extends Combination {
   val name = "Seat Wind"
   val description = "1 pung of player's wind"
 
-
   override val implied = List(PungOfTerminalOrHonors)
 
   def find(m: HuLe): Result =
-    m.allPungsLike.find(_.tile.family == m.context.seatWind) match {
-      case None => EmptyResult
-      case Some(pung) => Result(pung)
-    }
+    Result(m.allPungsLike.find(_.tile.family == m.context.seatWind))
 }
 
 object PrevalentWind extends Combination {
@@ -485,16 +481,11 @@ object PrevalentWind extends Combination {
   val name = "Prevalent Wind"
   val description = "1 pung of round wind"
 
-
   override val implied = List(PungOfTerminalOrHonors)
 
   def find(m: HuLe): Result =
-    m.allPungsLike.find(_.tile.family == m.context.prevalentWind) match {
-      case None => EmptyResult
-      case Some(pung) => Result(pung)
-    }
+    Result(m.allPungsLike.find(_.tile.family == m.context.prevalentWind))
 }
-
 
 object DragonPung extends Combination {
   val id = 59
@@ -502,12 +493,10 @@ object DragonPung extends Combination {
   val name = "Dragon Pung"
   val description = "A pung of dragon"
 
-
   def find(m: HuLe): Result =
   // all dragon pung is scored
     Result(m.allDragonPungsLike.map(List(_)))
 }
-
 
 object LastTile extends Combination {
   val id = 58
@@ -515,10 +504,10 @@ object LastTile extends Combination {
   val name = "Last Tile"
   val description = "Finish with the fourth tile when all other three are visible"
 
-
   def find(m: HuLe): Result =
-    if (m.lastTileContext.lastTileSituation == LastTileOfKind) Result(SingleTile(m.lastTileContext.tile))
-    else EmptyResult
+    SomeResult(SingleTile(m.lastTileContext.tile)) {
+      m.lastTileContext.lastTileSituation == LastTileOfKind
+    }
 }
 
 object TwoMeldedKongs extends Combination {
@@ -529,17 +518,12 @@ object TwoMeldedKongs extends Combination {
 
   override val excluded = List(MeldedKong)
 
-  def find(m: HuLe): Result = {
-    if (m.allMeldedKongs.size == 2 || (m.allMeldedKongs.size == 1 && m.concealedKongs.size == 1)) {
-      Result((m.allMeldedKongs ::: m.concealedKongs).sorted(OrdFigure))
+  def find(m: HuLe): Result =
+    SomeResult(m.allKongs) {
+      m.allMeldedKongs.size == 2 || (m.allMeldedKongs.size == 1 && m.concealedKongs.size == 1)
     }
-    else {
-      EmptyResult
-    }
-  }
 
 }
-
 
 object FullyConcealedHand extends Combination {
   val id = 56
@@ -551,10 +535,8 @@ object FullyConcealedHand extends Combination {
   override val implied = List(SelfDrawnComb)
 
   def find(m: HuLe): Result =
-    m.lastTileContext.origin == SelfDrawn && m.melded.size == 0
-    match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+    SomeResult(m.allFigures) {
+      m.lastTileContext.origin == SelfDrawn && m.melded.size == 0
     }
 }
 
@@ -564,20 +546,15 @@ object OutsideHand extends Combination {
   val name = "Outside Hand"
   val description = "At least 1 honor or 1 terminal in each figure"
 
-  def find(m: HuLe): Result = {
-
-    m.allFigures.forall(figure => figure match {
-      case f: SomeKnittedWithSomeDragons => false
-      case f: Knitted => false
-      case f: ThirteenOrphans => false
-      case f => f.asList.exists(_.isTerminalOrHonor)
-    })
-
-    match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allFigures.forall(figure => figure match {
+        case f: SomeKnittedWithSomeDragons => false
+        case f: Knitted => false
+        case f: ThirteenOrphans => false
+        case f => f.asList.exists(_.isTerminalOrHonor)
+      })
     }
-  }
 }
 
 object TwoDragonPungs extends Combination {
@@ -588,14 +565,11 @@ object TwoDragonPungs extends Combination {
 
   override val excluded = List(DragonPung)
 
-  def find(m: HuLe): Result = {
-    m.allDragonPungsLike.size == 2 match {
-      case true => Result(m.allDragonPungsLike)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allDragonPungsLike) {
+      m.allDragonPungsLike.size == 2
     }
-  }
 }
-
 
 object MeldedHand extends Combination {
   val id = 53
@@ -605,13 +579,11 @@ object MeldedHand extends Combination {
 
   override val excluded = List(SingleWait)
 
-  def find(m: HuLe): Result = {
-    val cond = m.allFigures.size == 5 && m.melded.size == 4 && m.lastTileContext.origin != SelfDrawn
-    if (cond)
-      Result(m.allFigures)
-    else
-      EmptyResult
-  }
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.melded.size == 4 && m.lastTileContext.origin != SelfDrawn
+    }
+
 }
 
 object AllTypes extends Combination {
@@ -621,26 +593,22 @@ object AllTypes extends Combination {
   val description = "5 figures in all families (bamboo, character, stone, wind, honor)"
 
 
-  def find(m: HuLe): Result = {
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      def hasFamily(family: Family, figures: Figures) =
+        figures.exists(figure => figure match {
+          case f: Knitted if family.isInstanceOf[StraightFamily] => true
+          case f: SomeKnittedWithSomeDragons => true
+          case f => f.asList.forall(_.family == family)
+        })
 
-    def hasFamily(family: Family, figures: Figures) =
-      figures.exists(figure => figure match {
-        case f: Knitted if family.isInstanceOf[StraightFamily] => true
-        case f: SomeKnittedWithSomeDragons => true
-        case f => f.asList.forall(_.family == family)
-      })
-
-
-    List(List(Bamboo), List(Character), List(Stone),
-      List(EastWind, NorthWind, WestWind, SouthWind),
-      List(RedDragon, WhiteDragon, GreenDragon))
-      .forall(listFamily => listFamily.exists(family => hasFamily(family, m.allFigures)))
-    match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+      List(List(Bamboo), List(Character), List(Stone),
+        List(EastWind, NorthWind, WestWind, SouthWind),
+        List(RedDragon, WhiteDragon, GreenDragon))
+        .forall(listFamily => listFamily.exists(family => hasFamily(family, m.allFigures)))
     }
 
-  }
+
 }
 
 object MixedShiftedChow extends Combination {
