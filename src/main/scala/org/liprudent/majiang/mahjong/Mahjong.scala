@@ -3,17 +3,21 @@ package org.liprudent.majiang
 import mahjong._
 import mahjong.DetailedPoints
 import mahjong.HuLe
+import mahjong.PlayerContext
 import mahjong.PlayerTiles
 import org.liprudent.majiang.figures._
 import tiles._
 import org.liprudent.majiang.tiles.Types._
+import tiles.ContextualTile
+import tiles.Tile._
+import org.liprudent.majiang.figures.Knitted
+import org.liprudent.majiang.figures.Kong
+import org.liprudent.majiang.figures.Bonus
+import org.liprudent.majiang.figures.PungLike
 import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
 import org.liprudent.majiang.figures.ThirteenOrphans
-import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Pung
-import org.liprudent.majiang.figures.Bonus
 import org.liprudent.majiang.figures.Dui
-import tiles.ContextualTile
 
 package object mahjong {
 
@@ -77,21 +81,29 @@ package object mahjong {
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(melded == melded.sorted(OrdFigure), "not sorted")
 
+
+    /* ANY FIGURES */
+
     lazy val allFigures = (closed ::: melded ::: concealedKongs).sorted(OrdFigure)
 
+    lazy val allClosedStraightFamilyFigures: List[Figure] =
+      allFigures.filter(_.asList.forall(_.isStraight))
+
+
+    /* KONGS */
+
     lazy val allMeldedKongs: List[Kong] = melded.filter(_.isInstanceOf[Kong]).asInstanceOf[List[Kong]]
+
     lazy val allKongs: List[Kong] = (allMeldedKongs ::: concealedKongs).sorted(OrdFigure)
+
+
+    /* PUNGS & KONGS */
 
     lazy val allPungsLike: List[PungLike] = allFigures.filter(_.isInstanceOf[PungLike]).asInstanceOf[List[PungLike]]
 
     lazy val allDragonPungsLike: List[PungLike] = allPungsLike.filter(_.tile.family.isInstanceOf[DragonFamily])
 
-    lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
-
-    lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
-
-    lazy val allClosedStraightFamilyFigures: List[Figure] =
-      allFigures.filter(_.asList.forall(_.isStraight))
+    lazy val allWindPungsLike: List[PungLike] = allPungsLike.filter(p => p.tile.family.isInstanceOf[WindFamily])
 
     lazy val allStraightPungLike = allPungsLike.filter(_.tile.isStraight)
 
@@ -102,8 +114,23 @@ package object mahjong {
       _.tile.isTerminalOrWind
     }
 
+
+    /* CHOWS */
+
+    lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
+
+
+    /* PAIRS */
+
+    lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
+
+
+    /* TILES */
+
     lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
+
     lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
+
 
     lazy val numberOfStraightFamily = numberOfStraightFamilyIn(allTiles)
 

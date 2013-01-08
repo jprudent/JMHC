@@ -275,6 +275,8 @@ package object figures {
 
     lazy val isStartingChow = t1.isFirst
 
+    lazy val isMiddleChow = t1.value == 4
+
     lazy val isEndingChow = t3.isLast
 
     lazy val family = t1.family

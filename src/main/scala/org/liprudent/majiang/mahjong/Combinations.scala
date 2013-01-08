@@ -165,6 +165,19 @@ object Combination {
       (c1, c2, c3) => c3.t1.value == c2.t1.value + 1 && !c1.sameFamily(c3) && !c2.sameFamily(c3)
     }
 
+  def findMixedShiftedPungs(pungs: List[PungLike]) = {
+    def cond(p1: PungLike, p2: PungLike) =
+      p1.tile.family != p2.tile.family && p2.tile.value == p1.tile.value + 1
+    findThreeFigures(pungs)(_ => true)((c1, c2) => cond(c1, c2))((c1, c2, c3) => cond(c2, c3))
+  }
+
+  def findMixedStraight(chows: List[Chow]) =
+    findThreeFigures(chows)(_.isStartingChow) {
+      (c1, c2) => c2.isMiddleChow && !c1.sameFamily(c2)
+    } {
+      (c1, c2, c3) => c3.isEndingChow && !c1.sameFamily(c3) && !c2.sameFamily(c3)
+    }
+
 }
 
 object FlowerTiles extends Combination {
@@ -734,12 +747,10 @@ object LastTileDrawComb extends Combination {
 
   override val excluded = List(SelfDrawnComb)
 
-  def find(m: HuLe): Result = {
-    m.lastTileContext.lastTileSituation == LastTileDraw match {
-      case true => Result(SingleTile(m.lastTileContext.tile))
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(SingleTile(m.lastTileContext.tile)) {
+      m.lastTileContext.lastTileSituation == LastTileDraw
     }
-  }
 }
 
 object ChickenHand extends Combination {
@@ -750,53 +761,52 @@ object ChickenHand extends Combination {
 
   override val excluded = List(SelfDrawnComb)
 
-  def find(m: HuLe): Result = {
-    val allForbidenThings: List[Combination] = List(
-      ThirteenOrphansComb,
-      SevenPairs,
-      LesserHonorsAndKnittedTiles,
-      KnittedStraight,
-      MixedStraight,
-      //TODO reversible tiles
-      MixedShiftedPung,
-      LastTileDrawComb,
-      LastTileClaimComb,
-      OutWithRemplacementTile,
-      RobbingTheKong,
-      AllPungs,
-      HalfFlush,
-      MixedShiftedChow,
-      AllTypes,
-      MeldedHand,
-      OutsideHand,
-      FullyConcealedHand,
-      LastTile,
-      DragonPung,
-      ConcealedHand,
-      AllChows,
-      TileHog,
-      DoublePung,
-      TwoConcealedPungs,
-      ConcealedKong,
-      AllSimples,
-      PureDoubleChows,
-      MixedDoubleChows,
-      ShortStraight,
-      TwoTerminalChows,
-      PungOfTerminalOrHonors,
-      MeldedKong,
-      OneVoidedSuit,
-      NoHonors,
-      EdgeWait,
-      ClosedWait,
-      SingleWait,
-      SelfDrawnComb)
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      val allForbidenThings: List[Combination] = List(
+        ThirteenOrphansComb,
+        SevenPairs,
+        LesserHonorsAndKnittedTiles,
+        KnittedStraight,
+        MixedStraight,
+        //TODO reversible tiles
+        MixedShiftedPung,
+        LastTileDrawComb,
+        LastTileClaimComb,
+        OutWithRemplacementTile,
+        RobbingTheKong,
+        AllPungs,
+        HalfFlush,
+        MixedShiftedChow,
+        AllTypes,
+        MeldedHand,
+        OutsideHand,
+        FullyConcealedHand,
+        LastTile,
+        DragonPung,
+        ConcealedHand,
+        AllChows,
+        TileHog,
+        DoublePung,
+        TwoConcealedPungs,
+        ConcealedKong,
+        AllSimples,
+        PureDoubleChows,
+        MixedDoubleChows,
+        ShortStraight,
+        TwoTerminalChows,
+        PungOfTerminalOrHonors,
+        MeldedKong,
+        OneVoidedSuit,
+        NoHonors,
+        EdgeWait,
+        ClosedWait,
+        SingleWait,
+        SelfDrawnComb)
 
-    val noPoints = allForbidenThings.forall(_.find(m) == EmptyResult)
+      allForbidenThings.forall(_.find(m) == EmptyResult)
 
-    if (noPoints) Result(m.allFigures)
-    else EmptyResult
-  }
+    }
 }
 
 
@@ -806,22 +816,9 @@ object MixedShiftedPung extends Combination {
   val name = "Mixed Shifted Pung"
   val description = "Three consecutive pungs in three families"
 
-  def find(m: HuLe): Result = {
+  def find(m: HuLe): Result =
+    Result(Combination.findMixedShiftedPungs(m.allStraightPungLike))
 
-    val straightPungs = m.allPungsLike.filter(_.tile.isStraight)
-
-    def cond(p1: PungLike, p2: PungLike) =
-      p1.tile.family != p2.tile.family && p2.tile.value == p1.tile.value + 1
-
-    val allMixedShiftedPungs: List[Figures] =
-      for {p1 <- straightPungs
-           p2 <- straightPungs if cond(p1, p2)
-           p3 <- straightPungs if cond(p2, p3)
-      } yield (List(p1, p2, p3).sorted(OrdFigure))
-
-    Result(allMixedShiftedPungs)
-
-  }
 }
 
 object MixedTripleChow extends Combination {
@@ -856,19 +853,16 @@ object ReversibleTiles extends Combination {
 
   override val excluded = List(OneVoidedSuit)
 
-  def find(m: HuLe): Result = {
-    val allowedTiles = List(
-      s1, s2, s3, s4, s5, s6, s7, s8, s9,
-      b2, b4, b5, b6, b8, b9,
-      dw
-    )
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      val allowedTiles = List(
+        s1, s2, s3, s4, s5, s6, s7, s8, s9,
+        b2, b4, b5, b6, b8, b9,
+        dw
+      )
 
-    m.allTiles.forall(allowedTiles.contains(_)) match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+      m.allTiles.forall(allowedTiles.contains(_))
     }
-
-  }
 }
 
 
@@ -878,35 +872,22 @@ object MixedStraight extends Combination {
   val name = "Mixed Straight"
   val description = "Three consecutive chows in three family"
 
-  def find(m: HuLe): Result = {
-    val allMixedStraight =
-      for {
-        chow1 <- m.allChows if chow1.t1.value == 1
-        chow2 <- m.allChows if !chow1.sameFamily(chow2) && chow2.t1.value == 4
-        chow3 <- m.allChows if !chow2.sameFamily(chow3) && !chow1.sameFamily(chow3) && chow3.t1.value == 7
-      } yield (List(chow1, chow2, chow3).sorted(OrdFigure))
-
-    Result(allMixedStraight)
-  }
+  def find(m: HuLe): Result =
+    Result(Combination.findMixedStraight(m.allChows))
 }
 
 object BigThreeWind extends Combination {
   val id = 38
   val points = 12
   val name = "Big Three Winds"
-  val description = "3 pungs of each wind"
+  val description = "3 pungs of different wind"
 
   override val implied = List(PungOfTerminalOrHonors)
 
-  def find(m: HuLe): Result = {
-
-    val winds = List(we, wn, ww, ws)
-
-    val allWindPungs = m.allPungsLike.filter(p => winds.contains(p.tile))
-
-    if (allWindPungs.size == 3) Result(allWindPungs)
-    else EmptyResult
-  }
+  def find(m: HuLe): Result =
+    SomeResult(m.allWindPungsLike) {
+      m.allWindPungsLike.size == 3
+    }
 }
 
 object LowerFour extends Combination {
