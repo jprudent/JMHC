@@ -1072,10 +1072,12 @@ object LowerTiles extends Combination {
 }
 
 object UpperTiles extends Combination {
-  val id = 26
+  val id = 25
   val points = 24
   val name = "Upper Tiles"
   val description = "Only 7-8-9"
+
+  override val excluded = List(UpperFour)
 
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {

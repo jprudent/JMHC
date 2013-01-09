@@ -269,6 +269,7 @@ package object mahjong {
       PureStraight,
       LowerTiles,
       UpperTiles,
+      PureTripleChow,
       FullFlush,
       GreaterHonorsAndKnittedTiles,
       SevenPairs,
