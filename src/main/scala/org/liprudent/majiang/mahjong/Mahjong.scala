@@ -81,6 +81,14 @@ package object mahjong {
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(melded == melded.sorted(OrdFigure), "not sorted")
 
+    require(melded.forall(_ match {
+      case f: Dui => false
+      case f: Knitted => false
+      case f: SomeKnittedWithSomeDragons => false
+      case f: ThirteenOrphans => false
+      case _ => true
+    }), "melded figures can only be kong, chow or pung")
+
 
     /* ANY FIGURES */
 
@@ -130,6 +138,10 @@ package object mahjong {
     lazy val allKnittedTiles = closed.filter(_.isInstanceOf[Knitted])
 
     lazy val allKnittedWithDragons = closed.filter(_.isInstanceOf[SomeKnittedWithSomeDragons])
+
+    lazy val allThirteenOrphans = closed.filter {
+      _.isInstanceOf[ThirteenOrphans]
+    }
 
 
     /* TILES */

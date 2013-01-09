@@ -1040,7 +1040,6 @@ object FullFlush extends Combination {
     }
 }
 
-
 object GreaterHonorsAndKnittedTiles extends Combination {
   val id = 20
   val points = 24
@@ -1067,9 +1066,10 @@ object SevenPairs extends Combination {
   override val excluded = List(ConcealedHand, SingleWait)
 
   def find(m: HuLe): Result =
-    if (m.closed.size == 7 && m.closed.forall(_.isInstanceOf[Dui]))
-      Result(m.closed)
-    else EmptyResult
+    SomeResult(m.closed) {
+      m.closed.size == 7 && m.closed.forall(_.isInstanceOf[Dui])
+    }
+
 }
 
 object AllTerminalsAndHonors extends Combination {
@@ -1078,19 +1078,13 @@ object AllTerminalsAndHonors extends Combination {
   val name = "All Terminals And Honors"
   val description = "only 1, 9 and honors"
 
-
   override val excluded = List(OutsideHand)
 
-  def find(m: HuLe): Result = {
-    m.allTiles.forall {
-      case Tile(family, value) if value == 1 || value == 9 || family.isInstanceOf[HonorFamily] => true
-      case _ => false
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.forall(_.isTerminalOrHonor)
     }
-    match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
-    }
-  }
+
 }
 
 object ThreeKongs extends Combination {
@@ -1099,12 +1093,10 @@ object ThreeKongs extends Combination {
   val name = "Three Kongs"
   val description = "Three Kongs"
 
-  def find(m: HuLe): Result = {
-    m.allKongs.size == 3 match {
-      case true => Result(m.allKongs)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allKongs) {
+      m.allKongs.size == 3
     }
-  }
 
 }
 
@@ -1116,12 +1108,10 @@ object AllHonors extends Combination {
 
   override val excluded = List(AllTerminalsAndHonors, AllPungs, PungOfTerminalOrHonors)
 
-  def find(m: HuLe): Result = {
-    m.allTiles.forall(!_.isStraight) match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.forall(_.isHonor)
     }
-  }
 
 }
 
@@ -1134,12 +1124,9 @@ object ThirteenOrphansComb extends Combination {
 
   override val excluded = List(AllTerminalsAndHonors, ConcealedHand)
 
-  def find(m: HuLe): Result = {
-    val allThirteenOrphans = m.closed.filter {
-      _.isInstanceOf[ThirteenOrphans]
-    }
-    Result(allThirteenOrphans)
-  }
+  def find(m: HuLe): Result =
+    Result(m.allThirteenOrphans)
+
 }
 
 object BigThreeDragons extends Combination {
@@ -1150,12 +1137,10 @@ object BigThreeDragons extends Combination {
 
   override val excluded = List(DragonPung)
 
-  def find(m: HuLe): Result = {
-    m.allDragonPungsLike.size == 3 match {
-      case true => Result(m.allDragonPungsLike)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allDragonPungsLike) {
+      m.allDragonPungsLike.size == 3
     }
 
-  }
 }
 
