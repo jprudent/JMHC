@@ -198,6 +198,16 @@ object Combination {
       (c1, c2, c3) => c3.sameFamily(c1, c2) && c3.isEndingChow
     }
 
+  def findPureShiftedPungs(pungs: List[PungLike]) = {
+    findThreeFigures(pungs) {
+      _.tile.isStraight
+    } {
+      (p1, p2) => p2.sameFamily(p1) && p2.tile.value == p1.tile.value + 1
+    } {
+      (p1, p2, p3) => p3.sameFamily(p1, p2) && p3.tile.value == p2.tile.value + 1
+    }
+  }
+
 
 }
 
@@ -1064,6 +1074,20 @@ object LowerTiles extends Combination {
     }
 }
 
+object MiddleTiles extends Combination {
+  val id = 27
+  val points = 24
+  val name = "Middle Tiles"
+  val description = "Only 4-5-6"
+
+  override val excluded = List(AllSimples)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.forall(t => t.isStraight && t.value >= 4 && t.value <= 6)
+    }
+}
+
 object UpperTiles extends Combination {
   val id = 25
   val points = 24
@@ -1077,6 +1101,19 @@ object UpperTiles extends Combination {
       m.allTiles.forall(t => t.isStraight && t.value >= 7)
     }
 }
+
+object PureShiftedPungs extends Combination {
+  val id = 24
+  val points = 24
+  val name = "Pure Shifted Pungs"
+  val description = "Three consecutive pungs in the same family"
+
+  override val excluded = List(UpperFour)
+
+  def find(m: HuLe): Result =
+    Result(Combination.findPureShiftedPungs(m.allStraightPungLike))
+}
+
 
 object PureTripleChow extends Combination {
   val id = 23

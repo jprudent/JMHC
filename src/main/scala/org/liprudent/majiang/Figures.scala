@@ -180,7 +180,10 @@ package object figures {
 
   abstract case class PungLike(val tile: Tile) extends Figure {
 
-    def sameFamily(p: PungLike) = tile.sameFamily(p.tile)
+    def sameFamily(p: PungLike): Boolean = tile.sameFamily(p.tile)
+
+    def sameFamily(x: PungLike, y: PungLike): Boolean =
+      sameFamily(x) && sameFamily(y)
 
     def sameValue(p: PungLike) = tile.sameValue(p.tile)
 
