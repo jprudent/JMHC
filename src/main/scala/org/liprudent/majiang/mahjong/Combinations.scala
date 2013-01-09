@@ -198,13 +198,6 @@ object Combination {
       (c1, c2, c3) => c3.sameFamily(c1, c2) && c3.isEndingChow
     }
 
-  def findPureTripleChows(chows: List[Chow]) =
-    findThreeFigures(chows)(_ => true) {
-      (c1, c2) => c1 == c2
-    } {
-      (c1, c2, c3) => c2 == c3
-    }
-
 
 }
 
@@ -1085,7 +1078,6 @@ object UpperTiles extends Combination {
     }
 }
 
-//TODO tests
 object PureTripleChow extends Combination {
   val id = 23
   val points = 24
