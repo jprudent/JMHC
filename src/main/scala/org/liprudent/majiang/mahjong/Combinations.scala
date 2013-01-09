@@ -198,6 +198,13 @@ object Combination {
       (c1, c2, c3) => c3.sameFamily(c1, c2) && c3.isEndingChow
     }
 
+  def findPureTripleChows(chows: List[Chow]) =
+    findThreeFigures(chows)(_ => true) {
+      (c1, c2) => c1 == c2
+    } {
+      (c1, c2, c3) => c2 == c3
+    }
+
 
 }
 
@@ -1050,6 +1057,50 @@ object PureStraight extends Combination {
 
 }
 
+object LowerTiles extends Combination {
+  val id = 27
+  val points = 24
+  val name = "Lower Tiles"
+  val description = "Only 1-2-3"
+
+  override val excluded = List(LowerFour)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.forall(t => t.isStraight && t.value <= 3)
+    }
+}
+
+object UpperTiles extends Combination {
+  val id = 26
+  val points = 24
+  val name = "Upper Tiles"
+  val description = "Only 7-8-9"
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.forall(t => t.isStraight && t.value >= 7)
+    }
+}
+
+//TODO tests
+object PureTripleChow extends Combination {
+  val id = 23
+  val points = 24
+  val name = "Pure Triple Chow"
+  val description = "Three identical chows"
+
+  override val excluded = List(PureDoubleChows)
+
+  def find(m: HuLe): Result = {
+    val allPureTripleChows = m.allChows.groupBy(c => c).filter {
+      case (chow, chows) => chows.size == 3
+    }.values.toList
+
+    Result(allPureTripleChows)
+  }
+}
+
 
 object FullFlush extends Combination {
   val id = 22
@@ -1122,6 +1173,22 @@ object ThreeKongs extends Combination {
     }
 
 }
+
+object QuadrupleChows extends Combination {
+  val id = 15
+  val points = 48
+  val name = "Quadruple Chows"
+  val description = "Four identical chows"
+
+  override val excluded = List(PureTripleChow, TileHog, AllChows)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allChows) {
+      m.allChows.count(_ == m.allChows(0)) == 4
+    }
+
+}
+
 
 object AllHonors extends Combination {
   val id = 11
