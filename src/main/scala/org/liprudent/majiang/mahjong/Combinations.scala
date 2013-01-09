@@ -1018,22 +1018,15 @@ object ThreeSuitedTerminalChows extends Combination {
 
     SomeResult(m.allFigures) {
       m.allPungsLike == Nil && m.standardHand && {
-        val groupedChows = m.allChows.groupBy(_.t1.family)
-        val terminalChows = groupedChows.map {
-          case (family, chows) => Combination.findTwoTerminalChows(chows)
-        }.filterNot(_ == Nil)
 
-        def hasPairOf5InThirdFamily() = {
-          m.allDuis.exists(d => d.tile.value == 5 && !m.allChows.map(_.t1.family).toSet.exists(_ == d.tile.family))
-        }
+        val hasPairOf5InThirdFamily =
+          m.allDuis.exists(d => d.tile.value == 5 && !m.allChows.exists(_.t1.sameFamily(d.tile)))
 
-        terminalChows.size == 2 && hasPairOf5InThirdFamily()
+        Combination.findTwoTerminalChows(m.allChows).size == 2 && hasPairOf5InThirdFamily
       }
-
 
     }
 }
-
 
 object FullFlush extends Combination {
   val id = 22
@@ -1041,13 +1034,10 @@ object FullFlush extends Combination {
   val name = "Full Flush"
   val description = "Only tiles of the same straight family"
 
-
-  def find(m: HuLe): Result = {
-    m.allTiles.groupBy(tile => tile.family).size == 1 match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.groupBy(tile => tile.family).size == 1
     }
-  }
 }
 
 
