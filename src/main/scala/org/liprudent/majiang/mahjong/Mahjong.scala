@@ -266,6 +266,7 @@ package object mahjong {
       AllFive,
       PureShiftedChow,
       ThreeSuitedTerminalChows,
+      PureStraight,
       FullFlush,
       GreaterHonorsAndKnittedTiles,
       SevenPairs,

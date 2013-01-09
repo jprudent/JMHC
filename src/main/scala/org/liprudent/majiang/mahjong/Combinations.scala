@@ -191,6 +191,14 @@ object Combination {
       (c1, c2, c3) => c3.sameFamily(c1, c2) && (c3.t1.value == c2.t1.value + (c2.t1.value - c1.t1.value))
     }
 
+  def findPureStraight(chows: List[Chow]) =
+    findThreeFigures(chows)(_.isStartingChow) {
+      (c1, c2) => c2.sameFamily(c1) && c2.isMiddleChow
+    } {
+      (c1, c2, c3) => c3.sameFamily(c1, c2) && c3.isEndingChow
+    }
+
+
 }
 
 object FlowerTiles extends Combination {
@@ -210,6 +218,7 @@ object FlowerTiles extends Combination {
 
 }
 
+//TODO should return SingleTile
 object SelfDrawnComb extends Combination {
   val id = 80
   val points = 1
@@ -1028,6 +1037,20 @@ object ThreeSuitedTerminalChows extends Combination {
     }
 }
 
+object PureStraight extends Combination {
+  val id = 28
+  val points = 16
+  val name = "Pure Straight"
+  val description = "1-2-3, 4-5-6, 7-8-9 in the same family"
+
+  override val excluded = List(ShortStraight, TwoTerminalChows)
+
+  def find(m: HuLe): Result =
+    Result(Combination.findPureStraight(m.allChows))
+
+}
+
+
 object FullFlush extends Combination {
   val id = 22
   val points = 24
@@ -1114,7 +1137,6 @@ object AllHonors extends Combination {
     }
 
 }
-
 
 object ThirteenOrphansComb extends Combination {
   val id = 7
