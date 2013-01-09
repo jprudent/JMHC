@@ -1249,6 +1249,34 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   }
 
   test(
+    """use case : Four concealed pungs - All Even Pungs
+      |verif : Mahjong Friends
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b2, b2, b2, b4, b4, b4, c6, c6, c6, s8, s8, s8, b6, b6))
+    val givenMelded: List[Figure] = List()
+    val givenContextualTile: ContextualTile = ContextualTile(s8, SelfDrawn, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Pung(b2), Pung(b4), Pung(c6), Pung(s8), Dui(b6))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 92
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(b2), Pung(b4), Pung(c6), Pung(s8)), FourConcealedPungs),
+        (allFigures, AllEvenPungs),
+        (allFigures, FullyConcealedHand)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
+
+  test(
     """use case : Pure Shifted Pungs - Middle Tiles
       |verif : My head
       |tricky part:

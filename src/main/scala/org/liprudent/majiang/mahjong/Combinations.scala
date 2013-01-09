@@ -1145,6 +1145,21 @@ object FullFlush extends Combination {
     }
 }
 
+object AllEvenPungs extends Combination {
+  val id = 21
+  val points = 24
+  val name = "All Even Pungs"
+  val description = "Only tiles 2, 4, 6, 8"
+
+  override val excluded = List(AllPungs, AllSimples)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.forall(_.value % 2 == 0)
+    }
+
+}
+
 object GreaterHonorsAndKnittedTiles extends Combination {
   val id = 20
   val points = 24
@@ -1217,6 +1232,22 @@ object QuadrupleChows extends Combination {
     SomeResult(m.allChows) {
       m.allChows.count(_ == m.allChows(0)) == 4
     }
+
+}
+
+object FourConcealedPungs extends Combination {
+  val id = 12
+  val points = 64
+  val name = "Four Concealed Pungs"
+  val description = "Four concealed pungs"
+
+  override val excluded = List(ThreeConcealedPungs)
+
+  def find(m: HuLe): Result = {
+    SomeResult(m.allPungsLike) {
+      m.allConcealedPungLike.size == 4
+    }
+  }
 
 }
 

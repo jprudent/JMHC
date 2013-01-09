@@ -273,11 +273,13 @@ package object mahjong {
       PureShiftedPungs,
       PureTripleChow,
       FullFlush,
+      AllEvenPungs,
       GreaterHonorsAndKnittedTiles,
       SevenPairs,
       AllTerminalsAndHonors,
       ThreeKongs,
       QuadrupleChows,
+      FourConcealedPungs,
       AllHonors,
       ThirteenOrphansComb,
       BigThreeDragons

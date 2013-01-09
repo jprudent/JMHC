@@ -180,6 +180,21 @@ class CombinationsSuite extends FunSuite {
 
   }
 
+  test("Four concealed pungs but finish with discarded tile so it's 3 pungs") {
+    val closed: List[Figure] = List(Pung(b2), Pung(b4), Pung(c6), Pung(s8), Dui(b6))
+    val disclosed: List[Figure] = List()
+    val lastTile: ContextualTile = ContextualTile(b6, Discarded, NotLastTile)
+    val context = PlayerContext(WestWind, EastWind)
+
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = FourConcealedPungs.find(hule)
+    val expected = Result(List(List(Pung(b2), Pung(b4), Pung(c6), Pung(s8))))
+
+    assert(actual === expected)
+
+  }
+
 
 }
 

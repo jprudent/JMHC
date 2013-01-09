@@ -72,6 +72,7 @@ class MahjongSuite extends FunSuite {
       Hand(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), b1ContextualTile),
       Nil
     )
+
   }
 
   test("a mahjong has 14 tiles") {
@@ -316,6 +317,18 @@ class MahjongSuite extends FunSuite {
     val excl = (List(Pung(ww)), PungOfTerminalOrHonors)
 
     assert(HulePointsComputer.isExcluded(ref, excl))
+  }
+
+  test("allConcealedPungLike - finish on pung") {
+    val fourConcealedPungs = HuLe(
+      List(Pung(b2), Pung(b4), Pung(c6), Pung(s8), Dui(b6)), List(),
+      ContextualTile(s8, Discarded, NotLastTile),
+      PlayerContext(EastWind, EastWind),
+      List(),
+      Bonus(List())
+    )
+
+    assert(fourConcealedPungs.allConcealedPungLike === List(Pung(b2), Pung(b4), Pung(c6)))
   }
 
 }
