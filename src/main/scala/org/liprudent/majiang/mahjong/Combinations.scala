@@ -186,9 +186,9 @@ object Combination {
 
   def findPureShiftedChow(chows: List[Chow]) =
     findThreeFigures(chows)(_ => true) {
-      (c1, c2) => c2.t1.value == c1.t1.value + 1 || c2.t1.value == c1.t1.value + 2
+      (c1, c2) => c2.sameFamily(c1) && (c2.t1.value == c1.t1.value + 1 || c2.t1.value == c1.t1.value + 2)
     } {
-      (c1, c2, c3) => c3.t1.value == c2.t1.value + (c2.t1.value - c1.t1.value)
+      (c1, c2, c3) => c3.sameFamily(c1, c2) && (c3.t1.value == c2.t1.value + (c2.t1.value - c1.t1.value))
     }
 
 }
@@ -1002,14 +1002,7 @@ object PureShiftedChow extends Combination {
   val description = "3 chows shifted by one or two tiles in the same family"
 
   def find(m: HuLe): Result = {
-    val chowsByFamily = m.allChows.groupBy(_.t1.family)
-
-
-    val allPureShiftedChows = chowsByFamily.map {
-      case (family, chows) => Combination.findPureShiftedChow(chows)
-    }.filterNot(_ == Nil).flatten.toList
-
-    Result(allPureShiftedChows)
+    Result(Combination.findPureShiftedChow(m.allChows))
   }
 }
 
