@@ -184,6 +184,13 @@ object Combination {
     findThreeFigures(pungs)(_ => true)((c1, c2) => cond(c1, c2))((c1, c2, c3) => cond(c2, c3))
   }
 
+  def findPureShiftedChow(chows: List[Chow]) =
+    findThreeFigures(chows)(_ => true) {
+      (c1, c2) => c2.t1.value == c1.t1.value + 1 || c2.t1.value == c1.t1.value + 2
+    } {
+      (c1, c2, c3) => c3.t1.value == c2.t1.value + (c2.t1.value - c1.t1.value)
+    }
+
 }
 
 object FlowerTiles extends Combination {
@@ -247,7 +254,6 @@ sealed trait WaitCombination extends Combination {
     }
   }
 }
-
 
 object SingleWait extends Combination with WaitCombination {
   val id = 79
@@ -982,12 +988,10 @@ object AllFive extends Combination {
 
   override val excluded = List(AllSimples)
 
-  def find(m: HuLe): Result = {
-    m.standardHand && m.allFigures.forall(_.asList.exists(_.value == 5)) match {
-      case true => Result(m.allFigures)
-      case false => EmptyResult
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.standardHand && m.allFigures.forall(_.asList.exists(_.value == 5))
     }
-  }
 }
 
 
@@ -999,16 +1003,10 @@ object PureShiftedChow extends Combination {
 
   def find(m: HuLe): Result = {
     val chowsByFamily = m.allChows.groupBy(_.t1.family)
-    def matchingPureShiftedChow(chows: List[Chow]): List[List[Chow]] = {
-      for {
-        c1 <- chows
-        c2 <- chows if c2.t1.value == c1.t1.value + 1 || c2.t1.value == c1.t1.value + 2
-        c3 <- chows if c3.t1.value == c2.t1.value + (c2.t1.value - c1.t1.value)
-      } yield (List(c1, c2, c3))
-    }
+
 
     val allPureShiftedChows = chowsByFamily.map {
-      case (family, chows) => matchingPureShiftedChow(chows)
+      case (family, chows) => Combination.findPureShiftedChow(chows)
     }.filterNot(_ == Nil).flatten.toList
 
     Result(allPureShiftedChows)

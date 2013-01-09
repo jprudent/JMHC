@@ -270,8 +270,11 @@ package object figures {
     def isConsequitive(y: Chow) =
       y.t1.value == t1.value + 3
 
-    def sameFamily(y: Chow) =
+    def sameFamily(y: Chow): Boolean =
       t1.sameFamily(y.t1)
+
+    def sameFamily(y: Chow, z: Chow): Boolean =
+      sameFamily(y) && sameFamily(z)
 
     lazy val isStartingChow = t1.isFirst
 
