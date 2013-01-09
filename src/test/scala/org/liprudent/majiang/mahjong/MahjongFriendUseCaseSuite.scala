@@ -1305,6 +1305,63 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """use case : Four Shifted Chows by 1
+      |verif : My head
+      |dubious: Short straight
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(dr, dr))
+    val givenMelded: List[Figure] = List(Chow(b1), Chow(b2), Chow(b3), Chow(b4))
+    val givenContextualTile: ContextualTile = ContextualTile(dr, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(dr))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 45
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Chow(b1), Chow(b2), Chow(b3), Chow(b4)), FourShiftedChows),
+        (allFigures, HalfFlush),
+        (allFigures, MeldedHand),
+        (List(Chow(b1), Chow(b4)), ShortStraight)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+  test(
+    """use case : Four Shifted Chows by 2
+      |verif : My head
+      |dubious : Two Terminal Chows
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(dr, dr))
+    val givenMelded: List[Figure] = List(Chow(b1), Chow(b3), Chow(b5), Chow(b7))
+    val givenContextualTile: ContextualTile = ContextualTile(dr, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(dr))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 45
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Chow(b1), Chow(b3), Chow(b5), Chow(b7)), FourShiftedChows),
+        (allFigures, HalfFlush),
+        (allFigures, MeldedHand),
+        (List(Chow(b1), Chow(b7)), TwoTerminalChows)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
   private def test(
                     givenClosed: TileSet,
                     givenMelded: List[Figure],

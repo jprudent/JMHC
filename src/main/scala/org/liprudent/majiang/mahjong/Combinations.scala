@@ -1220,6 +1220,22 @@ object ThreeKongs extends Combination {
 
 }
 
+object FourShiftedChows extends Combination {
+  val id = 16
+  val points = 32
+  val name = "Quadruple Chows"
+  val description = "Four shifted chows by 1 or 2 tiles in the same family"
+
+  override val excluded = List(PureShiftedChow, AllChows)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allChows) {
+      Combination.findPureShiftedChow(m.allChows).toSet.size == 2
+    }
+
+}
+
+
 object QuadrupleChows extends Combination {
   val id = 15
   val points = 48
