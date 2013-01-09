@@ -1333,6 +1333,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       thenCombinations, thenPoints)
 
   }
+
   test(
     """use case : Four Shifted Chows by 2
       |verif : My head
@@ -1355,6 +1356,35 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (allFigures, HalfFlush),
         (allFigures, MeldedHand),
         (List(Chow(b1), Chow(b7)), TwoTerminalChows)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
+
+  test(
+    """use case : Four pure shifted pungs
+      |verif : My head
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b1, b1))
+    val givenMelded: List[Figure] = List(Pung(s6), Pung(s7), Pung(s8), Pung(s9))
+    val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(b1))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 48 + 6 + 1 + 1
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (List(Pung(s6), Pung(s7), Pung(s8), Pung(s9)), FourPureShiftedPungs),
+        (allFigures, MeldedHand),
+        (List(Pung(s9)), PungOfTerminalOrHonors),
+        (allFigures, OneVoidedSuit)
       )
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,

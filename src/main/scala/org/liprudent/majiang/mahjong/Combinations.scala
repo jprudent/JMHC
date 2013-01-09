@@ -1235,9 +1235,24 @@ object FourShiftedChows extends Combination {
 
 }
 
+object FourPureShiftedPungs extends Combination {
+  val id = 15
+  val points = 48
+  val name = "Four Pure Shifted Pungs"
+  val description = "Four pure consecutive pungs in one family"
+
+  override val excluded = List(PureShiftedPungs, AllPungs)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allPungsLike) {
+      Combination.findPureShiftedPungs(m.allPungsLike).toSet.size == 2
+    }
+
+}
+
 
 object QuadrupleChows extends Combination {
-  val id = 15
+  val id = 14
   val points = 48
   val name = "Quadruple Chows"
   val description = "Four identical chows"
@@ -1250,6 +1265,7 @@ object QuadrupleChows extends Combination {
     }
 
 }
+
 
 object FourConcealedPungs extends Combination {
   val id = 12

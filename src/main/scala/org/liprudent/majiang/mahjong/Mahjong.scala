@@ -278,6 +278,7 @@ package object mahjong {
       SevenPairs,
       AllTerminalsAndHonors,
       ThreeKongs,
+      FourPureShiftedPungs,
       FourShiftedChows,
       QuadrupleChows,
       FourConcealedPungs,
