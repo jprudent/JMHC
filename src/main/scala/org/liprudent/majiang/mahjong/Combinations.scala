@@ -1014,26 +1014,24 @@ object ThreeSuitedTerminalChows extends Combination {
 
   override val excluded = List(AllChows, MixedDoubleChows, PureDoubleChows, TwoTerminalChows)
 
-  def find(m: HuLe): Result = {
-    //quick fail
-    if (m.allPungsLike.size != 0 || !m.standardHand) return EmptyResult
+  def find(m: HuLe): Result =
 
-    val groupedChows = m.allChows.groupBy(_.t1.family)
+    SomeResult(m.allFigures) {
+      m.allPungsLike == Nil && m.standardHand && {
+        val groupedChows = m.allChows.groupBy(_.t1.family)
+        val terminalChows = groupedChows.map {
+          case (family, chows) => Combination.findTwoTerminalChows(chows)
+        }.filterNot(_ == Nil)
 
-    val terminalChows = groupedChows.map {
-      case (family, chows) => Combination.findTwoTerminalChows(chows)
-    }.filterNot(_ == Nil)
+        def hasPairOf5InThirdFamily() = {
+          m.allDuis.exists(d => d.tile.value == 5 && !m.allChows.map(_.t1.family).toSet.exists(_ == d.tile.family))
+        }
 
-    def hasPairOf5InThirdFamily() = {
-      m.allDuis.exists(d => d.tile.value == 5 && !m.allChows.map(_.t1.family).toSet.exists(_ == d.tile.family))
+        terminalChows.size == 2 && hasPairOf5InThirdFamily()
+      }
+
+
     }
-
-    if (terminalChows.size == 2 && hasPairOf5InThirdFamily())
-      Result(m.allFigures)
-    else
-      EmptyResult
-
-  }
 }
 
 
