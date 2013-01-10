@@ -195,6 +195,21 @@ class CombinationsSuite extends FunSuite {
 
   }
 
+  test("Little Four winds") {
+    val closed: List[Figure] = List(Pung(wn), Pung(ww), Pung(ws), Pung(dr), Dui(we))
+    val disclosed: List[Figure] = List()
+    val lastTile: ContextualTile = ContextualTile(dr, Discarded, NotLastTile)
+    val context = PlayerContext(WestWind, EastWind)
+
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = LittleFourWinds.find(hule)
+    val expected = Result(List(List(Pung(wn), Pung(ww), Pung(ws), Dui(we))))
+
+    assert(actual === expected)
+
+  }
+
 
 }
 

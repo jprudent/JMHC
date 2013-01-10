@@ -1322,9 +1322,8 @@ object LittleThreeDragons extends Combination {
   val id = 10
   val points = 64
   val name = "Little three dragons"
-  val description = "Little three dragons"
+  val description = "2 pungs of dragon and a pair of dragon"
 
-  //TODO imply OneVoidedFamily or HalfFlush ... ??
   override val excluded = List(TwoDragonPungs)
 
   def find(m: HuLe): Result =
@@ -1335,6 +1334,21 @@ object LittleThreeDragons extends Combination {
 
 }
 
+object LittleFourWinds extends Combination {
+  val id = 9
+  val points = 64
+  val name = "Little four winds"
+  val description = "3 pungs of wind and a pair of wind"
+
+  //BigThreeWind is implied because it can exist Pung of Terminal or honor
+  override val implied = List(BigThreeWind)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allWindFigures) {
+      m.allWindFigures.size == 4 && m.allWindPungsLike.size == 3
+    }
+
+}
 
 object ThirteenOrphansComb extends Combination {
   val id = 7
