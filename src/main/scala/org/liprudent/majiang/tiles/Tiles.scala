@@ -172,6 +172,8 @@ case class Tile(family: Family, value: Int) {
 
   lazy val isWind = family.isInstanceOf[WindFamily]
 
+  lazy val isDragon = family.isInstanceOf[DragonFamily]
+
   lazy val isTerminalOrHonor = isTerminal || isHonor
 
   lazy val isTerminalOrWind = isTerminal || isWind

@@ -1283,7 +1283,6 @@ object PureTerminalChows extends Combination {
           m.allChows.count(c => c.family == fam && c.isEndingChow) == 2 &&
           m.allDuis(0).tile == Tile(fam, 5)
       }
-
     }
 
 }
@@ -1304,7 +1303,6 @@ object FourConcealedPungs extends Combination {
 
 }
 
-
 object AllHonors extends Combination {
   val id = 11
   val points = 64
@@ -1319,6 +1317,24 @@ object AllHonors extends Combination {
     }
 
 }
+
+object LittleThreeDragons extends Combination {
+  val id = 10
+  val points = 64
+  val name = "Little three dragons"
+  val description = "Little three dragons"
+
+  //TODO imply OneVoidedFamily or HalfFlush ... ??
+  override val excluded = List(TwoDragonPungs)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allDragonFigures) {
+      m.allDragonFigures.size == 3 &&
+        m.allDragonPungsLike.size == 2
+    }
+
+}
+
 
 object ThirteenOrphansComb extends Combination {
   val id = 7
