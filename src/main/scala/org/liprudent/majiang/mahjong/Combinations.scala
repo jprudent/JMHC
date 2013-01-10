@@ -133,7 +133,7 @@ object Combination {
 
   }
 
-  def findTwoTerminalChows(chows: List[Chow]) =
+  def findTwoTerminalChowsInSameFamily(chows: List[Chow]) =
     findTwoFigures(chows)(_.isStartingChow) {
       (c1, c2) => c2.sameFamily(c1) && c2.isEndingChow
     }
@@ -390,7 +390,7 @@ object TwoTerminalChows extends Combination {
   val description = "1, 2, 3 and 7, 8, 9 in one family"
 
   def find(m: HuLe): Result =
-    Result(Combination.findTwoTerminalChows(m.allChows))
+    Result(Combination.findTwoTerminalChowsInSameFamily(m.allChows))
 }
 
 object ShortStraight extends Combination {
@@ -1041,7 +1041,7 @@ object ThreeSuitedTerminalChows extends Combination {
         val hasPairOf5InThirdFamily =
           m.allDuis.exists(d => d.tile.value == 5 && !m.allChows.exists(_.t1.sameFamily(d.tile)))
 
-        Combination.findTwoTerminalChows(m.allChows).size == 2 && hasPairOf5InThirdFamily
+        Combination.findTwoTerminalChowsInSameFamily(m.allChows).size == 2 && hasPairOf5InThirdFamily
       }
 
     }
@@ -1250,7 +1250,6 @@ object FourPureShiftedPungs extends Combination {
 
 }
 
-
 object QuadrupleChows extends Combination {
   val id = 14
   val points = 48
@@ -1266,6 +1265,28 @@ object QuadrupleChows extends Combination {
 
 }
 
+object PureTerminalChows extends Combination {
+  val id = 13
+  val points = 64
+  val name = "Pure terminal chows"
+  val description = "2 times 123, 789 and a pair of 5 in one family"
+
+  override val excluded = List(FullFlush, AllChows, TwoTerminalChows, PureDoubleChows)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.numberOfStraightFamily == 1 &&
+        m.allChows.size == 4 &&
+        m.allDuis.size == 1 && {
+        val fam = m.allChows.head.family
+        m.allChows.count(c => c.family == fam && c.isStartingChow) == 2 &&
+          m.allChows.count(c => c.family == fam && c.isEndingChow) == 2 &&
+          m.allDuis(0).tile == Tile(fam, 5)
+      }
+
+    }
+
+}
 
 object FourConcealedPungs extends Combination {
   val id = 12

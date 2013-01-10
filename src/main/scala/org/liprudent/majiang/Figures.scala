@@ -326,6 +326,8 @@ package object figures {
 
     val properties = DuiProperties
 
+    lazy val family = tile.family
+
     override def asList = List(tile, tile)
 
   }

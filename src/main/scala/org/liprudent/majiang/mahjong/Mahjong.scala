@@ -281,6 +281,7 @@ package object mahjong {
       FourPureShiftedPungs,
       FourShiftedChows,
       QuadrupleChows,
+      PureTerminalChows,
       FourConcealedPungs,
       AllHonors,
       ThirteenOrphansComb,
@@ -328,13 +329,11 @@ package object mahjong {
 
       def toExcludeContainedInRef() = toExclude._1.forall(fig => ref._1.contains(fig))
 
-      val ret =
-        mutuallyExcludes() ||
-          ((implies() || same()) && toExcludeContainedInRef())
 
-      if (ret) println(ref + "excludes" + toExclude)
+      mutuallyExcludes() ||
+        ((implies() || same()) && toExcludeContainedInRef())
 
-      ret
+
     }
   }
 
