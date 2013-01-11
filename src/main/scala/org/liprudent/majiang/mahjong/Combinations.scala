@@ -1350,6 +1350,23 @@ object LittleFourWinds extends Combination {
 
 }
 
+object AllTerminals extends Combination {
+  val id = 8
+  val points = 64
+  val name = "All Terminals"
+  val description = "only 1 and 9"
+
+  //BigThreeWind is implied because it can exist Pung of Terminal or honor
+  override val excluded = List(AllPungs, AllTerminalsAndHonors, PungOfTerminalOrHonors, NoHonors)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allTiles.forall(_.isTerminal)
+    }
+
+}
+
+
 object ThirteenOrphansComb extends Combination {
   val id = 7
   val points = 88
