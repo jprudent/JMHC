@@ -178,7 +178,7 @@ package object figures {
       knitted2.asInstanceOf[Knitted].fam147.order - knitted1.asInstanceOf[Knitted].fam147.order
   }
 
-  abstract case class PungLike(val tile: Tile) extends Figure {
+  abstract class PungLike(val tile: Tile) extends Figure {
 
     def sameFamily(p: PungLike): Boolean = tile.sameFamily(p.tile)
 
