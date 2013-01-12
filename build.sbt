@@ -10,3 +10,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
+libraryDependencies += "org.jbehave" % "jbehave-core" % "3.7.5" % "test"
+
+libraryDependencies += "org.jbehave" % "jbehave-scala" % "3.7.5" % "test"
+
+libraryDependencies += "com.novocode" % "junit-interface" % "0.10-M2" % "test"

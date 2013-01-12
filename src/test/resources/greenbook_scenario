@@ -1,0 +1,5 @@
+Scenario: Big Four Winds - Example 1
+
+Given player wind is North
+When scoring
+Then BigFourWinds is scored
