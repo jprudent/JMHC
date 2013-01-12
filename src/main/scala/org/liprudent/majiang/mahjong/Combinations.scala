@@ -1139,6 +1139,8 @@ object FullFlush extends Combination {
   val name = "Full Flush"
   val description = "Only tiles of the same straight family"
 
+  override val excluded = List(NoHonors)
+
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
       m.allTiles.groupBy(tile => tile.family).size == 1
@@ -1416,6 +1418,49 @@ object FourKongs extends Combination {
 
 }
 
+object NineGates extends Combination {
+  val id = 4
+  val points = 88
+  val name = "Nine gates"
+  val description = "1-1-1-2-3-4-5-6-7-8-9-9-9 + another of the same family"
+
+  override val excluded = List(FullFlush, ConcealedHand, PungOfTerminalOrHonors)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.numberOfStraightFamily == 1 && {
+        m.allTiles.head.isStraight && {
+          val fam = m.allTiles.head.family
+
+          def t(value: Int, occ: Int) = (Tile(fam, value), occ)
+          val pattern = List[Types.TileOccurence](t(1, 3), t(2, 1), t(3, 1), t(4, 1), t(5, 1), t(6, 1), t(7, 1), t(8, 1), t(9, 3))
+          val actual = TileSet(m.allTiles).tocs
+
+          pattern.zip(actual).forall {
+            case ((t1, occMin), (t2, occActual)) => t1 == t2 && occActual >= occMin
+          }
+        }
+      }
+
+    }
+
+}
+
+object AllGreen extends Combination {
+  val id = 3
+  val points = 88
+  val name = "All Green"
+  val description = "Only green tiles: 2,3,4,6,8 bamboos and green dragon"
+
+  //override val excluded = List(AllPungs, SingleWait)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      val allowed = List(b2, b3, b4, b6, b8, dg)
+      m.allTiles.forall(allowed.contains(_))
+    }
+
+}
 
 object BigThreeDragons extends Combination {
   val id = 2

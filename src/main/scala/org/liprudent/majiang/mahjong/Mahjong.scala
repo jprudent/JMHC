@@ -296,6 +296,8 @@ package object mahjong {
       ThirteenOrphansComb,
       SevenShiftedPairs,
       FourKongs,
+      NineGates,
+      AllGreen,
       BigThreeDragons
     )
 

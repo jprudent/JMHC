@@ -1104,13 +1104,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Dui(b2))
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
-    val thenPoints = 31
+    val thenPoints = 30
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
         (allFigures, FullFlush),
         (List(Pung(b3), Chow(b3)), TileHog),
         (List(Pung(b7), Chow(b7)), TileHog),
-        (allFigures, NoHonors),
         (List(Dui(b2)), SingleWait),
         (List(Dui(b2)), SelfDrawnComb)
       )
@@ -1489,6 +1488,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       thenCombinations, thenPoints)
 
   }
+
   test(
     """use case : Four Kongs
       |verif : My head
@@ -1515,6 +1515,61 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Kong(c1)), PungOfTerminalOrHonors),
         (List(Kong(dr)), MeldedKong),
         (List(Kong(c1), Kong(c2), Kong(c3), Dui(b1)), OneVoidedSuit)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : All Green
+      |verif : my head
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b6, b6, b8, b8, b8))
+    val givenMelded: List[Figure] = List(Pung(b3), Chow(b2))
+    val givenContextualTile: ContextualTile = ContextualTile(b8, Discarded, NotLastTile)
+    val givenConcealedKongs = List(Kong(dg))
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Pung(b8), Dui(b6))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 100
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (allFigures, AllGreen),
+        (allFigures, HalfFlush),
+        (List(Kong(dg)), DragonPung),
+        (List(Pung(b3), Chow(b2)), TileHog),
+        (List(Kong(dg)), ConcealedKong)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
+  test(
+    """use case : Nine Gates
+      |verif : my head
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b5, b6, b7, b8, b8))
+    val givenMelded: List[Figure] = List(Pung(b1), Pung(b9), Chow(b2))
+    val givenContextualTile: ContextualTile = ContextualTile(b8, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Chow(b5), Dui(b8))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 89
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (allFigures, NineGates),
+        (List(Chow(b2), Chow(b5)), ShortStraight)
       )
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
