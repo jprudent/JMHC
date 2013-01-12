@@ -295,6 +295,7 @@ package object mahjong {
       AllTerminals,
       ThirteenOrphansComb,
       SevenShiftedPairs,
+      FourKongs,
       BigThreeDragons
     )
 

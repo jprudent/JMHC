@@ -1401,6 +1401,21 @@ object SevenShiftedPairs extends Combination {
 
 }
 
+object FourKongs extends Combination {
+  val id = 5
+  val points = 88
+  val name = "Four kongs"
+  val description = "Four kongs"
+
+  override val excluded = List(AllPungs, SingleWait)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allKongs) {
+      m.allKongs.size == 4
+    }
+
+}
+
 
 object BigThreeDragons extends Combination {
   val id = 2
