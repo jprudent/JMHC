@@ -96,7 +96,7 @@ package object mahjong {
     lazy val allFigures = (closed ::: melded ::: concealedKongs).sorted(OrdFigure)
 
     lazy val allClosedStraightFamilyFigures: List[Figure] =
-      allFigures.filter(_.asList.forall(_.isStraight))
+      allFigures.filter(_.toTiles.forall(_.isStraight))
 
     lazy val allDragonFigures: List[Figure] =
       allDragonPungsLike ::: allDuis.filter(_.tile.isDragon)
@@ -153,9 +153,9 @@ package object mahjong {
 
     /* TILES */
 
-    lazy val allTiles: List[Tile] = allFigures.map(_.asList).flatten
+    lazy val allTiles: List[Tile] = allFigures.map(_.toTiles).flatten
 
-    lazy val allClosedTiles: List[Tile] = closed.map(_.asList).flatten
+    lazy val allClosedTiles: List[Tile] = closed.map(_.toTiles).flatten
 
 
     lazy val numberOfStraightFamily = numberOfStraightFamilyIn(allTiles)
@@ -195,7 +195,7 @@ package object mahjong {
 
     lazy val total = detailedPoints.foldLeft(0)((total, c) => {
       val combinationPoints = c._2 match {
-        case FlowerTiles => c._1(0).asList.size
+        case FlowerTiles => c._1(0).toTiles.size
         case _ => c._2.points
       }
       combinationPoints + total

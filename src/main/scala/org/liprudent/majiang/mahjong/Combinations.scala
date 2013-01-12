@@ -240,7 +240,7 @@ object SelfDrawnComb extends Combination {
     m.lastTileContext.origin == SelfDrawn match {
       case true => {
 
-        m.closed.find(_.asList.contains(m.lastTileContext.tile)) match {
+        m.closed.find(_.toTiles.contains(m.lastTileContext.tile)) match {
           case None => EmptyResult
           case Some(f) => Result(f)
         }
@@ -489,12 +489,12 @@ object TileHog extends Combination {
 
   def find(m: HuLe): Result = {
     val allFiguresButKong = m.allFigures.filterNot(_.isInstanceOf[Kong])
-    val allTilesButKong = allFiguresButKong.map(f => f.asList).flatten
+    val allTilesButKong = allFiguresButKong.map(f => f.toTiles).flatten
     val allTileHogs = TileSet(allTilesButKong).tocs.filter {
       case (tile, occurence) if occurence == 4 => true
       case _ => false
     }.map {
-      case (tile, occurence) => allFiguresButKong.filter(_.asList.contains(tile))
+      case (tile, occurence) => allFiguresButKong.filter(_.toTiles.contains(tile))
     }
 
     Result(allTileHogs)
@@ -616,7 +616,7 @@ object OutsideHand extends Combination {
         case f: SomeKnittedWithSomeDragons => false
         case f: Knitted => false
         case f: ThirteenOrphans => false
-        case f => f.asList.exists(_.isTerminalOrHonor)
+        case f => f.toTiles.exists(_.isTerminalOrHonor)
       })
     }
 }
@@ -662,7 +662,7 @@ object AllTypes extends Combination {
         figures.exists(figure => figure match {
           case f: Knitted if family.isInstanceOf[StraightFamily] => true
           case f: SomeKnittedWithSomeDragons => true
-          case f => f.asList.forall(_.family == family)
+          case f => f.toTiles.forall(_.family == family)
         })
 
       List(List(Bamboo), List(Character), List(Stone),
@@ -1009,7 +1009,7 @@ object AllFive extends Combination {
 
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
-      m.standardHand && m.allFigures.forall(_.asList.exists(_.value == 5))
+      m.standardHand && m.allFigures.forall(_.toTiles.exists(_.value == 5))
     }
 }
 

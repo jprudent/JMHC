@@ -28,8 +28,11 @@ package object figures {
     //TODO properties is an invariant, have to find a "trick" to express that
     val properties: FigureProperties
 
-    //TODO rename asListOfTiles or toTiles
-    def asList: List[Tile]
+    /**
+     *
+     * @return All tiles composing this figure
+     */
+    def toTiles: List[Tile]
 
   }
 
@@ -74,7 +77,7 @@ package object figures {
 
     val properties = ThirteenOrphansProperties
 
-    override def asList = (extraTile :: properties.fixedTiles).sorted
+    override def toTiles = (extraTile :: properties.fixedTiles).sorted
   }
 
   // TODO centralize in companion
@@ -120,7 +123,7 @@ package object figures {
 
     lazy val groupedKnitted: List[List[Tile]] = knitted.groupBy(_.family).values.toList
 
-    override def asList = honors ::: knitted
+    override def toTiles = honors ::: knitted
 
   }
 
@@ -154,7 +157,7 @@ package object figures {
 
     val properties = KnittedProperties
 
-    override def asList = List(
+    override def toTiles = List(
       Tile(fam147, 1),
       Tile(fam147, 4),
       Tile(fam147, 7),
@@ -187,7 +190,7 @@ package object figures {
 
     def sameValue(p: PungLike) = tile.sameValue(p.tile)
 
-    override def asList = (0 until properties.size map (i => tile)).toList
+    override def toTiles = (0 until properties.size map (i => tile)).toList
   }
 
   /**
@@ -265,7 +268,7 @@ package object figures {
 
     val properties = Chow
 
-    override def asList = List(t1, t2, t3)
+    override def toTiles = List(t1, t2, t3)
 
     def sameValues(y: Chow) =
       y.t1.value == t1.value
@@ -330,7 +333,7 @@ package object figures {
 
     lazy val value = tile.value
 
-    override def asList = List(tile, tile)
+    override def toTiles = List(tile, tile)
 
   }
 
@@ -367,7 +370,7 @@ package object figures {
         x.asInstanceOf[Bonus].bonus.size - y.asInstanceOf[Bonus].bonus.size
     }
 
-    override def asList = bonus
+    override def toTiles = bonus
 
   }
 
@@ -384,7 +387,7 @@ package object figures {
         Tile.ord.compare(x.asInstanceOf[SingleTile].t, y.asInstanceOf[SingleTile].t)
     }
 
-    override def asList = List(t)
+    override def toTiles = List(t)
   }
 
 }

@@ -538,7 +538,8 @@ case class FiguresComputer(tileSet: TileSet) {
       List(Bamboo, Character, Stone)
         .permutations // all combinations of those 3 families
         .map(families => Knitted(families(0), families(1), families(2))).toList // as Knitted
-        .filter(knitted => knitted.asList.forall(tile => tileSet.exists(t => t == tile))) // where each knitted tile exists in tileSet
+        .filter(knitted => knitted.toTiles.forall(tile => tileSet.exists(t => t == tile))) // where each knitted tile
+        // exists in tileSet
         .toList
     }
   }
@@ -620,7 +621,7 @@ case class FiguresComputer(tileSet: TileSet) {
       case all => {
         all.map {
           figure => {
-            val next: Set[Figures] = findFigures(FiguresComputer(figuresComputer.tileSet.removed(figure.asList)))
+            val next: Set[Figures] = findFigures(FiguresComputer(figuresComputer.tileSet.removed(figure.toTiles)))
             next match {
               case s if s.isEmpty => Set(List(figure))
               case _ => next.map(figures => (figure :: figures))
