@@ -4,27 +4,31 @@ import collection.mutable.ListBuffer
 import org.jbehave.core.steps.Steps
 import org.jbehave.core.annotations._
 
-class BowlingSteps extends Steps {
+class MahjongSteps extends Steps {
   var rolls: ListBuffer[Int] = _
 
   @BeforeScenario
   def init() {
+    println("init scenario")
   }
 
 
   @Given("player wind is $wind")
   def givenPlayerWind(wind: String) {
-    // throw new RuntimeException(wind)
+    println("given player wind is " + wind)
+    //throw new RuntimeException(wind)
   }
 
   @When("scoring")
   def whenScoring = {
+    println("when scoring")
     //throw new RuntimeException("scoring")
   }
 
 
   @Then("$combination is scored")
   def thenCombinatin(combination: String) {
+    println("then " + combination + " is scored")
     //throw new RuntimeException(combination)
   }
 
