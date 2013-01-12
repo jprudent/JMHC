@@ -359,7 +359,7 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
 
   /**
    *
-   * @return A list. Each element is a detailed solution for given <code>ptiles</code>.
+   * @return A list ordered by desc total. Each element is a detailed solution for given <code>ptiles</code>.
    */
   lazy val find: List[DetailedPoints] = {
     if (!quickValid) Nil
@@ -370,7 +370,7 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
         .map(closedCombination =>
         HulePointsComputer(
           HuLe(closedCombination, ptiles.melded, ptiles.hand.lastTileContext, context, ptiles.concealedKongs, ptiles.bonus)))
-        .toList
+        .toList.sortWith((detail1, detail2) => detail1.total >= detail2.total)
     }
   }
 
