@@ -1644,7 +1644,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     thenTotal: Int
                     ) {
 
-    val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
+    val pts = PlayerTiles(ConcealedTiles(givenClosed, givenContextualTile),
       givenMelded.sorted(OrdFigure),
       givenConcealedKongs,
       givenBonus)

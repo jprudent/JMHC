@@ -18,58 +18,58 @@ class MahjongSuite extends FunSuite {
     val b1ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
 
     val valid = PlayerTiles(
-      Hand(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
+      ConcealedTiles(List(b1, b2, b3, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
       Nil
     )
 
     val noMahjong = PlayerTiles(
-      Hand(List(b1, b2, b4, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
+      ConcealedTiles(List(b1, b2, b4, c4, c5, c6, s7, s8, s9, ww, ww, ww, dr, dr), b1ContextualTile),
       Nil
     )
 
     val invalid = PlayerTiles(
-      Hand(List(b1), b1ContextualTile),
+      ConcealedTiles(List(b1), b1ContextualTile),
       valid.melded
     )
 
     val kongs = PlayerTiles(
-      Hand(List(b1, b1, b1, b2, b2), b1ContextualTile),
+      ConcealedTiles(List(b1, b1, b1, b2, b2), b1ContextualTile),
       List(Kong(b9), Kong(wn)),
       List(Kong(dg))
     )
 
     val allChows_mixedTripleChow = PlayerTiles(
-      Hand(List(b9, b7, b8, c7, c8, c9, s7, s8, s9, b1, b2, b3, dr, dr), b1ContextualTile),
+      ConcealedTiles(List(b9, b7, b8, c7, c8, c9, s7, s8, s9, b1, b2, b3, dr, dr), b1ContextualTile),
       Nil
     )
 
     val knittedStraight = PlayerTiles(
-      Hand(List(b1, b4, b7, c2, c5, c8, s3, s6, s9), ContextualTile(b1, SelfDrawn, NotLastTile)),
+      ConcealedTiles(List(b1, b4, b7, c2, c5, c8, s3, s6, s9), ContextualTile(b1, SelfDrawn, NotLastTile)),
       List(Pung(c8), Dui(ww))
     )
 
     val knittedStraightLesserDragon5 = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c3, c6, c9, ww, we, ws, wn, dr), b1ContextualTile),
+      ConcealedTiles(List(b1, b4, b7, s2, s5, s8, c3, c6, c9, ww, we, ws, wn, dr), b1ContextualTile),
       Nil
     )
 
     val knittedStraightLesserDragon6 = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c6, c9, ww, we, ws, wn, dr, dg), b1ContextualTile),
+      ConcealedTiles(List(b1, b4, b7, s2, s5, s8, c6, c9, ww, we, ws, wn, dr, dg), b1ContextualTile),
       Nil
     )
 
     val greaterHonorsAndKnittedTiles = PlayerTiles(
-      Hand(List(b1, b4, b7, s2, s5, s8, c9, ww, we, ws, wn, dr, dg, dw), b1ContextualTile),
+      ConcealedTiles(List(b1, b4, b7, s2, s5, s8, c9, ww, we, ws, wn, dr, dg, dw), b1ContextualTile),
       Nil
     )
 
     val thirteenOrphans = PlayerTiles(
-      Hand(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), b1ContextualTile),
+      ConcealedTiles(List(b1, b9, c1, c9, s1, s9, we, wn, ww, ws, dr, dg, dw, dr), b1ContextualTile),
       Nil
     )
 
     val sevenPairs = PlayerTiles(
-      Hand(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), b1ContextualTile),
+      ConcealedTiles(List(b1, b1, b2, b2, s4, s4, we, we, b8, b8, ww, ww, ww, ww), b1ContextualTile),
       Nil
     )
 

@@ -29,7 +29,6 @@ object Family {
   }
 }
 
-//TODO rename as StraightFamily
 sealed abstract class StraightFamily extends Family {
   override def validValue(value: Int) = value >= 1 && value <= 9
 }
@@ -727,16 +726,16 @@ object FiguresComputer {
  * @param tileSet The tiles the hand is made of.
  * @param lastTileContext The context of the last tile
  */
-case class Hand(tileSet: TileSet, lastTileContext: ContextualTile) {
+case class ConcealedTiles(tileSet: TileSet, lastTileContext: ContextualTile) {
 
   /**
    * add a new tile and remove one
    * @param added ContextualTile to add
    * @param removed tile to remove
-   * @return a new Hand with tiles updated
+   * @return a new ConcealedTiles with tiles updated
    */
-  def addRemove(added: ContextualTile, removed: Tile): Hand = {
-    Hand(add(added).tileSet.removed(removed), added)
+  def addRemove(added: ContextualTile, removed: Tile): ConcealedTiles = {
+    ConcealedTiles(add(added).tileSet.removed(removed), added)
   }
 
   /**
@@ -745,17 +744,17 @@ case class Hand(tileSet: TileSet, lastTileContext: ContextualTile) {
    * @param contextualTile The new tile to add
    * @return The new hand with the new tile added
    */
-  private def add(contextualTile: ContextualTile): Hand =
-    Hand(tileSet.added(contextualTile.tile), contextualTile)
+  private def add(contextualTile: ContextualTile): ConcealedTiles =
+    ConcealedTiles(tileSet.added(contextualTile.tile), contextualTile)
 
-  override lazy val toString: String = "Hand : " + tileSet.toString + "\nLast tile: " + lastTileContext
+  override lazy val toString: String = "ConcealedTiles : " + tileSet.toString + "\nLast tile: " + lastTileContext
 
 }
 
-object Hand {
+object ConcealedTiles {
 
-  def apply(tiles: List[Tile], lastTileContext: ContextualTile)(implicit notUsed: DummyImplicit): Hand = {
-    new Hand(TileSet(tiles), lastTileContext)
+  def apply(tiles: List[Tile], lastTileContext: ContextualTile)(implicit notUsed: DummyImplicit): ConcealedTiles = {
+    new ConcealedTiles(TileSet(tiles), lastTileContext)
   }
 
 }

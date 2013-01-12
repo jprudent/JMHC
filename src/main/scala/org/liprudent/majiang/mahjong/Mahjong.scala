@@ -34,7 +34,8 @@ package object mahjong {
    * @note Melded Kongs are included in `melded`
    *       TODO there are too much parameters.
    */
-  case class PlayerTiles(hand: Hand, melded: Figures,
+  case class PlayerTiles(hand: ConcealedTiles,
+                         melded: Figures,
                          concealedKongs: List[Kong] = noKongs,
                          bonus: Bonus = Bonus(Nil)) {
 
@@ -214,9 +215,6 @@ package object mahjong {
   }
 
   object HulePointsComputer {
-
-    //TODO uncomment when all combinations have been implemented
-    //require(combinations.size == 88)
 
     val combinations = List[Combination](
       FlowerTiles,

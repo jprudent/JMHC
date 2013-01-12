@@ -800,7 +800,7 @@ object ChickenHand extends Combination {
         LesserHonorsAndKnittedTiles,
         KnittedStraight,
         MixedStraight,
-        //TODO reversible tiles
+        ReversibleTiles,
         MixedShiftedPung,
         LastTileDrawComb,
         LastTileClaimComb,
@@ -869,7 +869,7 @@ object MixedTripleChow extends Combination {
       .filter(_.size == 3) //FIXME ???
       .flatten // List[Chow]
 
-    //TODO dans le cas o? 4 chows identique, combien de fois faut-il compter cette combinaison ???
+
     Result(resolved)
 
   }
