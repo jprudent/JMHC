@@ -298,8 +298,11 @@ package object mahjong {
       FourKongs,
       NineGates,
       AllGreen,
-      BigThreeDragons
+      BigThreeDragons,
+      BigFourWinds
     )
+
+    require(combinations.size == 81)
 
     def apply(huLe: HuLe): DetailedPoints = {
       val res: List[Result] = combinations.map(combination => combination.find(huLe))

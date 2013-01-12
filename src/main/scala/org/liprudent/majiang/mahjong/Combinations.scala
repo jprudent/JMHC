@@ -1477,3 +1477,20 @@ object BigThreeDragons extends Combination {
 
 }
 
+object BigFourWinds extends Combination {
+  val id = 1
+  val points = 88
+  val name = "Big Four Winds"
+  val description = "4 wind pungs"
+
+  override val excluded = List(BigThreeWind, AllPungs, PrevalentWind,
+    SeatWind, PungOfTerminalOrHonors)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allWindPungsLike) {
+      m.allWindPungsLike.size == 4
+    }
+
+}
+
+
