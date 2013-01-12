@@ -1380,6 +1380,28 @@ object ThirteenOrphansComb extends Combination {
 
 }
 
+object SevenShiftedPairs extends Combination {
+  val id = 6
+  val points = 88
+  val name = "Seven shifted pairs"
+  val description = "7 consecutive pairs in the same family"
+
+  override val excluded = List(SevenPairs, FullFlush)
+
+  def find(m: HuLe): Result =
+    SomeResult(m.allFigures) {
+      m.allDuis.size == 7 &&
+        m.numberOfStraightFamily == 1 && {
+        val fam = m.allDuis(0).family
+        val firstValue = m.allDuis(0).value
+        val lastValue = firstValue + 7
+        (firstValue until lastValue).forall(i => m.allDuis.contains(Dui(Tile(fam, i))))
+      }
+    }
+
+}
+
+
 object BigThreeDragons extends Combination {
   val id = 2
   val points = 88

@@ -328,6 +328,8 @@ package object figures {
 
     lazy val family = tile.family
 
+    lazy val value = tile.value
+
     override def asList = List(tile, tile)
 
   }

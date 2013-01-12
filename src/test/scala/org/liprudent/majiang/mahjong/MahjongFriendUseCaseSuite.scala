@@ -534,45 +534,6 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
-  private def test(
-                    givenClosed: TileSet,
-                    givenMelded: List[Figure],
-                    givenConcealedKongs: List[Kong],
-                    givenContextualTile: ContextualTile,
-                    givenBonus: Bonus,
-                    givenContext: PlayerContext,
-                    thenClosed: List[Figure],
-                    thenCombinations: List[(List[Figure], Combination)],
-                    thenTotal: Int
-                    ) {
-
-    val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
-      givenMelded.sorted(OrdFigure),
-      givenConcealedKongs,
-      givenBonus)
-
-    val actual = HuFinder(pts, givenContext).find
-
-    val expected = List(
-      DetailedPoints(
-        HuLe(thenClosed.sorted(OrdFigure),
-          givenMelded.sorted(OrdFigure),
-          givenContextualTile,
-          givenContext,
-          givenConcealedKongs,
-          givenBonus),
-        thenCombinations.map {
-          case (figures, combination) => (figures.sorted(OrdFigure), combination)
-        })
-    )
-
-    assert(actual.size == 1, "Not a valid HuLe : " + pts)
-    assert(actual(0).huLe === expected(0).huLe)
-    assert(actual === expected)
-    assert(actual(0).total === thenTotal)
-
-  }
-
   test(
     """use case : Tile Hog - Pure Shifted Chow
       |verif : Mahjong Friends
@@ -1500,6 +1461,35 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   }
 
+  test(
+    """use case : Seven shifted pairs
+      |verif : My head
+      |tricky part:
+    """.stripMargin) {
+    val givenClosed = TileSet(List(b2, b2, b3, b3, b4, b4, b5, b5, b6, b6, b7, b7, b8, b8))
+    val givenMelded: List[Figure] = List()
+    val givenContextualTile: ContextualTile = ContextualTile(b2, Discarded, NotLastTile)
+    val givenConcealedKongs = List()
+    val givenBonus: Bonus = Bonus(Nil)
+    val givenContext = PlayerContext(EastWind, EastWind)
+
+    val thenClosed = List(Dui(b2), Dui(b3), Dui(b4), Dui(b5), Dui(b6), Dui(b7), Dui(b8))
+    val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
+    val thenPoints = 90
+    val thenCombinations: List[(List[Figure], Combination)] =
+      List(
+        (allFigures, SevenShiftedPairs),
+        (allFigures, AllSimples)
+        //        (List(),),
+        //        (List(),),
+        //        (List(),)
+      )
+
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
+
+  }
+
   private def test(
                     givenClosed: TileSet,
                     givenMelded: List[Figure],
@@ -1526,4 +1516,44 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     test(givenClosed, givenMelded, noKongs, givenContextualTile, Bonus(Nil), givenContext, thenClosed, thenCombinations, thenTotal)
   }
 
+  private def test(
+                    givenClosed: TileSet,
+                    givenMelded: List[Figure],
+                    givenConcealedKongs: List[Kong],
+                    givenContextualTile: ContextualTile,
+                    givenBonus: Bonus,
+                    givenContext: PlayerContext,
+                    thenClosed: List[Figure],
+                    thenCombinations: List[(List[Figure], Combination)],
+                    thenTotal: Int
+                    ) {
+
+    val pts = PlayerTiles(Hand(givenClosed, givenContextualTile),
+      givenMelded.sorted(OrdFigure),
+      givenConcealedKongs,
+      givenBonus)
+
+    val actual = HuFinder(pts, givenContext).find
+
+    val expected = List(
+      DetailedPoints(
+        HuLe(thenClosed.sorted(OrdFigure),
+          givenMelded.sorted(OrdFigure),
+          givenContextualTile,
+          givenContext,
+          givenConcealedKongs,
+          givenBonus),
+        thenCombinations.map {
+          case (figures, combination) => (figures.sorted(OrdFigure), combination)
+        })
+    )
+
+
+    assert(actual.size != 0, "No mahjong found : " + pts)
+    //assert(actual.size == 1, "Several mahjong found : " + actual)
+    assert(actual(0).huLe === expected(0).huLe)
+    assert(actual(0) === expected(0))
+    assert(actual(0).total === thenTotal)
+
+  }
 }
