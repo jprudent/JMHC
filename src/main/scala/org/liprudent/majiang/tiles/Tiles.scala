@@ -18,6 +18,8 @@ sealed abstract class Family {
 
   def order: Int
 
+  def shortName: String
+
   def <(f: Family) = Family.ord.lt(this, f)
 }
 
@@ -27,6 +29,7 @@ object Family {
       f1.order.compareTo(f2.order)
     }
   }
+
 }
 
 sealed abstract class StraightFamily extends Family {
@@ -36,26 +39,36 @@ sealed abstract class StraightFamily extends Family {
 case object Bamboo extends StraightFamily {
   override val name = "Bamboo"
   override val order = 0
+  override val shortName = "b"
 }
 
 case object Character extends StraightFamily {
   override val name = "Character"
   override val order = 1
+  override val shortName = "c"
 }
 
 case object Stone extends StraightFamily {
   override val name = "Stone"
   override val order = 2
+  override val shortName = "s"
 }
 
 
 sealed abstract class HonorFamily extends Family {
   override def validValue(value: Int) = value == 0xF00D
-
-  def shortName: String
 }
 
-sealed abstract class WindFamily extends HonorFamily {}
+sealed abstract class WindFamily extends HonorFamily {
+  def windName: String
+}
+
+object WindFamily {
+  def apply(windName: String): WindFamily = {
+    List(EastWind, NorthWind, WestWind, SouthWind)
+      .find(_.windName == windName).get
+  }
+}
 
 sealed abstract class DragonFamily extends HonorFamily {}
 
@@ -63,24 +76,28 @@ case object EastWind extends WindFamily {
   override val name = "East Wind"
   override val order = 3
   override val shortName = "we"
+  override val windName = "East"
 }
 
 case object WestWind extends WindFamily {
   override val name = "West Wind"
   override val order = 5
   override val shortName = "ww"
+  override val windName = "West"
 }
 
 case object NorthWind extends WindFamily {
   override val name = "North Wind"
   override val order = 4
   override val shortName = "wn"
+  override val windName = "North"
 }
 
 case object SouthWind extends WindFamily {
   override val name = "South Wind"
   override val order = 6
   override val shortName = "ws"
+  override val windName = "South"
 }
 
 case object RedDragon extends DragonFamily {
@@ -103,8 +120,6 @@ case object WhiteDragon extends DragonFamily {
 
 sealed abstract class BonusFamily extends Family {
   override def validValue(value: Int) = value == 0xBABA
-
-  def shortName: String
 }
 
 case object PlumbFlower extends BonusFamily {
@@ -215,6 +230,15 @@ object Tile {
 
   def apply(family: BonusFamily) = new Tile(family, 0xBABA)
 
+  def apply(t: String): Tile = {
+    val Straight = """([bcs])(\d)""".r
+    val HonorAndFlowers = """(\w{2})""".r
+    t match {
+      case Straight(f, v) => Tile.all.find(tile => tile.family.shortName == f && tile.value == v.toInt).get
+      case HonorAndFlowers(f) => Tile.all.find(_.family.shortName == f).get
+    }
+  }
+
   implicit val ord = new Ordering[Tile] {
 
     /**
@@ -277,6 +301,16 @@ object Tile {
     s1, s2, s3, s4, s5, s6, s7, s8, s9,
     we, ww, ws, wn,
     dr, dw, dg)
+
+  val all = Set(
+    b1, b2, b3, b4, b5, b6, b7, b8, b9,
+    c1, c2, c3, c4, c5, c6, c7, c8, c9,
+    s1, s2, s3, s4, s5, s6, s7, s8, s9,
+    we, ww, ws, wn,
+    dr, dw, dg,
+    fp, fo, fc, fb, ss, su, sa, sw)
+
+  val allWind = Set(we, wn, ww, ws)
 
 }
 

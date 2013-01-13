@@ -40,4 +40,13 @@ class TilesSuite extends FunSuite {
 
   }
 
+  test("Tile matching by short name") {
+    assert(Tile("we") === we)
+    assert(Tile("wn") === wn)
+    assert(Tile("ww") === ww)
+    assert(Tile("ws") === ws)
+    assert(Tile("dr") === dr)
+    assert(Tile("c9") === c9)
+  }
+
 }
