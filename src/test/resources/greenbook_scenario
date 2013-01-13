@@ -1,6 +1,6 @@
-!-- ------------------
-!--  BIG FOUR WINDS --
-!-- ------------------
+!-- ----------------------
+!--  81. BIG FOUR WINDS --
+!-- ----------------------
 
 Scenario: Big Four Winds - Example 1
 
@@ -44,9 +44,9 @@ Then "Seat Wind" is not scored
 Then "Pung Of Terminals Or Honors" is not scored
 
 
-!-- ---------------------
-!--  BIG THREE DRAGONS --
-!-- ---------------------
+!-- -------------------------
+!--  80. BIG THREE DRAGONS --
+!-- -------------------------
 
 Scenario: Big Three Dragons - Example 1
 
@@ -56,5 +56,27 @@ When scoring
 Then "Big Three Dragons" is scored
 Then "All Terminals And Honors" is scored
 Then "One Voided Suit" is scored
+Then "Two Dragon Pungs" is not scored
+Then "Dragon Pung" is not scored
+
+
+Scenario: Big Three Dragons - Example 2
+
+Given concealed "dr-dr-dr dg-dg-dg dw-dw-dw we-we-we ww-ww"
+Given player goes out on "ww" "Discarded"
+When scoring
+Then "Big Three Dragons" is scored
+Then "All Honors" is scored
+Then "Two Dragon Pungs" is not scored
+Then "Dragon Pung" is not scored
+
+
+Scenario: Big Three Dragons - Example 3
+
+Given concealed "dr-dr-dr dg-dg-dg dw-dw-dw b4-b5-b6 b5-b5"
+Given player goes out on "b4" "Discarded"
+When scoring
+Then "Big Three Dragons" is scored
+Then "Half Flush" is scored
 Then "Two Dragon Pungs" is not scored
 Then "Dragon Pung" is not scored
