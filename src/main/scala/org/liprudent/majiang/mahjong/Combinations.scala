@@ -1468,7 +1468,7 @@ object BigThreeDragons extends Combination {
   val name = "Big three dragons"
   val description = "Three pungs of dragon"
 
-  override val excluded = List(DragonPung)
+  override val excluded = List(TwoDragonPungs)
 
   def find(m: HuLe): Result =
     SomeResult(m.allDragonPungsLike) {

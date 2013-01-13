@@ -21,61 +21,109 @@ case class Context(
   lazy val playerContext = PlayerContext(gnPlayerWind, gnPrevalentWind)
 }
 
+object Context {
+
+  val default = Context(
+    gnConcealed = Nil,
+    thConcealed = Nil,
+    gnLastTileContext = ContextualTile(Tile.b7, Discarded, NotLastTile),
+    gnMelded = Nil,
+    gnPlayerWind = EastWind,
+    gnPrevalentWind = NorthWind
+  )
+
+  // Context is stored in thread local because
+  // jBehave instanciate steps clazz only once
+  val instance = new ThreadLocal[Context]
+
+  def get = instance.get()
+
+  def set(ctx: Context) = instance.set(ctx)
+
+  def init = instance.set(default)
+}
+
+object Result {
+  val instance = new ThreadLocal[List[DetailedPoints]]
+
+  def get = instance.get()
+
+  def set(res: List[DetailedPoints]) {
+    instance.set(res)
+  }
+}
+
 class MahjongSteps extends Steps {
 
-  var context: Context = null
+  /**
+   * Handy accessor to result
+   * @return result
+   */
+  def result = Result.get
 
-  var result: List[DetailedPoints] = null
+  /**
+   * Handy accessor to context
+   * @return context
+   */
+  def context = Context.get
 
 
   @BeforeScenario
   def init() {
-    context = Context(
-      gnConcealed = Nil,
-      thConcealed = Nil,
-      gnLastTileContext = ContextualTile(Tile.we, Discarded, NotLastTile),
-      gnMelded = Nil,
-      gnPlayerWind = EastWind,
-      gnPrevalentWind = NorthWind
-    )
+    Context.init
   }
 
   @Given( """concealed "$tiles"""")
   def givenConcealed(tiles: String) {
     val splitted = tiles.split( """(\s|-)""")
-    println(splitted.toList)
-    context = context.copy(gnConcealed = splitted.map {
+    Context set context.copy(gnConcealed = splitted.map {
       tile => Tile(tile)
-    }.toList)
+    }.toList.sorted(Tile.ord))
   }
 
   @Given("prevalent wind is $wind")
   def givenPrevalentWind(wind: String) {
-    context = context.copy(gnPrevalentWind = WindFamily(wind))
+    Context set context.copy(gnPrevalentWind = WindFamily(wind))
   }
 
   @Given("player wind is $wind")
   def givenPlayertWind(wind: String) {
-    context = context.copy(gnPlayerWind = WindFamily(wind))
+    Context set context.copy(gnPlayerWind = WindFamily(wind))
+  }
+
+  @Given( """player goes out on "$lastTile" "$lastTileOrigin"""")
+  def givenLastTile(lastTile: String, lastTileOrigin: String) {
+    val mappedLastTile = Tile(lastTile)
+    val mappedLastTileOrigin = TileOrigin(lastTileOrigin)
+    val updatedLastTileContext = context.gnLastTileContext.copy(
+      tile = mappedLastTile,
+      origin = mappedLastTileOrigin
+    )
+    Context set context.copy(gnLastTileContext = updatedLastTileContext)
   }
 
   @When("scoring")
   def whenScoring = {
 
-    result = HuFinder(context.playerTiles, context.playerContext).find
+    Result set HuFinder(context.playerTiles, context.playerContext).find
   }
 
 
-  @Then("$combination is scored")
-  def thenCombinatin(combination: String) {
-    println("then " + combination + " is scored")
-    //throw new RuntimeException(combination)
+  @Then( """"$combination" is scored""")
+  def thenCombination(combination: String) {
+    checkHasResult
+    assert(result(0).hasCombination(combination),
+      combination + "not found in result")
   }
 
   @Then("$combination is not scored")
   def thenNotCombinatin(combination: String) {
-    println("then " + combination + " is NOT scored")
-    //throw new RuntimeException(combination)
+    assert(!result(0).hasCombination(combination),
+      combination + "found in result")
+  }
+
+  private def checkHasResult {
+    assert(!result.isEmpty, "No results")
   }
 
 

@@ -42,7 +42,8 @@ package object mahjong {
     require(melded.sorted(OrdFigure) == melded, "melded not sorted")
 
     require(hand.tileSet.toTiles.contains(hand.lastTileContext.tile) ||
-      concealedKongs.exists(_.tile == hand.lastTileContext.tile))
+      concealedKongs.exists(_.tile == hand.lastTileContext.tile),
+      hand.lastTileContext.tile + " not in " + hand.tileSet.toTiles + " nor in " + concealedKongs)
 
     lazy val numberOfTiles = hand.tileSet.size + disclosedSize + concealedKongsSize
 
@@ -200,6 +201,17 @@ package object mahjong {
       }
       combinationPoints + total
     })
+
+    def hasCombination(combination: Combination): Boolean =
+      detailedPoints.exists(_._2 == combination)
+
+    def hasCombination(combination: String): Boolean = {
+      HulePointsComputer.combinations.find(_.name.toUpperCase == combination.toUpperCase) match {
+        case None => false
+        case Some(mappedCombination) => hasCombination(mappedCombination)
+      }
+
+    }
   }
 
   /**

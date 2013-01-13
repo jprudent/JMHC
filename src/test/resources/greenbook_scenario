@@ -1,35 +1,60 @@
+!-- ------------------
+!--  BIG FOUR WINDS --
+!-- ------------------
 
 Scenario: Big Four Winds - Example 1
 
 Given concealed "we-we-we ws-ws-ws ww-ww-ww wn-wn-wn dr-dr"
+Given player goes out on "we" "Discarded"
 Given prevalent wind is East
 Given player wind is East
 When scoring
-Then BigFourWinds is scored
-Then AllHonors is scored
-Then AllPungs is not scored
-Then PrevalentWind is not scored
-Then SeatWind is not scored
-Then PungOfTerminalsOrHonors is not scored
+Then "Big Four Winds" is scored
+Then "All Honors" is scored
+Then "All Pungs" is not scored
+Then "Prevalent Wind" is not scored
+Then "Seat Wind" is not scored
+Then "Pung Of Terminals Or Honors" is not scored
+
 
 Scenario: Big Four Winds - Example 2
-Given concealed "we-we-we ws-ws-ws-ws ww-ww-ww wn-wn-wn c9-c9"
+
+Given concealed "we-we-we ws-ws-ws ww-ww-ww wn-wn-wn c9-c9"
+Given player goes out on "we" "Discarded"
 When scoring
-Then BigFourWinds is scored
-Then AllTerminalsAndHonors is scored
-Then HalfFlush is scored
-Then AllPungs is not scored
-Then PrevalentWind is not scored
-Then SeatWind is not scored
-Then PungOfTerminalsOrHonors is not scored
+Then "Big Four Winds" is scored
+Then "All Terminals And Honors" is scored
+Then "Half Flush" is scored
+Then "All Pungs" is not scored
+Then "Prevalent Wind" is not scored
+Then "Seat Wind" is not scored
+Then "Pung Of Terminals Or Honors" is not scored
+
 
 Scenario: Big Four Winds - Example 3
-Given concealed "we-we-we ws-ws-ws-ws ww-ww-ww wn-wn-wn b3-b3"
+
+Given concealed "we-we-we ws-ws-ws ww-ww-ww wn-wn-wn b3-b3"
+Given player goes out on "we" "Discarded"
 When scoring
-Then BigFourWinds is scored
-Then AllTerminalsAndHonors is scored
-Then HalfFlush is scored
-Then AllPungs is not scored
-Then PrevalentWind is not scored
-Then SeatWind is not scored
-Then PungOfTerminalsOrHonors is not scored
+Then "Big Four Winds" is scored
+Then "Half Flush" is scored
+Then "All Pungs" is not scored
+Then "Prevalent Wind" is not scored
+Then "Seat Wind" is not scored
+Then "Pung Of Terminals Or Honors" is not scored
+
+
+!-- ---------------------
+!--  BIG THREE DRAGONS --
+!-- ---------------------
+
+Scenario: Big Three Dragons - Example 1
+
+Given concealed "dr-dr-dr dg-dg-dg dw-dw-dw c1-c1-c1 s9-s9"
+Given player goes out on "s9" "Discarded"
+When scoring
+Then "Big Three Dragons" is scored
+Then "All Terminals And Honors" is scored
+Then "One Voided Suit" is scored
+Then "Two Dragon Pungs" is not scored
+Then "Dragon Pung" is not scored

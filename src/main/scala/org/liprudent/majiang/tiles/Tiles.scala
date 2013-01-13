@@ -319,6 +319,17 @@ object Tile {
  */
 sealed trait TileOrigin
 
+object TileOrigin {
+  def apply(origin: String): TileOrigin = {
+    origin.toUpperCase match {
+      case "SELF DRAWN" => SelfDrawn
+      case "DISCARDED" => Discarded
+      case "KONG ROBBED" => KongRobbed
+      case "REPLACED TILE" => ReplacedTile
+    }
+  }
+}
+
 /**
  * Origin of the tile when the player self drawn the tile
  */
