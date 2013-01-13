@@ -291,14 +291,14 @@ class MahjongSuite extends FunSuite {
   test("is not excluded : All Chows - Mixed Triple Chow") {
 
     val ref = (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
-    val excl = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow)
+    val excl = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChows)
 
     assert(!HulePointsComputer.isExcluded(ref, excl))
 
   }
 
   test("is excluded : Mixed Triple Chow - Mixed Double Chow") {
-    val ref = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow)
+    val ref = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChows)
     val excl = (List(Chow(b7, b8, b9), Chow(c7, c8, c9)), MixedDoubleChows)
 
     assert(HulePointsComputer.isExcluded(ref, excl))
@@ -314,7 +314,7 @@ class MahjongSuite extends FunSuite {
 
   test("is excluded : Seat Wind - Pung of honor or terminal") {
     val ref = (List(Pung(ww)), SeatWind)
-    val excl = (List(Pung(ww)), PungOfTerminalOrHonors)
+    val excl = (List(Pung(ww)), PungOfTerminalsOrHonors)
 
     assert(HulePointsComputer.isExcluded(ref, excl))
   }

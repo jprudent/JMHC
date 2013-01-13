@@ -88,7 +88,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed: List[Figure with Product] = List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9))
     val thenCombinations: List[(List[Chow], Combination)] = List(
-      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChow),
+      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChows),
       (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
     )
 
@@ -193,7 +193,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr))
     val thenCombinations =
       List(
-        (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChow),
+        (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChows),
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), OutsideHand),
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), FullyConcealedHand),
         (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows),
@@ -219,7 +219,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
         (List(Pung(s1), Pung(s2), Pung(s8), Chow(s4, s5, s6), Dui(we)), HalfFlush),
-        (List(Pung(s1)), PungOfTerminalOrHonors),
+        (List(Pung(s1)), PungOfTerminalsOrHonors),
         (List(Chow(s4, s5, s6)), SelfDrawnComb),
         (List(Bonus(List(fp, fo, sw))), FlowerTiles)
       )
@@ -320,7 +320,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(b9), Pung(dr), Chow(c1, c2, c3), Pung(ww), Dui(ws)), OutsideHand),
         (List(Pung(dr)), DragonPung),
         (List(Pung(ww)), SeatWind),
-        (List(Pung(b9)), PungOfTerminalOrHonors),
+        (List(Pung(b9)), PungOfTerminalsOrHonors),
         (List(Pung(b9), Chow(c1, c2, c3)), OneVoidedSuit),
         (List(Bonus(List(sa))), FlowerTiles)
       )
@@ -343,8 +343,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(c9), Pung(ww), Dui(b2))
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
-        (List(Pung(c9)), PungOfTerminalOrHonors),
-        (List(Pung(ww)), PungOfTerminalOrHonors),
+        (List(Pung(c9)), PungOfTerminalsOrHonors),
+        (List(Pung(ww)), PungOfTerminalsOrHonors),
         (List(Pung(c8), Pung(c9), Chow(b1, b2, b3), Dui(b2)), OneVoidedSuit)
       )
 
@@ -393,7 +393,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), MeldedHand),
         (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), OutsideHand),
         (List(Chow(b1, b2, b3), Chow(b1, b2, b3)), PureDoubleChows),
-        (List(Pung(s1)), PungOfTerminalOrHonors),
+        (List(Pung(s1)), PungOfTerminalsOrHonors),
         (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), NoHonors)
       )
 
@@ -418,7 +418,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       List(
         (List(Kong(dg), Kong(wn), Kong(c5)), ThreeKongs),
         (List(Kong(dg)), DragonPung),
-        (List(Kong(wn)), PungOfTerminalOrHonors),
+        (List(Kong(wn)), PungOfTerminalsOrHonors),
         (List(Kong(c5), Chow(s3), Dui(s3)), OneVoidedSuit)
       )
 
@@ -445,7 +445,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Kong(b3), Pung(c2), Pung(s1)), MixedShiftedPung),
         (List(Kong(b3), Pung(c2), Pung(s1), Pung(ws)), AllPungs),
         (List(Pung(ws)), PrevalentWind),
-        (List(Pung(s1)), PungOfTerminalOrHonors),
+        (List(Pung(s1)), PungOfTerminalsOrHonors),
         (List(Kong(b3)), MeldedKong),
         (List(Pung(s1)), SelfDrawnComb)
       )
@@ -500,7 +500,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Kong(c6), Kong(s8)), TwoMeldedKongs),
         (List(Kong(s8), Pung(c8)), DoublePung),
         (List(Kong(c6)), ConcealedKong),
-        (List(Pung(s9)), PungOfTerminalOrHonors)
+        (List(Pung(s9)), PungOfTerminalsOrHonors)
       )
 
     test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext,
@@ -527,7 +527,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(b1), Pung(b4), Pung(b7), Pung(dg), Dui(dw)), HalfFlush),
         (List(Pung(dg)), DragonPung),
         (List(Pung(b4), Pung(b7)), TwoConcealedPungs),
-        (List(Pung(b1)), PungOfTerminalOrHonors)
+        (List(Pung(b1)), PungOfTerminalsOrHonors)
       )
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
@@ -579,8 +579,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       List(
         (List(SingleTile(s3)), LastTile),
         (List(Pung(s3), Chow(s3)), TileHog),
-        (List(Kong(c9)), PungOfTerminalOrHonors),
-        (List(Pung(c1)), PungOfTerminalOrHonors),
+        (List(Kong(c9)), PungOfTerminalsOrHonors),
+        (List(Pung(c1)), PungOfTerminalsOrHonors),
         (List(Kong(c9)), MeldedKong),
         (List(Kong(c9), Pung(c1), Pung(s3), Chow(s3), Dui(s2)), OneVoidedSuit),
         (List(Kong(c9), Pung(c1), Pung(s3), Chow(s3), Dui(s2)), NoHonors)
@@ -634,7 +634,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(c1), Pung(s4), Pung(s7), Pung(dr)), AllPungs),
         (List(Pung(dr)), DragonPung),
         (List(Pung(c1), Pung(dr)), TwoConcealedPungs),
-        (List(Pung(c1)), PungOfTerminalOrHonors),
+        (List(Pung(c1)), PungOfTerminalsOrHonors),
         (List(Pung(c1), Pung(s4), Pung(s7)), OneVoidedSuit)
       )
 
@@ -661,7 +661,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Kong(c1), Pung(s4), Chow(c2), Chow(s1), Dui(s2)), LowerFour),
         (List(Kong(c1), Pung(s4)), TwoConcealedPungs),
         (List(Kong(c1)), ConcealedKong),
-        (List(Kong(c1)), PungOfTerminalOrHonors),
+        (List(Kong(c1)), PungOfTerminalsOrHonors),
         (List(Kong(c1), Pung(s4), Chow(c2), Chow(s1), Dui(s2)), OneVoidedSuit),
         (List(Chow(c2)), SelfDrawnComb)
       )
@@ -801,8 +801,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Kong(c4), Kong(c9), Pung(c1)), ThreeConcealedPungs),
         (List(Kong(c4), Kong(c9)), TwoConcealedKongs),
         (List(Kong(c4), Kong(c9), Pung(c1), Chow(c5), Dui(dr)), HalfFlush),
-        (List(Kong(c9)), PungOfTerminalOrHonors),
-        (List(Pung(c1)), PungOfTerminalOrHonors),
+        (List(Kong(c9)), PungOfTerminalsOrHonors),
+        (List(Pung(c1)), PungOfTerminalsOrHonors),
         (List(Dui(dr)), SingleWait)
       )
 
@@ -1000,7 +1000,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Pung(c9), Pung(wn), Pung(ww), Pung(ws)), AllPungs),
         (List(Pung(wn)), PrevalentWind),
         (List(Pung(ww)), SeatWind),
-        (List(Pung(c9)), PungOfTerminalOrHonors),
+        (List(Pung(c9)), PungOfTerminalsOrHonors),
         (List(Pung(c9), Dui(b5)), OneVoidedSuit),
         (List(Dui(b5)), SingleWait)
       )
@@ -1195,7 +1195,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenPoints = 61
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
-        (List(Chow(b7), Chow(b7), Chow(b7)), PureTripleChow),
+        (List(Chow(b7), Chow(b7), Chow(b7)), PureTripleChows),
         (allFigures, UpperTiles),
         (allFigures, MeldedHand),
         (allFigures, OutsideHand),
@@ -1343,7 +1343,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       List(
         (List(Pung(s6), Pung(s7), Pung(s8), Pung(s9)), FourPureShiftedPungs),
         (allFigures, MeldedHand),
-        (List(Pung(s9)), PungOfTerminalOrHonors),
+        (List(Pung(s9)), PungOfTerminalsOrHonors),
         (allFigures, OneVoidedSuit)
       )
 
@@ -1424,7 +1424,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (allFigures, AllTerminalsAndHonors),
         (List(Pung(c1), Pung(wn), Pung(ww), Pung(ws)), AllPungs),
         (allFigures, HalfFlush),
-        (List(Pung(c1)), PungOfTerminalOrHonors)
+        (List(Pung(c1)), PungOfTerminalsOrHonors)
       )
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
@@ -1512,7 +1512,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Kong(c1), Kong(c2), Kong(c3)), PureShiftedPungs),
         (List(Kong(c1), Kong(c2), Kong(c3)), ThreeConcealedPungs),
         (List(Kong(dr)), DragonPung),
-        (List(Kong(c1)), PungOfTerminalOrHonors),
+        (List(Kong(c1)), PungOfTerminalsOrHonors),
         (List(Kong(dr)), MeldedKong),
         (List(Kong(c1), Kong(c2), Kong(c3), Dui(b1)), OneVoidedSuit)
       )

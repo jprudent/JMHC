@@ -3,9 +3,13 @@ package org.liprudent.majiang.greenbook
 import org.jbehave.core.steps.Steps
 import org.jbehave.core.annotations._
 import org.liprudent.majiang.tiles._
-import org.liprudent.majiang.mahjong._
 import org.liprudent.majiang.HuFinder
+import org.liprudent.majiang.figures._
+import org.liprudent.majiang.mahjong.PlayerContext
+import org.liprudent.majiang.figures.Kong
+import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.mahjong.PlayerTiles
+import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.mahjong.DetailedPoints
 import org.liprudent.majiang.tiles.ContextualTile
 
@@ -75,10 +79,18 @@ class MahjongSteps extends Steps {
 
   @Given( """concealed "$tiles"""")
   def givenConcealed(tiles: String) {
-    val splitted = tiles.split( """(\s|-)""")
+    val splitted = splitTiles(tiles)
     Context set context.copy(gnConcealed = splitted.map {
       tile => Tile(tile)
     }.toList.sorted(Tile.ord))
+  }
+
+  @Given( """melded "$tiles"""")
+  def givenMelded(tiles: String) {
+    val figures = splitFigures(tiles)
+    val mappedFigures = toFigures(figures)
+
+    Context set context.copy(gnMelded = mappedFigures)
   }
 
   @Given("prevalent wind is $wind")
@@ -113,17 +125,56 @@ class MahjongSteps extends Steps {
   def thenCombination(combination: String) {
     checkHasResult
     assert(result(0).hasCombination(combination),
-      combination + "not found in result")
+      combination + " not found in result. Result is" + result)
   }
 
-  @Then("$combination is not scored")
+  @Then( """"$combination" is not scored""")
   def thenNotCombinatin(combination: String) {
     assert(!result(0).hasCombination(combination),
-      combination + "found in result")
+      combination + " found in result. Result is " + result)
   }
 
   private def checkHasResult {
     assert(!result.isEmpty, "No results")
+  }
+
+  /**
+   *
+   *
+   * @param tiles a list of figures. for instance "b2-b3-b4 dr-dr c1 c5"
+   * @return a list of tiles. for instance List("b2","b3","b4","dr","dr","c1","c5")
+   */
+  private def splitTiles(tiles: String) = tiles.split( """(\s|-)""")
+
+  private def splitFigures(tiles: String) = tiles.split( """(\s)""")
+
+  private def toFigures(figures: Seq[String]): Types.Figures = {
+
+    def toFigure(figure: String): Figure = {
+
+      def build(builder: (Tile) => Figure): Figure = {
+        val tile = Tile(splitTiles(figure)(0))
+        builder(tile)
+      }
+
+      def ??? = throw new RuntimeException(figure + " cannot be translated.")
+
+      val tiles = splitTiles(figure).groupBy(t => t)
+      tiles.size match {
+        case 1 => tiles.values.head.size match {
+          case 2 => build(Dui.apply)
+          case 3 => build(Pung.apply)
+          case 4 => build(Kong.apply)
+          case _ => ???
+        }
+        case 3 => build(Chow.apply)
+        case _ => ???
+      }
+
+
+    }
+
+    figures.map(toFigure(_)).toList.sorted(OrdFigure)
   }
 
 

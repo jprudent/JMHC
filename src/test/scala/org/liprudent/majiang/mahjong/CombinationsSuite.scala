@@ -158,7 +158,7 @@ class CombinationsSuite extends FunSuite {
 
     val hule = HuLe(closed, disclosed, lastTile, context)
 
-    val actual = PungOfTerminalOrHonors.find(hule)
+    val actual = PungOfTerminalsOrHonors.find(hule)
     val expected = Result(List(List(Pung(b9)), List(Pung(ww))))
 
     assert(actual === expected)
@@ -205,6 +205,36 @@ class CombinationsSuite extends FunSuite {
 
     val actual = LittleFourWinds.find(hule)
     val expected = Result(List(List(Pung(wn), Pung(ww), Pung(ws), Dui(we))))
+
+    assert(actual === expected)
+
+  }
+
+  test("Mixed Triple Chow not found on PureTripleChow") {
+    val closed: List[Figure] = List(Pung(dg), Chow(b2), Chow(b2), Dui(b6))
+    val disclosed: List[Figure] = List(Chow(b2))
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded, NotLastTile)
+    val context = PlayerContext(WestWind, EastWind)
+
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = MixedTripleChows.find(hule)
+    val expected = EmptyResult
+
+    assert(actual === expected)
+
+  }
+
+  test("Mixed Triple Chow found") {
+    val closed: List[Figure] = List(Pung(dg), Chow(b2), Chow(c2), Dui(b6))
+    val disclosed: List[Figure] = List(Chow(s2))
+    val lastTile: ContextualTile = ContextualTile(dg, Discarded, NotLastTile)
+    val context = PlayerContext(WestWind, EastWind)
+
+    val hule = HuLe(closed, disclosed, lastTile, context)
+
+    val actual = MixedTripleChows.find(hule)
+    val expected = Result(List(Chow(b2), Chow(c2), Chow(s2)))
 
     assert(actual === expected)
 

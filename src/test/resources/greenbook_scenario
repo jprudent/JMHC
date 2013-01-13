@@ -1,5 +1,37 @@
+!--
+!-- Conventions:
+!-- ------------
+!--
+!-- -- TILES --
+!-- there is a 2 characters length string available to describe any tile
+!--  *) Bamboos    : b1 b2 b3 b4 b5 b6 b7 b8 b9  [ b(amboo)                                           ]
+!--  *) Characters : c1 c2 c3 c4 c5 c6 c7 c8 c9  [ c(haracter)                                        ]
+!--  *) Stones     : s1 s2 s3 s4 s5 s6 s7 s8 s9  [ s(tone)                                            ]
+!--  *) Honors     : dg dr dw                    [ d(ragon) g(reen)  r(ed)    w(hite)                 ]
+!--  *) Winds      : we wn ww ws                 [ w(ind)   e(ast)   n(orth)  w(est)   s(outh)        ]
+!--  *) Flowers    : fp fo fc fb                 [ f(lower) p(lumb)  o(rchid) b(amboo) c(hrysantheum) ]
+!--  *) Seasons    : ss su sa sw                 [ s(eason) s(pring) s(u)mmer a(utomn) w(inter)       ]
+!--
+!--  -- FIGURES --
+!-- You can associate tiles to form figures:
+!--  *) Dui/Pair           : dg-dg       c1-c1       ...
+!--  *) Chow/Straight/Suit : c1-c2-c3    s7-s8-s9    ...
+!--  *) Pung/Triplet       : ww-ww-ww    dr-dr-dr    c1-c1-c1    ...
+!--  *) Kong/Quartet       : ww-ww-ww-ww dr-dr-dr-dr c1-c1-c1-c1 ...
+!--  *) Flowers/Bonus      : fp-ss-sw    ...
+!-- Some figures are invalid like: dg-dr c1-c2-c4 c1-c2-c2 ww-ww-ws ...
+!-- You can describe a set of figures within double quotes (") separating each figure by a space
+!-- For instance : "dg-dg c1-c2-c3 dr-dr-dr ww-ww-ww-ww fp-ss" represents a pair of green dragon,
+!--                a chow of 1-2-3 characters, a pung of red dragon, a kong of west wind and a
+!--                2 tiles bonus (plumb flower and spring season)
+!-- Another example with a list of single tiles: "b1 b3 b2 b2 b2 b3 b1 b1 b3" which makes no
+!-- assumption of possible figures ("b1-b2-b3 b1-b2-b3 b1-b2-b3" or "b1-b1-b1 b2-b2-b2 b3-b3-b3").
+
+
+
+
 !-- ----------------------
-!--  81. BIG FOUR WINDS --
+!--  01. BIG FOUR WINDS --
 !-- ----------------------
 
 Scenario: Big Four Winds - Example 1
@@ -45,7 +77,7 @@ Then "Pung Of Terminals Or Honors" is not scored
 
 
 !-- -------------------------
-!--  80. BIG THREE DRAGONS --
+!--  02. BIG THREE DRAGONS --
 !-- -------------------------
 
 Scenario: Big Three Dragons - Example 1
@@ -80,3 +112,59 @@ Then "Big Three Dragons" is scored
 Then "Half Flush" is scored
 Then "Two Dragon Pungs" is not scored
 Then "Dragon Pung" is not scored
+
+
+
+!-- -----------------
+!--  03. ALL GREEN --
+!-- -----------------
+
+Scenario: All Green - Example 1
+
+Given concealed "b2-b2 b3-b3 b4-b4 b6-b6 b8-b8 b8-b8 dg-dg"
+Given player goes out on "dg" "Self Drawn"
+When scoring
+Then "All Green" is scored
+Then "Seven Pairs" is scored
+Then "Half Flush" is scored
+Then "Fully Concealed Hand" is scored
+
+
+Scenario: All Green - Example 2
+
+Given concealed "b2-b3-b4 b2-b3-b4 dg-dg-dg b6-b6"
+Given melded "b2-b3-b4"
+Given player goes out on "dg" "Discarded"
+When scoring
+Then "All Green" is scored
+Then "Pure Triple Chows" is scored
+Then "Half Flush" is scored
+Then "Dragon Pung" is scored
+Then "Mixed Triple Chows" is not scored
+
+Scenario: All Green - Example 3
+
+Given concealed "b2-b2-b2 b3-b3-b3 b4-b4-b4 b6-b6-b6 b8-b8"
+Given player goes out on "b8" "Discarded"
+When scoring
+Then "All Green" is scored
+Then "Pure Shifted Pungs" is scored
+Then "Full Flush" is scored
+Then "All Pungs" is scored
+Then "All Simples" is scored
+
+
+
+!-- ------------------
+!--  03. NINE GATES --
+!-- ------------------
+
+Scenario: Nine Gates - Example 1
+
+Given concealed "b2-b3-b4 b2-b3-b4 b2-b3-b4 dg-dg-dg b6-b6"
+Given player goes out on "dg" "Discarded"
+When scoring
+Then "All Green" is scored
+Then "Pure Shifted Pungs" is scored
+Then "Half Flush" is scored
+Then "Dragon Pung" is scored

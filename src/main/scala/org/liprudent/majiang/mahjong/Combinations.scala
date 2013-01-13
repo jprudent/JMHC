@@ -165,6 +165,13 @@ object Combination {
       (c1, c2, c3) => c3.t1.value == c2.t1.value + 1 && !c1.sameFamily(c3) && !c2.sameFamily(c3)
     }
 
+  def findMixedTripleChow(chows: List[Chow]) =
+    findThreeFigures(chows)(_ => true) {
+      (c1, c2) => c2.sameValues(c1) && c1.family < c2.family
+    } {
+      (c1, c2, c3) => c3.sameValues(c2) && c1.family < c3.family && c2.family < c3.family
+    }
+
   def findMixedShiftedPungs(pungs: List[PungLike]) = {
     def cond(p1: PungLike, p2: PungLike) =
       p1.tile.family != p2.tile.family && p2.tile.value == p1.tile.value + 1
@@ -368,10 +375,10 @@ object MeldedKong extends Combination {
 }
 
 
-object PungOfTerminalOrHonors extends Combination {
+object PungOfTerminalsOrHonors extends Combination {
   val id = 73
   val points = 1
-  val name = "Pung of Terminals or Honor"
+  val name = "Pung Of Terminals or Honors"
   val description = "Pung of 1 or 9 or winds"
 
 
@@ -533,7 +540,7 @@ object SeatWind extends Combination {
   val name = "Seat Wind"
   val description = "1 pung of player's wind"
 
-  override val implied = List(PungOfTerminalOrHonors)
+  override val implied = List(PungOfTerminalsOrHonors)
 
   def find(m: HuLe): Result =
     Result(m.allPungsLike.find(_.tile.family == m.context.seatWind))
@@ -545,7 +552,7 @@ object PrevalentWind extends Combination {
   val name = "Prevalent Wind"
   val description = "1 pung of round wind"
 
-  override val implied = List(PungOfTerminalOrHonors)
+  override val implied = List(PungOfTerminalsOrHonors)
 
   def find(m: HuLe): Result =
     Result(m.allPungsLike.find(_.tile.family == m.context.prevalentWind))
@@ -826,7 +833,7 @@ object ChickenHand extends Combination {
         MixedDoubleChows,
         ShortStraight,
         TwoTerminalChows,
-        PungOfTerminalOrHonors,
+        PungOfTerminalsOrHonors,
         MeldedKong,
         OneVoidedSuit,
         NoHonors,
@@ -852,27 +859,17 @@ object MixedShiftedPung extends Combination {
 
 }
 
-object MixedTripleChow extends Combination {
+object MixedTripleChows extends Combination {
   val id = 41
   val points = 8
-  val name = "Mixed Triple Chow"
+  val name = "Mixed Triple Chows"
   val description = "Three identical chows in three families"
 
 
   override val implied = List(MixedDoubleChows)
 
-  def find(m: HuLe): Result = {
-    //FIXME j'ai comme un doute que ?a match 3 chows dans 2 familles
-    val resolved: List[Figure] = m.allChows
-      .groupBy(_.t1.value) // Map[Int, List[Chow]
-      .values.toList // List[List[Chow]]
-      .filter(_.size == 3) //FIXME ???
-      .flatten // List[Chow]
-
-
-    Result(resolved)
-
-  }
+  def find(m: HuLe): Result =
+    Result(Combination.findMixedTripleChow(m.allChows))
 }
 
 object ReversibleTiles extends Combination {
@@ -913,7 +910,7 @@ object BigThreeWind extends Combination {
   val name = "Big Three Winds"
   val description = "3 pungs of different wind"
 
-  override val implied = List(PungOfTerminalOrHonors)
+  override val implied = List(PungOfTerminalsOrHonors)
 
   def find(m: HuLe): Result =
     SomeResult(m.allWindPungsLike) {
@@ -1115,10 +1112,10 @@ object PureShiftedPungs extends Combination {
 }
 
 
-object PureTripleChow extends Combination {
+object PureTripleChows extends Combination {
   val id = 23
   val points = 24
-  val name = "Pure Triple Chow"
+  val name = "Pure Triple Chows"
   val description = "Three identical chows"
 
   override val excluded = List(PureDoubleChows)
@@ -1258,7 +1255,7 @@ object QuadrupleChows extends Combination {
   val name = "Quadruple Chows"
   val description = "Four identical chows"
 
-  override val excluded = List(PureTripleChow, TileHog, AllChows)
+  override val excluded = List(PureTripleChows, TileHog, AllChows)
 
   def find(m: HuLe): Result =
     SomeResult(m.allChows) {
@@ -1311,7 +1308,7 @@ object AllHonors extends Combination {
   val name = "All Honors"
   val description = "Only winds and dragons"
 
-  override val excluded = List(AllTerminalsAndHonors, AllPungs, PungOfTerminalOrHonors)
+  override val excluded = List(AllTerminalsAndHonors, AllPungs, PungOfTerminalsOrHonors)
 
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
@@ -1359,7 +1356,7 @@ object AllTerminals extends Combination {
   val description = "only 1 and 9"
 
   //BigThreeWind is implied because it can exist Pung of Terminal or honor
-  override val excluded = List(AllPungs, AllTerminalsAndHonors, PungOfTerminalOrHonors, NoHonors)
+  override val excluded = List(AllPungs, AllTerminalsAndHonors, PungOfTerminalsOrHonors, NoHonors)
 
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
@@ -1424,7 +1421,7 @@ object NineGates extends Combination {
   val name = "Nine gates"
   val description = "1-1-1-2-3-4-5-6-7-8-9-9-9 + another of the same family"
 
-  override val excluded = List(FullFlush, ConcealedHand, PungOfTerminalOrHonors)
+  override val excluded = List(FullFlush, ConcealedHand, PungOfTerminalsOrHonors)
 
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
@@ -1451,8 +1448,6 @@ object AllGreen extends Combination {
   val points = 88
   val name = "All Green"
   val description = "Only green tiles: 2,3,4,6,8 bamboos and green dragon"
-
-  //override val excluded = List(AllPungs, SingleWait)
 
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
@@ -1484,7 +1479,7 @@ object BigFourWinds extends Combination {
   val description = "4 wind pungs"
 
   override val excluded = List(BigThreeWind, AllPungs, PrevalentWind,
-    SeatWind, PungOfTerminalOrHonors)
+    SeatWind, PungOfTerminalsOrHonors)
 
   def find(m: HuLe): Result =
     SomeResult(m.allWindPungsLike) {

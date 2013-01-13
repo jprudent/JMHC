@@ -205,9 +205,9 @@ package object mahjong {
     def hasCombination(combination: Combination): Boolean =
       detailedPoints.exists(_._2 == combination)
 
-    def hasCombination(combination: String): Boolean = {
-      HulePointsComputer.combinations.find(_.name.toUpperCase == combination.toUpperCase) match {
-        case None => false
+    def hasCombination(combinationName: String): Boolean = {
+      HulePointsComputer.combinations.find(_.name.toUpperCase == combinationName.toUpperCase) match {
+        case None => throw new IllegalArgumentException("Unknown combination name : " + combinationName)
         case Some(mappedCombination) => hasCombination(mappedCombination)
       }
 
@@ -237,7 +237,7 @@ package object mahjong {
       NoHonors,
       OneVoidedSuit,
       MeldedKong,
-      PungOfTerminalOrHonors,
+      PungOfTerminalsOrHonors,
       TwoTerminalChows,
       ShortStraight,
       MixedDoubleChows,
@@ -269,7 +269,7 @@ package object mahjong {
       MixedShiftedChow,
       HalfFlush,
       MixedShiftedPung,
-      MixedTripleChow,
+      MixedTripleChows,
       ReversibleTiles,
       MixedStraight,
       BigThreeWind,
@@ -287,7 +287,7 @@ package object mahjong {
       MiddleTiles,
       UpperTiles,
       PureShiftedPungs,
-      PureTripleChow,
+      PureTripleChows,
       FullFlush,
       AllEvenPungs,
       GreaterHonorsAndKnittedTiles,
