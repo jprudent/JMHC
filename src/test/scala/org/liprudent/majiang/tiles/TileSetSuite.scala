@@ -8,23 +8,24 @@ import org.liprudent.majiang.tiles.Tile._
 
 @RunWith(classOf[JUnitRunner])
 class TileSetSuite extends FunSuite {
+
   test("remove when multiple") {
     val hand = TileSet(List(b1, b2, b3, b1, b2, b2, b2))
-    val actual = hand.remove(b1)
+    val actual = hand removed (b1)
     val expected = TileSet(List(/*X*/ b2, b3, b1, b2, b2, b2))
     assert(actual == expected, actual + "instead of \n" + expected)
   }
 
   test("remove when single") {
     val hand = TileSet(List(b1, b2, b3, b1, b2, b2, b2))
-    val actual = hand.remove(b3)
+    val actual = hand removed (b3)
     val expected = TileSet(List(b1, b2, /*X*/ b1, b2, b2, b2))
     assert(actual == expected, actual + "instead of \n" + expected)
   }
 
   test("remove several") {
     val hand = TileSet(List(b1, b2, b2, b2, b2, b3))
-    val actual = hand.remove(List(b1, b3))
+    val actual = hand removed (List(b1, b3))
     val expected = TileSet(List(b2, b2, b2, b2))
     assert(actual == expected, actual + "instead of \n" + expected)
   }

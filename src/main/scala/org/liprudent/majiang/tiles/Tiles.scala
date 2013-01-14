@@ -469,9 +469,17 @@ case class TileSet(tocs: List[TileOccurence]) {
     }
   }
 
+  /**
+   * Find the number of occurence of a given tile
+   * @param tile Find number of occurence of this tile
+   * @return the number of occurence of `tile`
+   */
   def occurence(tile: Tile): Occurence =
     tocs.find(_._1 == tile).map(_._2).getOrElse(0)
 
+  /**
+   * convert as a list of Tile
+   */
   lazy val toTiles: List[Tile] =
     tocs.map(toc => for {i <- 1 to toc._2} yield (toc._1)).flatten
 
@@ -481,7 +489,7 @@ case class TileSet(tocs: List[TileOccurence]) {
    * @param from The list where to remove the tile <code>t</code>
    * @return The list <code>from</code> minus the tile <code>t</code>
    */
-  protected def remove(t: Tile, from: List[TileOccurence]): List[TileOccurence] = {
+  private def remove(t: Tile, from: List[TileOccurence]): List[TileOccurence] = {
 
     def isTile = (tileOccurence: TileOccurence) => tileOccurence._1 == t
 
@@ -491,10 +499,6 @@ case class TileSet(tocs: List[TileOccurence]) {
         if (occ == 1) from.filterNot(isTile)
         else ((tile, occ - 1) :: from.filterNot(isTile)).sorted
     }
-  }
-
-  protected def remove(tiles: List[Tile], from: List[TileOccurence]): List[TileOccurence] = {
-    tiles.foldLeft(from)((acc: List[TileOccurence], t: Tile) => remove(t, acc))
   }
 
 
