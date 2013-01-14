@@ -131,15 +131,6 @@ class FiguresComputerSuite extends FunSuite {
     val hand = FiguresComputer(List(b1, b2, b3, b1, b2, b3, b1, b2, b3))
     val actual = hand.allFiguresCombinations
 
-    def nicePrint(lstFigures: Set[Figures]) {
-      lstFigures.foreach {
-        figures => println("Solution : ")
-        figures.foreach(figure => println("\t" + figure))
-      }
-    }
-
-    nicePrint(actual)
-
     assert(expected.forall(exp => actual.contains(exp)), actual)
   }
 

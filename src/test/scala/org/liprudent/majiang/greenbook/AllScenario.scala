@@ -40,7 +40,7 @@ class AllScenario extends JUnitStories {
       .useStepMonitor(xref.getStepMonitor)
 
 
-  override val storyPaths = MutableBufferWrapper(ListBuffer("greenbook_scenario"))
+  override val storyPaths = MutableBufferWrapper(ListBuffer("org/liprudent/majiang/greenbook/greenbook_scenario"))
 
 
 }
