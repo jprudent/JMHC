@@ -7,7 +7,8 @@ import org.liprudent.majiang.figures._
 
 
 /**
- * This class will find all possibles set of figures that can be made with a set of tiles
+ * This class will find all possibles set of figures
+ * that can be made with a set of tiles
  *
  * @param tileSet
  */
@@ -43,6 +44,9 @@ case class FiguresComputer(tileSet: TileSet) {
     }.flatten
   }
 
+  /**
+   * an ordered list of possible knitted
+   */
   lazy val knitted: List[Knitted] = {
 
     //quick fail
@@ -58,6 +62,9 @@ case class FiguresComputer(tileSet: TileSet) {
     }
   }
 
+  /**
+   * An ordered list of possible knitted + dragons
+   */
   lazy val someKnittedSomeDragons: List[SomeKnittedWithSomeDragons] = {
 
     //quick fail
@@ -94,6 +101,9 @@ case class FiguresComputer(tileSet: TileSet) {
     }
   }
 
+  /**
+   * An ordered list of possible thirteen orphans
+   */
   lazy val thirteenOrphans: List[ThirteenOrphans] = {
     val containsFixed = ThirteenOrphansProperties.fixedTiles.forall(tile => tileSet.exists(_ == tile))
     if (containsFixed) {
@@ -108,22 +118,16 @@ case class FiguresComputer(tileSet: TileSet) {
     }
   }
 
-  private def hasTwins(tileSet: TileSet) =
-    tileSet.tocs.forall(_._2 >= 2)
-
-  private def hasChowsOrTwins(computer: FiguresComputer) =
-    List(computer.chows, computer.pungs, computer.duis).exists(_.size != 0)
-
   /**
    * all possible figures
    * <p>
-   * result is ordered : pungs, chows, duis
+   * result is ordered
    */
   lazy val allFigures: List[Figure] = (thirteenOrphans ::: someKnittedSomeDragons ::: knitted ::: duis ::: chows ::: pungs).sorted(OrdFigure)
 
   /**
    *
-   * @return All possible combinations of figures. Each element of the set is an ordered list of figures.
+   * @return All possible combinations of figures. Each element of the set is a valid ordered list of figures.
    */
   lazy val allFiguresCombinations: Set[Figures] = findFigures(this)
 
@@ -154,19 +158,10 @@ case class FiguresComputer(tileSet: TileSet) {
    * an ordered list of possible length free suits
    */
   protected lazy val allSuits: List[Suit] = {
-    splitByFamily.map {
+    tileSet.splitByFamily.map {
       tilesSameFamily =>
         findSuits(TileSet(tilesSameFamily))
     }.flatten
-  }
-
-  /**
-   * a list of sub-list containing ordered TileOccurence of the same family
-   */
-  protected[tiles] val splitByFamily: List[List[TileOccurence]] = {
-    tileSet.tocs.groupBy {
-      e => e._1.family
-    }.values.toList.sorted(OrdListTileOccurence)
   }
 
 
@@ -227,6 +222,12 @@ case class FiguresComputer(tileSet: TileSet) {
     val nbElements = suitSize - length + 1
     (for {i <- 0 until nbElements} yield (for {j <- i until i + length} yield j).toList).toList
   }
+
+  private def hasTwins(tileSet: TileSet) =
+    tileSet.tocs.forall(_._2 >= 2)
+
+  private def hasChowsOrTwins(computer: FiguresComputer) =
+    List(computer.chows, computer.pungs, computer.duis).exists(_.size != 0)
 }
 
 object FiguresComputer {

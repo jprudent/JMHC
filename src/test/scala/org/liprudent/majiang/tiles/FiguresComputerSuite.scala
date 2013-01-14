@@ -4,7 +4,6 @@ import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import Tile._
-import org.liprudent.majiang.tiles.Types._
 import org.liprudent.majiang.figures._
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
@@ -32,16 +31,6 @@ class FiguresComputerSuite extends FunSuite {
     val actual = hand1.sublistsOf(3, List(List(b1, b2, b3, b4)))
     assert(actual == expected, actual)
   }
-
-  test("Split by family") {
-    val hand = FiguresComputer(List(b2, c1, b1, s1, c2, dr, dr, we, ww))
-
-    val families: List[List[TileOccurence]] = hand.splitByFamily
-    assert(families == List(List((b1, 1), (b2, 1)), List((c1, 1), (c2, 1)), List((s1, 1)),
-      List((we, 1)), List((ww, 1)), List((dr, 2))), families)
-
-  }
-
 
   test("Chows finding") {
     val hand1 = FiguresComputer(List(b1, b2, b3, b4, we))

@@ -470,6 +470,15 @@ case class TileSet(tocs: List[TileOccurence]) {
   }
 
   /**
+   * a list of sub-list containing ordered TileOccurence of the same family
+   */
+  protected[tiles] val splitByFamily: List[List[TileOccurence]] = {
+    tocs.groupBy {
+      e => e._1.family
+    }.values.toList.sorted(OrdListTileOccurence)
+  }
+
+  /**
    * Find the number of occurence of a given tile
    * @param tile Find number of occurence of this tile
    * @return the number of occurence of `tile`
