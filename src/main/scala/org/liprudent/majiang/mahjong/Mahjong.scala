@@ -205,12 +205,19 @@ package object mahjong {
     def hasCombination(combination: Combination): Boolean =
       detailedPoints.exists(_._2 == combination)
 
-    def hasCombination(combinationName: String): Boolean = {
+    def hasCombination(combinationName: String): Boolean =
+      hasCombination(toCombination(combinationName))
+
+    /**
+     * Convert a combination name to a domain Combination object
+     * @param combinationName case insensitive. The combination name to convert
+     * @return The combination or throw an exception if not found
+     */
+    def toCombination(combinationName: String): Combination = {
       HulePointsComputer.combinations.find(_.name.toUpperCase == combinationName.toUpperCase) match {
         case None => throw new IllegalArgumentException("Unknown combination name : " + combinationName)
-        case Some(mappedCombination) => hasCombination(mappedCombination)
+        case Some(mappedCombination) => mappedCombination
       }
-
     }
   }
 
@@ -228,6 +235,7 @@ package object mahjong {
 
   object HulePointsComputer {
 
+    //TODO move it to Combination
     val combinations = List[Combination](
       FlowerTiles,
       SelfDrawnComb,

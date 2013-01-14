@@ -36,8 +36,9 @@
 
 Scenario: Big Four Winds - Example 1
 
-Given concealed "we-we-we ws-ws-ws ww-ww-ww wn-wn-wn dr-dr"
-Given player goes out on "we" "Discarded"
+Given concealed "ws-ws-ws ww-ww-ww wn-wn-wn dr-dr"
+Given melded "we-we-we"
+Given player goes out on "ws" "Discarded"
 Given prevalent wind is East
 Given player wind is East
 When scoring
@@ -47,6 +48,7 @@ Then "All Pungs" is not scored
 Then "Prevalent Wind" is not scored
 Then "Seat Wind" is not scored
 Then "Pung Of Terminals Or Honors" is not scored
+
 
 
 Scenario: Big Four Winds - Example 2
@@ -94,7 +96,10 @@ Then "Dragon Pung" is not scored
 
 Scenario: Big Three Dragons - Example 2
 
-Given concealed "dr-dr-dr dg-dg-dg dw-dw-dw we-we-we ww-ww"
+Given concealed "dg-dg-dg dw-dw-dw we-we-we ww-ww"
+Given melded "dr-dr-dr"
+Given player wind is North
+Given prevalent wind is North
 Given player goes out on "ww" "Discarded"
 When scoring
 Then "Big Three Dragons" is scored
@@ -105,7 +110,8 @@ Then "Dragon Pung" is not scored
 
 Scenario: Big Three Dragons - Example 3
 
-Given concealed "dr-dr-dr dg-dg-dg dw-dw-dw b4-b5-b6 b5-b5"
+Given concealed "dg-dg-dg dw-dw-dw b4-b5-b6 b5-b5"
+Given melded "dr-dr-dr"
 Given player goes out on "b4" "Discarded"
 When scoring
 Then "Big Three Dragons" is scored
@@ -128,6 +134,9 @@ Then "All Green" is scored
 Then "Seven Pairs" is scored
 Then "Half Flush" is scored
 Then "Fully Concealed Hand" is scored
+!-- Not in green book:
+Then "Tile Hog" is scored
+Then nothing else is scored
 
 
 Scenario: All Green - Example 2
@@ -141,10 +150,12 @@ Then "Pure Triple Chows" is scored
 Then "Half Flush" is scored
 Then "Dragon Pung" is scored
 Then "Mixed Triple Chows" is not scored
+Then nothing else is scored
 
 Scenario: All Green - Example 3
 
-Given concealed "b2-b2-b2 b3-b3-b3 b4-b4-b4 b6-b6-b6 b8-b8"
+Given concealed "b4-b4-b4 b6-b6-b6 b8-b8"
+Given melded "b2-b2-b2 b3-b3-b3"
 Given player goes out on "b8" "Discarded"
 When scoring
 Then "All Green" is scored
@@ -152,19 +163,47 @@ Then "Pure Shifted Pungs" is scored
 Then "Full Flush" is scored
 Then "All Pungs" is scored
 Then "All Simples" is scored
+!-- Not in green book
+Then "Two Concealed Pungs" is scored
+Then nothing else is scored
 
 
 
 !-- ------------------
-!--  03. NINE GATES --
+!--  04. NINE GATES --
 !-- ------------------
 
 Scenario: Nine Gates - Example 1
 
-Given concealed "b2-b3-b4 b2-b3-b4 b2-b3-b4 dg-dg-dg b6-b6"
-Given player goes out on "dg" "Discarded"
+Given concealed "b1-b1 b1-b2-b3 b4-b5-b6 b7-b8-b9 b9-b9-b9 "
+Given player goes out on "b9" "Self Drawn"
 When scoring
-Then "All Green" is scored
-Then "Pure Shifted Pungs" is scored
-Then "Half Flush" is scored
-Then "Dragon Pung" is scored
+Then "Nine Gates" is scored
+Then "Pure Straight" is scored
+Then "Tile Hog" is scored
+Then "Fully Concealed Hand" is scored
+Then "Full Flush" is not scored
+Then "Concealed Hand" is not scored
+Then "Pung Of Terminals Or Honors" is not scored
+Then nothing else is scored
+
+
+
+!-- ------------------
+!--  05. FOUR KONGS --
+!-- ------------------
+
+Scenario: Four Kongs - Example 1
+
+Given concealed "b2-b2-b2-b2 c5-c5-c5-c5 dr-dr"
+Given melded "s7-s7-s7-s7 we-we-we-we"
+Given player goes out on "dr" "Self Drawn"
+Given player wind is North
+Given prevalent wind is North
+When scoring
+Then "Four Kongs" is scored
+Then "All Types" is scored
+Then "Pung of Terminals or Honors" is scored
+Then "Pung of Terminals or Honors" is scored
+Then "Single Wait" is not scored
+!-- Then nothing else is scored
