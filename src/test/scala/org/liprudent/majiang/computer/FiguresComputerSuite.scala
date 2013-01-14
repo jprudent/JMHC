@@ -1,34 +1,36 @@
-package org.liprudent.majiang.tiles
+package org.liprudent.majiang.computer
 
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import Tile._
 import org.liprudent.majiang.figures._
+import org.liprudent.majiang.tiles.Tile._
+import org.liprudent.majiang.figures.ThirteenOrphans
+import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
+import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
+import org.liprudent.majiang.tiles.{TileSet, Stone, Bamboo, Character}
 
 @RunWith(classOf[JUnitRunner])
 class FiguresComputerSuite extends FunSuite {
 
   test("Find suits") {
-    val hand1 = FiguresComputer(List(b1, b2, b3, b1, b2, b2, b2, we, wn, dg, dg))
-    val actual: List[Suit] = hand1.findSuits(hand1.tileSet)
+    val hand1 = TileSet(List(b1, b2, b3, b1, b2, b2, b2, we, wn, dg, dg))
+    val actual: List[Suit] = FiguresComputer.findSuits(hand1)
     val expected = List(List(b1, b2, b3), List(b1, b2), List(b2), List(b2), List(we), List(wn), List(dg), List(dg))
     assert(actual == expected, actual)
   }
 
   test("findSubSuitsIndices") {
-    val hand1 = FiguresComputer(List(b1, b2, b3, b4))
     val expected = List(List(0, 1, 2), List(1, 2, 3), List(2, 3, 4))
-    val actual = hand1.findSubSuitsIndices(5, 3)
+    val actual = FiguresComputer.findSubSuitsIndices(5, 3)
     assert(actual == expected, actual)
   }
 
   test("listOf") {
-    val hand1 = FiguresComputer(List(b1, b2, b3, b4))
     val expected = List(List(b1, b2, b3), List(b2, b3, b4))
-    val actual = hand1.sublistsOf(3, List(List(b1, b2, b3, b4)))
+    val actual = FiguresComputer.sublistsOf(3, List(List(b1, b2, b3, b4)))
     assert(actual == expected, actual)
   }
 

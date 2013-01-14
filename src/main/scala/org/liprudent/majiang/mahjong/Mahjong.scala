@@ -1,5 +1,6 @@
 package org.liprudent.majiang
 
+import computer.FiguresComputer
 import mahjong._
 import mahjong.DetailedPoints
 import mahjong.HuLe
@@ -456,7 +457,7 @@ object UniqueWait {
 
     def satisfy(tile: Tile): Boolean = {
       val added: TileSet = closed.added(tile)
-      val allCombinations = FiguresComputer(added).allFiguresCombinations
+      val allCombinations = computer.FiguresComputer(added).allFiguresCombinations
       allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed, concealedKongs)).size > 0
     }
 

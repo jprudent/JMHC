@@ -472,7 +472,7 @@ case class TileSet(tocs: List[TileOccurence]) {
   /**
    * a list of sub-list containing ordered TileOccurence of the same family
    */
-  protected[tiles] val splitByFamily: List[List[TileOccurence]] = {
+  val splitByFamily: List[List[TileOccurence]] = {
     tocs.groupBy {
       e => e._1.family
     }.values.toList.sorted(OrdListTileOccurence)

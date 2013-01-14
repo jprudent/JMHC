@@ -1,10 +1,13 @@
-package org.liprudent.majiang.tiles
+package org.liprudent.majiang.computer
 
-import Types.TileOccurence
-import Types.Figures
-
+import org.liprudent.majiang.tiles._
 import org.liprudent.majiang.figures._
-
+import org.liprudent.majiang.tiles.Types._
+import org.liprudent.majiang.figures.ThirteenOrphans
+import org.liprudent.majiang.figures.Knitted
+import org.liprudent.majiang.figures.Pung
+import org.liprudent.majiang.figures.Dui
+import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
 
 /**
  * This class will find all possibles set of figures
@@ -28,7 +31,7 @@ case class FiguresComputer(tileSet: TileSet) {
    * an ordered list of possible chows
    */
   lazy val chows: List[Chow] = {
-    sublistsOf(Chow.size, allSuits).map(new Chow(_))
+    FiguresComputer.sublistsOf(Chow.size, allSuits).map(new Chow(_))
   }
 
   /**
@@ -160,17 +163,33 @@ case class FiguresComputer(tileSet: TileSet) {
   protected lazy val allSuits: List[Suit] = {
     tileSet.splitByFamily.map {
       tilesSameFamily =>
-        findSuits(TileSet(tilesSameFamily))
+        FiguresComputer.findSuits(TileSet(tilesSameFamily))
     }.flatten
   }
 
+
+  private def hasTwins(tileSet: TileSet) =
+    tileSet.tocs.forall(_._2 >= 2)
+
+  private def hasChowsOrTwins(computer: FiguresComputer) =
+    List(computer.chows, computer.pungs, computer.duis).exists(_.size != 0)
+}
+
+object FiguresComputer {
+
+  /**
+   * Factory to create a FiguresComputer given a list of tiles
+   * @param tiles list of tiles to compute
+   * @return a FigureComputer
+   */
+  def apply(tiles: List[Tile]): FiguresComputer = FiguresComputer(TileSet(tiles))
 
   /**
    * Search for the longest suits.
    * @param tiles where to find suits.
    * @return the list of the longest suits
    */
-  protected[tiles] def findSuits(tiles: TileSet): List[Suit] = {
+  def findSuits(tiles: TileSet): List[Suit] = {
 
     def findSuit(tiles: List[TileOccurence], prev: Tile): Suit = {
       tiles match {
@@ -189,18 +208,17 @@ case class FiguresComputer(tileSet: TileSet) {
 
   }
 
-
   /**
    * Find all sublists of fixed length in given suits
    * @param suitSize sublists fixed length
    * @param suits the suits where to find sublists. Theses suits can have any length.
    * @return A list of sub-lists with fixed length
    */
-  protected[tiles] def sublistsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
+  def sublistsOf(suitSize: Int, suits: List[Suit]): List[Suit] = {
     require(suitSize > 0)
 
     def listsOf(suitSize: Int, suit: Suit): List[Suit] = {
-      findSubSuitsIndices(suit.size, suitSize).map {
+      FiguresComputer.findSubSuitsIndices(suit.size, suitSize).map {
         indices: List[Int] =>
           indices.map(i => suit(i))
       }
@@ -211,25 +229,16 @@ case class FiguresComputer(tileSet: TileSet) {
 
 
   /**
-   * Computes all fixed <code>length</code> sub-suit indices of a suit of tiles which length is
-   * <code>suitSize</code>.
+   * Computes all fixed `length` sub-suit indices of a suit of tiles which length is
+   * `suitSize`.
+   * For instance `findSubSuitsIndices(6,3) == List(List(0,1,2),List(1,2,3),List(2,3,4),List(3,4,5),List(4,5,6))`
    * @param suitSize The list where to compute sub-lists indices from
    * @param length The fixed length of each sub-suit
    * @return a list of list of indices. Indices are sorted ascending and lists too.
    *
    **/
-  protected[tiles] def findSubSuitsIndices(suitSize: Int, length: Int): List[List[Int]] = {
+  def findSubSuitsIndices(suitSize: Int, length: Int): List[List[Int]] = {
     val nbElements = suitSize - length + 1
     (for {i <- 0 until nbElements} yield (for {j <- i until i + length} yield j).toList).toList
   }
-
-  private def hasTwins(tileSet: TileSet) =
-    tileSet.tocs.forall(_._2 >= 2)
-
-  private def hasChowsOrTwins(computer: FiguresComputer) =
-    List(computer.chows, computer.pungs, computer.duis).exists(_.size != 0)
-}
-
-object FiguresComputer {
-  def apply(tiles: List[Tile]): FiguresComputer = FiguresComputer(TileSet(tiles))
 }
