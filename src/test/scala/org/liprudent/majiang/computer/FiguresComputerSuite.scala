@@ -103,7 +103,7 @@ class FiguresComputerSuite extends FunSuite {
     val hand = FiguresComputer(List(b1, b2, b3, b1, b2, b3, b1, b2, b3))
     val expected = List(Pung(b1), Pung(b2), Pung(b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(b1, b2, b3), Dui(b1), Dui(b2), Dui(b3))
     val actual = hand.allFigures
-    assert(expected == actual, actual)
+    assert(expected === actual)
   }
 
 

@@ -17,11 +17,15 @@ import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
  */
 case class FiguresComputer(tileSet: TileSet) {
 
+  /**
+   * @return All possible combinations of figures. Each element of the set is a valid ordered list of figures.
+   */
+  lazy val allFiguresCombinations: Set[Figures] = findFigures(this)
 
   /**
    * an ordered list of possible pungs
    */
-  lazy val pungs: List[Pung] = {
+  protected[computer] val pungs: List[Pung] = {
     tileSet.tocs.filter(t => t._2 >= PungProperties.size).map {
       t => new Pung(t._1)
     }
@@ -30,14 +34,14 @@ case class FiguresComputer(tileSet: TileSet) {
   /**
    * an ordered list of possible chows
    */
-  lazy val chows: List[Chow] = {
+  protected[computer] lazy val chows: List[Chow] = {
     FiguresComputer.sublistsOf(Chow.size, allSuits).map(new Chow(_))
   }
 
   /**
    * an ordered list of possible duis
    */
-  lazy val duis: List[Dui] = {
+  protected[computer] lazy val duis: List[Dui] = {
     tileSet.tocs.filter(t => t._2 >= DuiProperties.size).map {
       t => {
         val d = new Dui(t._1)
@@ -50,7 +54,7 @@ case class FiguresComputer(tileSet: TileSet) {
   /**
    * an ordered list of possible knitted
    */
-  lazy val knitted: List[Knitted] = {
+  protected[computer] lazy val knitted: List[Knitted] = {
 
     //quick fail
     if (tileSet.size < 9 || chows.size >= 2 || pungs.size >= 2) Nil
@@ -68,18 +72,18 @@ case class FiguresComputer(tileSet: TileSet) {
   /**
    * An ordered list of possible knitted + dragons
    */
-  lazy val someKnittedSomeDragons: List[SomeKnittedWithSomeDragons] = {
+  protected[computer] lazy val someKnittedSomeDragons: List[SomeKnittedWithSomeDragons] = {
 
     //quick fail
     if (tileSet.size != 14) Nil
 
     else {
-      val honors = tileSet.filter(!_.family.isInstanceOf[StraightFamily])
+      val honors = tileSet.filter(_.isHonor)
       if (hasTwins(honors) || honors.size < 5) {
         Nil
       }
       else {
-        val knitted = tileSet.filter(_.family.isInstanceOf[StraightFamily])
+        val knitted = tileSet.filter(_.isStraight)
         val knittedComputer: FiguresComputer = FiguresComputer(tileSet)
         if (knitted.size != 14 - honors.size || hasChowsOrTwins(knittedComputer)) {
           Nil
@@ -92,7 +96,7 @@ case class FiguresComputer(tileSet: TileSet) {
           val knitteds: List[TileSet] = List(tiles147, tiles258, tiles369)
 
           //all tiles should be the same family
-          if (knitteds.forall(tileSet => tileSet.sameFamily)) {
+          if (knitteds.forall(tileSet => tileSet.isSingleFamily)) {
             val allKnitted: List[Tile] = knitteds.map(_.toTiles).flatten.sorted
             assert(allKnitted.size == 14 - honors.size)
             List(SomeKnittedWithSomeDragons(allKnitted, honors.toTiles))
@@ -107,7 +111,7 @@ case class FiguresComputer(tileSet: TileSet) {
   /**
    * An ordered list of possible thirteen orphans
    */
-  lazy val thirteenOrphans: List[ThirteenOrphans] = {
+  protected[computer] lazy val thirteenOrphans: List[ThirteenOrphans] = {
     val containsFixed = ThirteenOrphansProperties.fixedTiles.forall(tile => tileSet.exists(_ == tile))
     if (containsFixed) {
       val extra = tileSet.tocs.filter(toc => toc._2 == 2)
@@ -126,13 +130,8 @@ case class FiguresComputer(tileSet: TileSet) {
    * <p>
    * result is ordered
    */
-  lazy val allFigures: List[Figure] = (thirteenOrphans ::: someKnittedSomeDragons ::: knitted ::: duis ::: chows ::: pungs).sorted(OrdFigure)
-
-  /**
-   *
-   * @return All possible combinations of figures. Each element of the set is a valid ordered list of figures.
-   */
-  lazy val allFiguresCombinations: Set[Figures] = findFigures(this)
+  protected[computer] lazy val allFigures: List[Figure] =
+    thirteenOrphans ::: someKnittedSomeDragons ::: knitted ::: pungs ::: chows ::: duis
 
   //TODO optimization: it's useless to try all combinations for a given Figure type
   //List(Chow(b1,b2,b3), Chow(b2,b3,b4)) == List(Chow(b2,b3,b4), Chow(b1,b2,b3))
@@ -155,7 +154,6 @@ case class FiguresComputer(tileSet: TileSet) {
       }
     }
   }
-
 
   /**
    * an ordered list of possible length free suits

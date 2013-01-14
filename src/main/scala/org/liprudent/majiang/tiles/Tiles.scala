@@ -462,7 +462,7 @@ case class TileSet(tocs: List[TileOccurence]) {
   /**
    * a list of tilesets where tiles are all the sameof the same family
    */
-  lazy val sameFamily: Boolean = {
+  lazy val isSingleFamily: Boolean = {
     tocs match {
       case Nil => true
       case t :: ts => ts.forall(_._1.family == t._1.family)
