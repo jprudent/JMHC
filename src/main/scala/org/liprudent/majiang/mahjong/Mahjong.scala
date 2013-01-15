@@ -1,6 +1,6 @@
 package org.liprudent.majiang
 
-import computer.FiguresComputer
+import computer.FindAllAndReduce
 import mahjong._
 import mahjong.DetailedPoints
 import mahjong.HuLe
@@ -383,7 +383,7 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
   lazy val find: List[DetailedPoints] = {
     if (!quickValid) Nil
     else {
-      val computer = FiguresComputer(ptiles.hand.tileSet)
+      val computer = FindAllAndReduce(ptiles.hand.tileSet)
       computer.allFiguresCombinations
         .filter(closedCombination => HuFinder.isWellFormedMahjong(closedCombination, ptiles.melded, ptiles.concealedKongs))
         .map(closedCombination =>
@@ -457,7 +457,7 @@ object UniqueWait {
 
     def satisfy(tile: Tile): Boolean = {
       val added: TileSet = closed.added(tile)
-      val allCombinations = computer.FiguresComputer(added).allFiguresCombinations
+      val allCombinations = computer.FindAllAndReduce(added).allFiguresCombinations
       allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed, concealedKongs)).size > 0
     }
 
