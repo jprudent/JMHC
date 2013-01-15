@@ -3,7 +3,7 @@ package org.liprudent.majiang.computer
 import org.liprudent.majiang.tiles.Types._
 
 
-trait FiguresComputer {
+trait TilesToFiguresService {
   /**
    * Find all possible combinations of tiles
    *

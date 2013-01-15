@@ -15,7 +15,7 @@ import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
  *
  * @param tileSet
  */
-case class FindAllAndReduce(tileSet: TileSet) extends FiguresComputer {
+case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
 
   /**
    * @return All possible combinations of figures. Each element of the set is a valid ordered list of figures.

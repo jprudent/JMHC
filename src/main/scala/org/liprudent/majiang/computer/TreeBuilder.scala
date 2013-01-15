@@ -2,7 +2,7 @@ package org.liprudent.majiang.computer
 
 import org.liprudent.majiang.tiles.{Types, TileSet}
 
-class TreeBuilder(tileset: TileSet) extends FiguresComputer {
+class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
 
   /**
    * Find all possible combinations of tiles
