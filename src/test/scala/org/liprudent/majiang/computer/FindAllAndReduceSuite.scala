@@ -13,7 +13,7 @@ import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
 import org.liprudent.majiang.tiles.{TileSet, Stone, Bamboo, Character}
 
 @RunWith(classOf[JUnitRunner])
-class FiguresComputerSuite extends FunSuite {
+class FindAllAndReduceSuite extends FunSuite {
 
   test("Find suits") {
     val hand1 = TileSet(List(b1, b2, b3, b1, b2, b2, b2, we, wn, dg, dg))
