@@ -154,6 +154,9 @@ package object figures {
    */
   case class Knitted(fam147: StraightFamily, fam258: StraightFamily, fam369: StraightFamily) extends Figure {
 
+    //This is an awkward statement that produces NoClassDefFound at runtime :
+    //assert(Knitted.allPossible.size == 6, Knitted.allPossible)
+
     require(fam147 != fam258 && fam147 != fam369 && fam258 != fam369)
 
     val properties = Knitted
@@ -174,7 +177,11 @@ package object figures {
       knitted2.asInstanceOf[Knitted].fam147.order - knitted1.asInstanceOf[Knitted].fam147.order
 
     //6 values
-    val allPossible = StraightFamily.all.combinations(3).map(comb => Knitted(comb(0), comb(1), comb(2)))
+    val allPossible = StraightFamily.all.permutations.toList.map {
+      comb =>
+        Knitted(comb(0), comb(1), comb(2))
+    }
+
   }
 
   abstract class PungLike(val tile: Tile) extends Figure {

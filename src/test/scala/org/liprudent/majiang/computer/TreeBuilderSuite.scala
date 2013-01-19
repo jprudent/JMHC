@@ -63,7 +63,7 @@ class TreeBuilderSuite extends FunSuite {
   }
 
   test("addTile Knitted") {
-    val figure = Knitted.allPossible.next()
+    val figure = Knitted.allPossible.head
 
     Tile.allHonors.foreach {
       honor =>

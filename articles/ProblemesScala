@@ -1,0 +1,13 @@
+Il est possible d'arriver à des incohérences, et des NPE au runtime!
+
+case class Language(name:String){
+    assert(Language.default == Language("Français"))
+}
+
+object Language {
+    val default = Language("Français")
+}
+
+Le serpent qui se mord la queue !!
+Le compilateur ne bronche pas.
+Au runtime: NoClassDefFound
