@@ -146,7 +146,7 @@ object PartialKnitted extends PartialNature {
   protected def optionalConcrete(tiles: List[Tile]) = {
     tiles.size == 9 match {
       case true => {
-        //tile.value % 3 tells us which group (147 : % = 2, 258 : % = 1, 369 : % = 0) the tile belongs to
+        //tile.value % 3 tells us which group (147 : % = 1, 258 : % = 2, 369 : % = 0) the tile belongs to
         val byGroup = tiles.groupBy(_.value % 3)
 
         //I'm sure the three families are present
@@ -154,7 +154,7 @@ object PartialKnitted extends PartialNature {
 
         def familyFor(modulo: Int) = byGroup.get(modulo).get.head.family.asInstanceOf[StraightFamily]
 
-        Some(Knitted(familyFor(2), familyFor(1), familyFor(0)))
+        Some(Knitted(familyFor(1), familyFor(2), familyFor(0)))
       }
       case false => None
     }
@@ -234,6 +234,8 @@ case class PartialFigure(tiles: List[Tile], natures: Set[PartialNature]) extends
   require(tiles.size >= 2)
   require(tiles == tiles.sorted(Tile.ord))
   require(natures != Nil)
+
+  require(natures.forall(_.isValid(tiles)))
 }
 
 object PartialFigure {
