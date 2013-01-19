@@ -7,7 +7,6 @@ import Types.TileOccurence
 //////////////////////////////////////////////////////////////////////
 // TILES DEFINITION
 //
-
 sealed abstract class Family {
   def name: String
 
@@ -31,6 +30,10 @@ object Family {
 
 sealed abstract class StraightFamily extends Family {
   override def validValue(value: Int) = value >= 1 && value <= 9
+}
+
+object StraightFamily {
+  val all = List(Bamboo, Character, Stone)
 }
 
 case object Bamboo extends StraightFamily {
@@ -62,8 +65,7 @@ sealed abstract class WindFamily extends HonorFamily {
 
 object WindFamily {
   def apply(windName: String): WindFamily = {
-    List(EastWind, NorthWind, WestWind, SouthWind)
-      .find(_.windName == windName).get
+    List(EastWind, NorthWind, WestWind, SouthWind).find(_.windName == windName).get
   }
 }
 
@@ -185,6 +187,8 @@ case class Tile(family: Family, value: Int) {
 
   lazy val isDragon = family.isInstanceOf[DragonFamily]
 
+  lazy val isFlower = family.isInstanceOf[BonusFamily]
+
   lazy val isTerminalOrHonor = isTerminal || isHonor
 
   lazy val isTerminalOrWind = isTerminal || isWind
@@ -207,6 +211,10 @@ case class Tile(family: Family, value: Int) {
    * example: Tile(Bamboo,1).isPreviousOf(Tile(Bamboo,2)) should be true
    */
   def previousOf(tile: Tile) = sameFamily(tile) && tile.value == value + 1
+
+  lazy val next: Option[Tile] =
+    if (isLast) None
+    else Some(Tile(family, value + 1))
 
   def nextOf(tile: Tile) = tile.previousOf(this)
 
@@ -292,22 +300,22 @@ object Tile {
   val sa = Tile(AutomnSeason)
   val sw = Tile(WinterSeason)
 
-  val allButBonus = Set(
-    b1, b2, b3, b4, b5, b6, b7, b8, b9,
-    c1, c2, c3, c4, c5, c6, c7, c8, c9,
-    s1, s2, s3, s4, s5, s6, s7, s8, s9,
-    we, ww, ws, wn,
-    dr, dw, dg)
-
-  val all = Set(
-    b1, b2, b3, b4, b5, b6, b7, b8, b9,
-    c1, c2, c3, c4, c5, c6, c7, c8, c9,
-    s1, s2, s3, s4, s5, s6, s7, s8, s9,
-    we, ww, ws, wn,
-    dr, dw, dg,
-    fp, fo, fc, fb, ss, su, sa, sw)
+  val all = Set(b1, b2, b3, b4, b5, b6, b7, b8, b9, c1, c2, c3, c4, c5, c6, c7, c8, c9, s1, s2, s3, s4, s5, s6, s7,
+    s8, s9, we, ww, ws, wn, dr, dw, dg, fp, fo, fc, fb, ss, su, sa, sw)
 
   val allWind = Set(we, wn, ww, ws)
+
+  val allDragons = Set(dr, dg, dw)
+
+  val allBonus = Set(fp, fo, fc, fb, ss, su, sa, sw)
+
+  val allButBonus = all -- allBonus
+
+  val allHonors = allDragons ++ allWind
+
+  val allStraight = allButBonus -- allHonors
+
+  val allTerminalsOrHonors = allStraight.filter(_.isTerminalOrHonor)
 
 }
 
@@ -383,8 +391,6 @@ case class ContextualTile(tile: Tile, origin: TileOrigin, lastTileSituation: Las
 
 ///////////////////////////////////////////////////////////////////////
 // HAND DEFINITIONS
-
-
 object OrdTileOccurence extends Ordering[TileOccurence] {
 
   def compare(t1: (Tile, Occurence), t2: (Tile, Occurence)): Int = {
@@ -412,7 +418,8 @@ object OrdListTileOccurence extends Ordering[List[TileOccurence]] {
  * Methods are provided to add and remove tiles
  * @param tocs The list of tiles this class handles
  */
-//TODO tocs is a way of representing tiles internally in TileSet. So this implementation detail should be masked from API
+//TODO tocs is a way of representing tiles internally in TileSet. So this implementation detail should be masked from
+// API
 //TODO action => tocs should be private
 case class TileSet(tocs: List[TileOccurence]) {
 
@@ -458,6 +465,8 @@ case class TileSet(tocs: List[TileOccurence]) {
   def exists(p: (Tile) => Boolean) = toTiles.exists(p)
 
   def filter(p: (Tile) => Boolean): TileSet = TileSet(toTiles.filter(p))
+
+  lazy val allUnique = !exists((tile: Tile) => occurence(tile) > 1)
 
   /**
    * a list of tilesets where tiles are all the sameof the same family

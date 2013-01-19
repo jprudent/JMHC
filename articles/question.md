@@ -1,0 +1,1 @@
+quelle est la différence entre List.span et List.partition ?

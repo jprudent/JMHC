@@ -73,15 +73,16 @@ package object figures {
    */
   case class ThirteenOrphans(extraTile: Tile) extends Figure {
 
-    require(extraTile.isTerminalOrHonor)
+    require(extraTile.isTerminalOrHonor, extraTile)
 
-    val properties = ThirteenOrphansProperties
+    override val properties = ThirteenOrphans
 
     override def toTiles = (extraTile :: properties.fixedTiles).sorted
+
   }
 
-  // TODO centralize in companion
-  object ThirteenOrphansProperties extends FigureProperties {
+  //TODO caching
+  object ThirteenOrphans extends FigureProperties {
 
     val size = 14
 
@@ -90,12 +91,11 @@ package object figures {
     def compare(x: Figure, y: Figure) =
       Tile.ord.compare(x.asInstanceOf[ThirteenOrphans].extraTile, y.asInstanceOf[ThirteenOrphans].extraTile)
 
-    val fixedTiles = List(
-      Tile.b1, Tile.b9,
-      Tile.c1, Tile.c9,
-      Tile.s1, Tile.s9,
-      Tile.we, Tile.wn, Tile.ww, Tile.ws,
+    val fixedTiles = List(Tile.b1, Tile.b9, Tile.c1, Tile.c9, Tile.s1, Tile.s9, Tile.we, Tile.wn, Tile.ww, Tile.ws,
       Tile.dr, Tile.dg, Tile.dw).sorted
+
+    val allPossible = Tile.allTerminalsOrHonors.map(t => ThirteenOrphans(t))
+
   }
 
 
@@ -119,7 +119,7 @@ package object figures {
     require(honors == honors.sorted, "sorted required for honors")
     require(TileSet(honors).tocs.size == honors.size, "no pair, no pung allowed in honors")
 
-    val properties = SomeKnittedWithSomeDragonsProperties
+    val properties = SomeKnittedWithSomeDragons
 
     lazy val groupedKnitted: List[List[Tile]] = knitted.groupBy(_.family).values.toList
 
@@ -128,7 +128,7 @@ package object figures {
   }
 
   // TODO centralize in companion
-  object SomeKnittedWithSomeDragonsProperties extends FigureProperties {
+  object SomeKnittedWithSomeDragons extends FigureProperties {
 
     val size = 14
 
@@ -137,6 +137,7 @@ package object figures {
     def compare(x: Figure, y: Figure) =
     // the more dragons you have, the strongest you are
       x.asInstanceOf[SomeKnittedWithSomeDragons].honors.size - y.asInstanceOf[SomeKnittedWithSomeDragons].honors.size
+
   }
 
 
@@ -155,23 +156,15 @@ package object figures {
 
     require(fam147 != fam258 && fam147 != fam369 && fam258 != fam369)
 
-    val properties = KnittedProperties
+    val properties = Knitted
 
-    override def toTiles = List(
-      Tile(fam147, 1),
-      Tile(fam147, 4),
-      Tile(fam147, 7),
-      Tile(fam258, 2),
-      Tile(fam258, 5),
-      Tile(fam258, 8),
-      Tile(fam369, 3),
-      Tile(fam369, 6),
-      Tile(fam369, 9)
-    )
+    override def toTiles = List(Tile(fam147, 1), Tile(fam147, 4), Tile(fam147, 7), Tile(fam258, 2), Tile(fam258, 5),
+      Tile(fam258, 8), Tile(fam369, 3), Tile(fam369, 6), Tile(fam369, 9))
+
   }
 
-  // TODO centralize in companion
-  object KnittedProperties extends FigureProperties {
+  //TODO caching
+  object Knitted extends FigureProperties {
 
     val size = 9
 
@@ -179,6 +172,9 @@ package object figures {
 
     def compare(knitted1: Figure, knitted2: Figure) =
       knitted2.asInstanceOf[Knitted].fam147.order - knitted1.asInstanceOf[Knitted].fam147.order
+
+    //6 values
+    val allPossible = StraightFamily.all.combinations(3).map(comb => Knitted(comb(0), comb(1), comb(2)))
   }
 
   abstract class PungLike(val tile: Tile) extends Figure {
@@ -191,6 +187,7 @@ package object figures {
     def sameValue(p: PungLike) = tile.sameValue(p.tile)
 
     override def toTiles = (0 until properties.size map (i => tile)).toList
+
   }
 
   /**
@@ -205,16 +202,18 @@ package object figures {
    */
   case class Kong(override val tile: Tile) extends PungLike(tile) {
 
-    val properties = KongProperties
+    val properties = Kong
 
   }
 
-  // TODO centralize in companion
-  object KongProperties extends FigureProperties {
+  // TODO caching
+  object Kong extends FigureProperties {
 
     val size = 4
 
     val order = 30
+
+    val allPossible = Tile.allButBonus.map(Kong(_))
 
     def compare(kong1: Figure, kong2: Figure) =
       Tile.ord.compare(kong1.asInstanceOf[Kong].tile, kong2.asInstanceOf[Kong].tile)
@@ -230,12 +229,12 @@ package object figures {
    */
   case class Pung(override val tile: Tile) extends PungLike(tile) {
 
-    val properties = PungProperties
+    val properties = Pung
 
   }
 
-  // TODO centralize in companion
-  object PungProperties extends FigureProperties {
+  // TODO caching
+  object Pung extends FigureProperties {
 
     val size = 3
 
@@ -243,6 +242,8 @@ package object figures {
 
     def compare(pung1: Figure, pung2: Figure) =
       Tile.ord.compare(pung1.asInstanceOf[Pung].tile, pung2.asInstanceOf[Pung].tile)
+
+    val allPossible = Tile.allButBonus.map(Pung(_))
   }
 
 
@@ -289,6 +290,7 @@ package object figures {
     lazy val isEndingChow = t3.isLast
 
     lazy val family = t1.family
+
   }
 
 
@@ -346,7 +348,6 @@ package object figures {
 
     def compare(dui1: Figure, dui2: Figure) =
       Tile.ord.compare(dui1.asInstanceOf[Dui].tile, dui2.asInstanceOf[Dui].tile)
-
   }
 
   /**
@@ -360,6 +361,7 @@ package object figures {
 
     require(bonus.forall(_.isBonus), "Only bonus tiles are accepted")
     require(bonus == bonus.sorted, "Tiles should be sorted")
+    require(TileSet(bonus).allUnique, "All tiles must be unique")
 
     // TODO centralize in companion
     val properties = new FigureProperties {
@@ -372,22 +374,49 @@ package object figures {
 
     override def toTiles = bonus
 
+
   }
 
   //TODO this is used to hold the result of LastTile combination
   //TODO the proper way to implement it is to create 2 bounded contexts:
   //TODO one for input and result of mahjong hand finder
   //TODO another for point computer results
-  case class SingleTile(t: Tile) extends Figure {
+  case class SingleTile(tile: Tile) extends Figure {
     val properties = new FigureProperties {
       val size: Int = 1
       val order = 80
 
       def compare(x: Figure, y: Figure) =
-        Tile.ord.compare(x.asInstanceOf[SingleTile].t, y.asInstanceOf[SingleTile].t)
+        Tile.ord.compare(x.asInstanceOf[SingleTile].tile, y.asInstanceOf[SingleTile].tile)
     }
 
-    override def toTiles = List(t)
+    override def toTiles = List(tile)
+
+  }
+
+  /**
+   * A partial figure is an invalid figure. But it can be used as a utility to construct hand
+   * @param tiles Tiles of this partial Figure
+   */
+  abstract class Partial(tiles: List[Tile]) extends Figure {
+
+    require(tiles == tiles.sorted(Tile.ord))
+
+    val properties = Partial
+
+    /**
+     *
+     * @return All tiles composing this figure
+     */
+    def toTiles = tiles
+
+  }
+
+  object Partial extends FigureProperties {
+    val size = 0
+    val order = Int.MinValue
+
+    def compare(x: Figure, y: Figure) = ???
   }
 
 }

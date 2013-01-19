@@ -26,7 +26,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
    * an ordered list of possible pungs
    */
   protected[computer] val pungs: List[Pung] = {
-    tileSet.tocs.filter(t => t._2 >= PungProperties.size).map {
+    tileSet.tocs.filter(t => t._2 >= Pung.size).map {
       t => new Pung(t._1)
     }
   }
@@ -58,10 +58,8 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
 
     //quick fail
     if (tileSet.size < 9 || chows.size >= 2 || pungs.size >= 2) Nil
-
     else {
-      List(Bamboo, Character, Stone)
-        .permutations // all combinations of those 3 families
+      List(Bamboo, Character, Stone).permutations // all combinations of those 3 families
         .map(families => Knitted(families(0), families(1), families(2))).toList // as Knitted
         .filter(knitted => knitted.toTiles.forall(tile => tileSet.exists(t => t == tile))) // where each knitted tile
         // exists in tileSet
@@ -76,19 +74,16 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
 
     //quick fail
     if (tileSet.size != 14) Nil
-
     else {
       val honors = tileSet.filter(_.isHonor)
       if (hasTwins(honors) || honors.size < 5) {
         Nil
-      }
-      else {
+      } else {
         val knitted = tileSet.filter(_.isStraight)
         val knittedComputer: FindAllAndReduce = FindAllAndReduce(tileSet)
         if (knitted.size != 14 - honors.size || hasChowsOrTwins(knittedComputer)) {
           Nil
-        }
-        else {
+        } else {
 
           val tiles147 = knitted.filter(tile => tile.value == 1 || tile.value == 4 || tile.value == 7)
           val tiles258 = knitted.filter(tile => tile.value == 2 || tile.value == 5 || tile.value == 8)
@@ -112,15 +107,14 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
    * An ordered list of possible thirteen orphans
    */
   protected[computer] lazy val thirteenOrphans: List[ThirteenOrphans] = {
-    val containsFixed = ThirteenOrphansProperties.fixedTiles.forall(tile => tileSet.exists(_ == tile))
+    val containsFixed = ThirteenOrphans.fixedTiles.forall(tile => tileSet.exists(_ == tile))
     if (containsFixed) {
       val extra = tileSet.tocs.filter(toc => toc._2 == 2)
       extra match {
         case (tile, occ) :: Nil if tile.family.isInstanceOf[HonorFamily] => List(ThirteenOrphans(tile))
         case _ => Nil
       }
-    }
-    else {
+    } else {
       Nil
     }
   }
@@ -147,10 +141,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
               case _ => next.map(figures => (figure :: figures))
             }
           }
-        }
-          .flatten
-          .toSet[Figures]
-          .map(figures => figures.sorted(OrdFigure))
+        }.flatten.toSet[Figures].map(figures => figures.sorted(OrdFigure))
       }
     }
   }
