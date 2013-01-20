@@ -5,8 +5,52 @@ import org.liprudent.majiang.figures._
 import scala.Some
 import org.liprudent.majiang.figures.SingleTile
 import org.liprudent.majiang.figures.Dui
+import java.io.FileWriter
 
-class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
+case class GraphBuilder(filename: String) {
+
+
+  val f = new FileWriter(filename, true)
+
+  def header() = print( """
+                          |
+                          |graph G {
+                          |   edge [len=2]
+                          |
+                        """.stripMargin)
+
+  def footer = print(
+    """
+      |
+      |}
+      |
+    """.stripMargin)
+
+  def node(node1: String, node2: String, edge: String) = {
+    print(
+      """%s -- %s [label="%s"]
+        |
+      """.stripMargin.format(node1, node2, edge))
+    //f.close()
+  }
+
+  private def print(s: String) = {
+    f.write(s)
+    f.flush()
+  }
+
+  private def printToFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
+    val p = new java.io.PrintWriter(f)
+    try {op(p)} finally {p.close()}
+  }
+}
+
+//TODO créer un objet
+case class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
+
+  val graph = GraphBuilder("/tmp/foo")
+
+  var cpt = 0
 
   /**
    * Find all possible combinations of tiles
@@ -14,7 +58,8 @@ class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
    * @return Set of all figures combinations
    */
   def allFiguresCombinations: Set[Types.Figures] = {
-    tileset.toTiles.map(t => discoverBranch(t, tileset.toTiles, Nil)).flatten.toSeq.toSet
+    val tiles: List[Tile] = tileset.toTiles.toSet.toList
+    tiles.map(t => discoverBranch(t, tileset.toTiles, Nil)).flatten.toSeq.toSet
   }
 
   //  private def discoverTree(t:Tile,remainingTile:List[Tile],result:Types.Figures):Set[Types.Figures] = {
@@ -22,15 +67,32 @@ class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
   //  }
   private def discoverBranch(t: Tile, remainingTile: List[Tile], result: Types.Figures): Seq[Types.Figures] = {
 
+    cpt = cpt + 1
+    //println("---\ncpt=%d\ntile=%s\nremaining=%s\nresult=%s".format(cpt,t,remainingTile,result))
     val newResult = addLeaf(t, result)
 
     newResult match {
       case Nil => Nil
       case _ => {
+
         val allButT = TreeBuilder.removeFirst(remainingTile) {_ == t}
+        assert(allButT.size == remainingTile.size - 1)
+
         allButT match {
-          case Nil => List(newResult)
-          case t :: remaining => discoverBranch(t, remaining, newResult)
+          case Nil => {
+            newResult.head match {
+              case f: PartialFigure => Nil
+              case f: SingleTile => Nil
+              case _ => List(newResult.reverse)
+            }
+          }
+          case _ => {
+            val tiles = allButT.toSet.toList
+            tiles.map {
+              next =>
+                discoverBranch(next, allButT, newResult)
+            }.flatten
+          }
         }
       }
     }
@@ -40,35 +102,66 @@ class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
    *
    * @param tile
    * @param result
-   * @return Nil if the construction is invalid.
+   * @return Nil if the construction is invalid. The new result otherwise.
    */
   private def addLeaf(tile: Tile, result: Types.Figures): Types.Figures = {
 
-    require(result == result.sorted(OrdFigure))
+    //require(result == result.sorted(OrdFigure).reverse,result)
     require(!tile.isFlower)
 
     result match {
       case Nil => List(SingleTile(tile))
-      case figure :: tail => enhanceFigure(tile, figure, tail) match {
-        case Nil => Nil
-        case h :: Nil => h :: result
-        case h :: t => h :: t ::: tail
+      case leaf :: validBranch => {
+        val enhancement: Types.Figures = enhanceFigure(tile, leaf, validBranch)
+        enhancement match {
+          case Nil => {
+            //println("abandoning tile = %s , result = %s".format(tile,result))
+            Nil
+          }
+          case enhanced :: Nil => enhanced :: validBranch
+          case newFigure :: leaf => newFigure :: result
+        }
       }
     }
   }
 
   /**
    *
-   * @param tile
-   * @param figure
-   * @param tail
-   * @return Nil if the construction is invalid
+   * @param tile Tile to add to figure
+   * @param figure The figure to be enhanced
+   * @param tail The other figures
+   * @return - List(SingleTile(tile),figure) if we can't add tile to figure
+   *         - List(Figure()) if tile can be added to figure
+   *         - Nil if construction is invalid
+   *         Construction is invalid if :
+   *         the enhancedFigure < tail.head
+   *         figure is a PartialFigure and can't be enhanced
    */
   private def enhanceFigure(tile: Tile, figure: Figure, tail: Types.Figures): Types.Figures = {
     val enhanced = FigureEnhancerService.addTile(figure, tile)
-    Nil
-  }
 
+    enhanced match {
+      case None => figure match {
+        case f: PartialFigure => Nil
+        case f: SingleTile => Nil
+        case _ => List(SingleTile(tile), figure)
+      }
+      case Some(enhanced) => enhanced match {
+        case enhanced: PartialFigure => List(enhanced)
+        case enhanced => {
+          tail match {
+            case Nil => List(enhanced)
+            case _ =>
+              if (OrdFigure.lt(enhanced, tail.head) || tail.head.isInstanceOf[Dui]) {
+                Nil
+              } else {
+                List(enhanced)
+              }
+          }
+        }
+      }
+    }
+  }
 }
 
 object TreeBuilder {
@@ -93,7 +186,15 @@ abstract class PartialNature {
   protected def optionalConcrete(tiles: List[Tile]): Option[Figure]
 }
 
+
 //TODO these objects should be case class
+//object PartialDui extends PartialNature {
+//  def isValid(tiles: List[Tile]) = {
+//    tiles.size == 1
+//  }
+//
+//  protected def optionalConcrete(tiles: List[Tile]) = None
+//}
 object PartialChow extends PartialNature {
 
   def isValid(tiles: List[Tile]) = {
