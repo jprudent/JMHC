@@ -35,16 +35,14 @@ package object mahjong {
    * @note Melded Kongs are included in `melded`
    *       TODO there are too much parameters.
    */
-  case class PlayerTiles(hand: ConcealedTiles,
-                         melded: Figures,
-                         concealedKongs: List[Kong] = noKongs,
+  case class PlayerTiles(hand: ConcealedTiles, melded: Figures, concealedKongs: List[Kong] = noKongs,
                          bonus: Bonus = Bonus(Nil)) {
 
     require(melded.sorted(OrdFigure) == melded, "melded not sorted")
 
     require(hand.tileSet.toTiles.contains(hand.lastTileContext.tile) ||
-      concealedKongs.exists(_.tile == hand.lastTileContext.tile),
-      hand.lastTileContext.tile + " not in " + hand.tileSet.toTiles + " nor in " + concealedKongs)
+      concealedKongs.exists(_.tile == hand.lastTileContext.tile), hand.lastTileContext.tile + " not in " + hand
+      .tileSet.toTiles + " nor in " + concealedKongs)
 
     lazy val numberOfTiles = hand.tileSet.size + disclosedSize + concealedKongsSize
 
@@ -73,13 +71,8 @@ package object mahjong {
    * @param context Player's context
    * @param bonus flowers and seasons
    */
-  case class HuLe(
-                   closed: Figures,
-                   melded: Figures,
-                   lastTileContext: ContextualTile,
-                   context: PlayerContext,
-                   concealedKongs: List[Kong] = noKongs,
-                   bonus: Bonus = Bonus(Nil)) {
+  case class HuLe(closed: Figures, melded: Figures, lastTileContext: ContextualTile, context: PlayerContext,
+                  concealedKongs: List[Kong] = noKongs, bonus: Bonus = Bonus(Nil)) {
 
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(melded == melded.sorted(OrdFigure), "not sorted")
@@ -94,7 +87,6 @@ package object mahjong {
 
 
     /* ANY FIGURES */
-
     lazy val allFigures = (closed ::: melded ::: concealedKongs).sorted(OrdFigure)
 
     lazy val allClosedStraightFamilyFigures: List[Figure] =
@@ -108,14 +100,12 @@ package object mahjong {
 
 
     /* KONGS */
-
     lazy val allMeldedKongs: List[Kong] = melded.filter(_.isInstanceOf[Kong]).asInstanceOf[List[Kong]]
 
     lazy val allKongs: List[Kong] = (allMeldedKongs ::: concealedKongs).sorted(OrdFigure)
 
 
     /* PUNGS & KONGS */
-
     lazy val allPungsLike: List[PungLike] = allFigures.filter(_.isInstanceOf[PungLike]).asInstanceOf[List[PungLike]]
 
     lazy val allDragonPungsLike: List[PungLike] = allPungsLike.filter(_.tile.isDragon)
@@ -133,17 +123,14 @@ package object mahjong {
 
 
     /* CHOWS */
-
     lazy val allChows: List[Chow] = allFigures.filter(_.isInstanceOf[Chow]).asInstanceOf[List[Chow]]
 
 
     /* PAIRS */
-
     lazy val allDuis: List[Dui] = allFigures.filter(_.isInstanceOf[Dui]).asInstanceOf[List[Dui]]
 
 
     /* SPECIAL FIGURES */
-
     lazy val allKnittedTiles = closed.filter(_.isInstanceOf[Knitted])
 
     lazy val allKnittedWithDragons = closed.filter(_.isInstanceOf[SomeKnittedWithSomeDragons])
@@ -154,7 +141,6 @@ package object mahjong {
 
 
     /* TILES */
-
     lazy val allTiles: List[Tile] = allFigures.map(_.toTiles).flatten
 
     lazy val allClosedTiles: List[Tile] = closed.map(_.toTiles).flatten
@@ -169,8 +155,7 @@ package object mahjong {
       }).filter {
         case (family, tiles) if family == "honors" => false
         case _ => true
-      }
-        .keySet.size
+      }.keySet.size
     }
 
     /**
@@ -237,89 +222,19 @@ package object mahjong {
   object HulePointsComputer {
 
     //TODO move it to Combination
-    val combinations = List[Combination](
-      FlowerTiles,
-      SelfDrawnComb,
-      SingleWait,
-      ClosedWait,
-      EdgeWait,
-      NoHonors,
-      OneVoidedSuit,
-      MeldedKong,
-      PungOfTerminalsOrHonors,
-      TwoTerminalChows,
-      ShortStraight,
-      MixedDoubleChows,
-      PureDoubleChows,
-      AllSimples,
-      ConcealedKong,
-      TwoConcealedPungs,
-      DoublePung,
-      TileHog,
-      AllChows,
-      ConcealedHand,
-      SeatWind,
-      PrevalentWind,
-      DragonPung,
-      AllPungs,
-      TwoConcealedKongs,
-      RobbingTheKong,
-      OutWithRemplacementTile,
-      LastTileClaimComb,
-      LastTileDrawComb,
-      ChickenHand,
-      LastTile,
-      TwoMeldedKongs,
-      FullyConcealedHand,
-      OutsideHand,
-      TwoDragonPungs,
-      MeldedHand,
-      AllTypes,
-      MixedShiftedChow,
-      HalfFlush,
-      MixedShiftedPung,
-      MixedTripleChows,
-      ReversibleTiles,
-      MixedStraight,
-      BigThreeWind,
-      LowerFour,
-      UpperFour,
-      KnittedStraight,
-      LesserHonorsAndKnittedTiles,
-      ThreeConcealedPungs,
-      TriplePungs,
-      AllFive,
-      PureShiftedChow,
-      ThreeSuitedTerminalChows,
-      PureStraight,
-      LowerTiles,
-      MiddleTiles,
-      UpperTiles,
-      PureShiftedPungs,
-      PureTripleChows,
-      FullFlush,
-      AllEvenPungs,
-      GreaterHonorsAndKnittedTiles,
-      SevenPairs,
-      AllTerminalsAndHonors,
-      ThreeKongs,
-      FourPureShiftedPungs,
-      FourShiftedChows,
-      QuadrupleChows,
-      PureTerminalChows,
-      FourConcealedPungs,
-      AllHonors,
-      LittleThreeDragons,
-      LittleFourWinds,
-      AllTerminals,
-      ThirteenOrphansComb,
-      SevenShiftedPairs,
-      FourKongs,
-      NineGates,
-      AllGreen,
-      BigThreeDragons,
-      BigFourWinds
-    )
+    val combinations = List[Combination](FlowerTiles, SelfDrawnComb, SingleWait, ClosedWait, EdgeWait, NoHonors,
+      OneVoidedSuit, MeldedKong, PungOfTerminalsOrHonors, TwoTerminalChows, ShortStraight, MixedDoubleChows,
+      PureDoubleChows, AllSimples, ConcealedKong, TwoConcealedPungs, DoublePung, TileHog, AllChows, ConcealedHand,
+      SeatWind, PrevalentWind, DragonPung, AllPungs, TwoConcealedKongs, RobbingTheKong, OutWithRemplacementTile,
+      LastTileClaimComb, LastTileDrawComb, ChickenHand, LastTile, TwoMeldedKongs, FullyConcealedHand, OutsideHand,
+      TwoDragonPungs, MeldedHand, AllTypes, MixedShiftedChow, HalfFlush, MixedShiftedPung, MixedTripleChows,
+      ReversibleTiles, MixedStraight, BigThreeWind, LowerFour, UpperFour, KnittedStraight,
+      LesserHonorsAndKnittedTiles, ThreeConcealedPungs, TriplePungs, AllFive, PureShiftedChow,
+      ThreeSuitedTerminalChows, PureStraight, LowerTiles, MiddleTiles, UpperTiles, PureShiftedPungs, PureTripleChows,
+      FullFlush, AllEvenPungs, GreaterHonorsAndKnittedTiles, SevenPairs, AllTerminalsAndHonors, ThreeKongs,
+      FourPureShiftedPungs, FourShiftedChows, QuadrupleChows, PureTerminalChows, FourConcealedPungs, AllHonors,
+      LittleThreeDragons, LittleFourWinds, AllTerminals, ThirteenOrphansComb, SevenShiftedPairs, FourKongs,
+      NineGates, AllGreen, BigThreeDragons, BigFourWinds)
 
     require(combinations.size == 81)
 
@@ -328,12 +243,10 @@ package object mahjong {
       val zipped: List[(Result, Combination)] = res.zip(combinations)
       val allDetailedPoints: List[(Figures, Combination)] = zipped.filter {
         case (result, _) => result != EmptyResult
-      }
-        .map {
+      }.map {
         case (result, combination) => result.figures.map(figures => (figures, combination))
       } //List[List[(figures,combination)]]
-        .flatten
-        .sorted(OrdDetailedPoint)
+        .flatten.sorted(OrdDetailedPoint)
 
 
       val detailedPoints = applyExclusion(allDetailedPoints)
@@ -384,12 +297,10 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
     if (!quickValid) Nil
     else {
       val computer = FindAllAndReduce(ptiles.hand.tileSet)
-      computer.allFiguresCombinations
-        .filter(closedCombination => HuFinder.isWellFormedMahjong(closedCombination, ptiles.melded, ptiles.concealedKongs))
-        .map(closedCombination =>
-        HulePointsComputer(
-          HuLe(closedCombination, ptiles.melded, ptiles.hand.lastTileContext, context, ptiles.concealedKongs, ptiles.bonus)))
-        .toList.sortWith((detail1, detail2) => detail1.total >= detail2.total)
+      computer.allFiguresCombinations.filter(closedCombination => HuFinder.isWellFormedMahjong(closedCombination,
+        ptiles.melded, ptiles.concealedKongs)).map(closedCombination =>
+        HulePointsComputer(HuLe(closedCombination, ptiles.melded, ptiles.hand.lastTileContext, context,
+          ptiles.concealedKongs, ptiles.bonus))).toList.sortWith((detail1, detail2) => detail1.total >= detail2.total)
     }
   }
 
@@ -452,16 +363,16 @@ object HuFinder {
 
 object UniqueWait {
 
-  def waitingTiles(closed: TileSet, disclosed: List[Figure], concealedKongs: List[Kong]): List[Tile] = {
+  def waitingTiles(concealed: TileSet, disclosed: List[Figure], concealedKongs: List[Kong]): List[Tile] = {
 
 
     def satisfy(tile: Tile): Boolean = {
-      val added: TileSet = closed.added(tile)
+      val added: TileSet = concealed.added(tile)
       val allCombinations = computer.FindAllAndReduce(added).allFiguresCombinations
       allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed, concealedKongs)).size > 0
     }
 
-    val tilesToTry = Tile.allButBonus.filter(tile => closed.occurence(tile) < 4)
+    val tilesToTry = Tile.allButBonus.filter(tile => concealed.occurence(tile) < 4)
     tilesToTry.filter(satisfy).toList.sorted
   }
 
