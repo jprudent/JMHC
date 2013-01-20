@@ -27,7 +27,7 @@ package object mahjong {
   /**
    * Represents the different sets of tiles owned by a player.
    *
-   * @param hand The hand containing the closed tiles of a player
+   * @param concealed The hand containing the closed tiles of a player
    * @param melded The tiles melded as figures
    * @param concealedKongs List of hidden kongs. By default empty list
    * @param bonus Flowers and seasons. Default is Nil.
@@ -35,16 +35,16 @@ package object mahjong {
    * @note Melded Kongs are included in `melded`
    *       TODO there are too much parameters.
    */
-  case class PlayerTiles(hand: ConcealedTiles, melded: Figures, concealedKongs: List[Kong] = noKongs,
+  case class PlayerTiles(concealed: ConcealedTiles, melded: Figures, concealedKongs: List[Kong] = noKongs,
     bonus: Bonus = Bonus(Nil)) {
 
     require(melded.sorted(OrdFigure) == melded, "melded not sorted")
 
-    require(hand.tileSet.toTiles.contains(hand.lastTileContext.tile) ||
-      concealedKongs.exists(_.tile == hand.lastTileContext.tile), hand.lastTileContext.tile + " not in " + hand
-      .tileSet.toTiles + " nor in " + concealedKongs)
+    require(concealed.tileSet.toTiles.contains(concealed.lastTileContext.tile) ||
+      concealedKongs.exists(_.tile == concealed.lastTileContext.tile), concealed.lastTileContext.tile + " not in " +
+      concealed.tileSet.toTiles + " nor in " + concealedKongs)
 
-    lazy val numberOfTiles = hand.tileSet.size + disclosedSize + concealedKongsSize
+    lazy val numberOfTiles = concealed.tileSet.size + disclosedSize + concealedKongsSize
 
     lazy val disclosedSize = count(melded)
 
@@ -69,10 +69,11 @@ package object mahjong {
    * @param melded melded figures
    * @param lastTileContext context of last tile
    * @param context Player's context
+   * @param waitingTiles Other tiles that may lead to a valid mahjong hand
    * @param bonus flowers and seasons
    */
   case class HuLe(closed: Figures, melded: Figures, lastTileContext: ContextualTile, context: PlayerContext,
-    concealedKongs: List[Kong] = noKongs, bonus: Bonus = Bonus(Nil)) {
+    waitingTiles: List[Tile], concealedKongs: List[Kong] = noKongs, bonus: Bonus = Bonus(Nil)) {
 
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(melded == melded.sorted(OrdFigure), "not sorted")
@@ -329,13 +330,16 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
   lazy val find: List[DetailedPoints] = {
     if (!quickValid) Nil
     else {
-      val computer = FindAllAndReduce(ptiles.hand.tileSet)
+      val computer = FindAllAndReduce(ptiles.concealed.tileSet)
 
       computer.allFiguresCombinations.foldLeft(List[DetailedPoints]()) {
         (res, concealed) =>
           if (HuFinder.isWellFormedMahjong(concealed, ptiles.melded, ptiles.concealedKongs)) {
-            HulePointsComputer(HuLe(concealed, ptiles.melded, ptiles.hand.lastTileContext, context,
-              ptiles.concealedKongs, ptiles.bonus)) :: res
+            val waitingTiles = UniqueWait.waitingTiles(ptiles.concealed.withoutLastTile.tileSet, ptiles.melded,
+              ptiles.concealedKongs)
+            val hule = HuLe(concealed, ptiles.melded, ptiles.concealed.lastTileContext, context, waitingTiles,
+              ptiles.concealedKongs, ptiles.bonus)
+            HulePointsComputer(hule) :: res
           } else {
             res
           }

@@ -4,7 +4,6 @@ import org.liprudent.majiang.figures._
 import org.liprudent.majiang.tiles.Types.Figures
 import org.liprudent.majiang.tiles._
 import org.liprudent.majiang.tiles.Tile._
-import org.liprudent.majiang.UniqueWait
 import org.liprudent.majiang.figures.ThirteenOrphans
 import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Dui
@@ -259,10 +258,7 @@ sealed trait WaitCombination extends Combination {
   def matchingWait(figure: Figure, waitingTile: Tile): Boolean
 
   def find(m: HuLe): Result = {
-    val tilesBeforeWinning: TileSet = TileSet(m.allClosedTiles).removed(m.lastTileContext.tile)
-    val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.melded, m.concealedKongs)
-
-    waitingTiles match {
+    m.waitingTiles match {
       //a single waiting tile
       case w :: Nil => {
         val waitingFigures = m.closed.filter(figure => matchingWait(figure, w))

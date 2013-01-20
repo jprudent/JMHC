@@ -3,7 +3,7 @@ package org.liprudent.majiang.mahjong
 import org.liprudent.majiang.tiles._
 import Tile._
 import org.liprudent.majiang.figures._
-import org.liprudent.majiang.HuFinder
+import org.liprudent.majiang.{UniqueWait, HuFinder}
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Bonus
 import org.liprudent.majiang.figures.Dui
@@ -68,13 +68,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val givenContext = PlayerContext(WestWind, EastWind)
 
     val thenClosed = List(Dui(b3))
-    val thenCombinations = List(
-      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), MeldedHand),
-      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)), AllChows),
-      (List(Chow(b5, b6, b7), Chow(c5, c6, c7)), MixedDoubleChows),
-      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), OneVoidedSuit)
-      //implied by MeldedHand (List(Dui(b3)), SingleWait)
-    )
+    val thenCombinations = List((List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9),
+      Dui(b3)), MeldedHand), (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
+      AllChows), (List(Chow(b5, b6, b7), Chow(c5, c6, c7)), MixedDoubleChows), (List(Chow(b1, b2, b3), Chow(b5, b6,
+      b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), OneVoidedSuit)
+      //implied by MeldedHand (List(Dui(b3)), SingleWait))
 
     test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
 
@@ -87,10 +85,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val givenContext = PlayerContext(WestWind, EastWind)
 
     val thenClosed: List[Figure with Product] = List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9))
-    val thenCombinations: List[(List[Chow], Combination)] = List(
-      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChows),
-      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
-    )
+    val thenCombinations: List[(List[Chow], Combination)] = List((List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6,
+      s7, s8)), MixedTripleChows), (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)),
+      AllChows))
 
     test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
   }
@@ -98,7 +95,6 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
 
   test("case Upper Four - Flowers - Double Chow - Closed Wait") {
-
     val givenClosed = TileSet(List(s6, s6, s6, s7, s8, s9, c6, c6))
     val givenMelded: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
     val givenContextualTile: ContextualTile = ContextualTile(s8, Discarded, NotLastTile)
@@ -107,19 +103,15 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Pung(s6), Chow(s7, s8, s9), Dui(c6))
     val thenCombinations =
-      List(
-        (List(Pung(s6), Chow(b6, b7, b8), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(c6)), UpperFour),
-        (List(Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedDoubleChows),
-        (List(Chow(s7, s8, s9)), ClosedWait),
-        (List(Bonus(List(fb, ss, sa))), FlowerTiles)
-      )
+      List((List(Pung(s6), Chow(b6, b7, b8), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(c6)), UpperFour), (List(Chow(c7,
+        c8, c9), Chow(s7, s8, s9)), MixedDoubleChows), (List(Chow(s7, s8, s9)), ClosedWait), (List(Bonus(List(fb, ss,
+        sa))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 17)
 
   }
 
   test("case All Types - SeatWind - Flower - Single Wait") {
-
     val givenClosed = TileSet(List(b2, b2, b2, c1, c2, c3, dg, dg))
     val givenMelded = List(Pung(ww), Chow(s3, s4, s5))
     val givenContextualTile: ContextualTile = ContextualTile(dg, Discarded, NotLastTile)
@@ -128,12 +120,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Pung(b2), Chow(c1, c2, c3), Dui(dg))
     val thenCombinations =
-      List(
-        (List(Pung(b2), Pung(ww), Chow(c1, c2, c3), Chow(s3, s4, s5), Dui(dg)), AllTypes),
-        (List(Pung(ww)), SeatWind),
-        (List(Dui(dg)), SingleWait),
-        (List(Bonus(List(fo))), FlowerTiles)
-      )
+      List((List(Pung(b2), Pung(ww), Chow(c1, c2, c3), Chow(s3, s4, s5), Dui(dg)), AllTypes), (List(Pung(ww)),
+        SeatWind), (List(Dui(dg)), SingleWait), (List(Bonus(List(fo))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 10)
 
@@ -148,19 +136,15 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Knitted(Bamboo, Character, Stone), Pung(c8), Dui(dr))
     val thenCombinations =
-      List(
-        (List(Knitted(Bamboo, Character, Stone)), KnittedStraight),
-        (List(Knitted(Bamboo, Character, Stone), Pung(c8), Dui(dr)), FullyConcealedHand),
-        (List(Knitted(Bamboo, Character, Stone), Pung(c8)), TileHog),
-        (List(Bonus(List(fo))), FlowerTiles)
-      )
+      List((List(Knitted(Bamboo, Character, Stone)), KnittedStraight), (List(Knitted(Bamboo, Character, Stone),
+        Pung(c8), Dui(dr)), FullyConcealedHand), (List(Knitted(Bamboo, Character, Stone), Pung(c8)), TileHog),
+        (List(Bonus(List(fo))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 19)
 
   }
 
   test("case Knitted Straight - All Types") {
-
     val givenClosed = TileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, dr, dr))
     val givenMelded = List(Pung(ww))
     val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
@@ -169,12 +153,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Knitted(Bamboo, Character, Stone), Dui(dr))
     val thenCombinations =
-      List(
-        (List(Knitted(Bamboo, Character, Stone)), KnittedStraight),
-        (List(Knitted(Bamboo, Character, Stone), Pung(ww), Dui(dr)), AllTypes),
-        (List(Pung(ww)), SeatWind),
-        (List(Bonus(List(fo))), FlowerTiles)
-      )
+      List((List(Knitted(Bamboo, Character, Stone)), KnittedStraight), (List(Knitted(Bamboo, Character, Stone),
+        Pung(ww), Dui(dr)), AllTypes), (List(Pung(ww)), SeatWind), (List(Bonus(List(fo))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 21)
 
@@ -192,13 +172,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr))
     val thenCombinations =
-      List(
-        (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChows),
-        (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), OutsideHand),
-        (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), FullyConcealedHand),
-        (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows),
-        (List(Chow(b1, b2, b3), Chow(b7, b8, b9)), TwoTerminalChows)
-      )
+      List((List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChows), (List(Chow(b1, b2, b3),
+        Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), OutsideHand), (List(Chow(b1, b2, b3),
+        Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9), Dui(dr)), FullyConcealedHand), (List(Chow(b1, b2, b3),
+        Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows), (List(Chow(b1, b2, b3), Chow(b7, b8, b9)),
+        TwoTerminalChows))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 19)
 
@@ -217,12 +195,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Pung(s2), Chow(s4, s5, s6), Dui(we))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(s1), Pung(s2), Pung(s8), Chow(s4, s5, s6), Dui(we)), HalfFlush),
-        (List(Pung(s1)), PungOfTerminalsOrHonors),
-        (List(Chow(s4, s5, s6)), SelfDrawnComb),
-        (List(Bonus(List(fp, fo, sw))), FlowerTiles)
-      )
+      List((List(Pung(s1), Pung(s2), Pung(s8), Chow(s4, s5, s6), Dui(we)), HalfFlush), (List(Pung(s1)),
+        PungOfTerminalsOrHonors), (List(Chow(s4, s5, s6)), SelfDrawnComb), (List(Bonus(List(fp, fo, sw))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
 
@@ -240,12 +214,10 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), AllTerminalsAndHonors),
-        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), SevenPairs),
-        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), AllTypes),
-        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), FullyConcealedHand)
-      )
+      List((List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), AllTerminalsAndHonors),
+        (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), SevenPairs), (List(Dui(we), Dui(dr),
+          Dui(dg), Dui(b1), Dui(b9), Dui(c1), Dui(s9)), AllTypes), (List(Dui(we), Dui(dr), Dui(dg), Dui(b1), Dui(b9),
+          Dui(c1), Dui(s9)), FullyConcealedHand))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 66)
   }
@@ -254,9 +226,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """case Mixed Shifted Chows - All Chows - Short Straight - Single Wait/Closed Wait - Flowere
       |verif : mahjong friends
       |verif : http://mahjong.forum2jeux.com/t442-finir-sur-la-paire#4869
-      |tricky part: winning tile b2 can be used to form Chow(b1,b2,b3) or Dui(b2).
-      |             So single wait is scored or closed wait is scored, not both.
-    """.stripMargin) {
+      |tricky part: winning tile b2 can be used to form Chow(b1,b2,b3) or Dui(b2).|             So single wait is
+      |scored or closed wait is scored, not both.""".stripMargin) {
     val givenClosed = TileSet(List(s3, s4, s5, b1, b2, b3, b4, b5, b6, b2, b2))
     val givenMelded: List[Figure] = List(Chow(c5, c6, c7))
     val givenContextualTile: ContextualTile = ContextualTile(b2, Discarded, NotLastTile)
@@ -265,13 +236,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Chow(s3, s4, s5), Chow(b1, b2, b3), Chow(b4, b5, b6), Dui(b2))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(s3, s4, s5), Chow(b4, b5, b6), Chow(c5, c6, c7)), MixedShiftedChow),
-        (List(Chow(s3, s4, s5), Chow(b1, b2, b3), Chow(b4, b5, b6), Chow(c5, c6, c7)), AllChows),
-        (List(Chow(b1, b2, b3), Chow(b4, b5, b6)), ShortStraight),
-        (List(Chow(b1, b2, b3)), ClosedWait),
-        (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
-      )
+      List((List(Chow(s3, s4, s5), Chow(b4, b5, b6), Chow(c5, c6, c7)), MixedShiftedChow), (List(Chow(s3, s4, s5),
+        Chow(b1, b2, b3), Chow(b4, b5, b6), Chow(c5, c6, c7)), AllChows), (List(Chow(b1, b2, b3), Chow(b4, b5, b6)),
+        ShortStraight), (List(Chow(b1, b2, b3)), ClosedWait), (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
 
@@ -281,9 +248,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """case Mixed Shifted Chows - All Chows - Single Wait/Edge Wait - Flowers
       |verif : my head
       |verif : http://mahjong.forum2jeux.com/t442-finir-sur-la-paire#4869
-      |tricky part: winning tile b3 can be used to form Chow(b1,b2,b3) or Dui(b3).
-      |             So single wait is scored or edge wait is scored, not both.
-    """.stripMargin) {
+      |tricky part: winning tile b3 can be used to form Chow(b1,b2,b3) or Dui(b3).|             So single wait is
+      |scored or edge wait is scored, not both.""".stripMargin) {
     val givenClosed = TileSet(List(s4, s5, s6, b1, b2, b3, b6, b7, b8, b3, b3))
     val givenMelded: List[Figure] = List(Chow(c5, c6, c7))
     val givenContextualTile: ContextualTile = ContextualTile(b3, Discarded, NotLastTile)
@@ -292,12 +258,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Chow(s4, s5, s6), Chow(b1, b2, b3), Chow(b6, b7, b8), Dui(b3))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(s4, s5, s6), Chow(b6, b7, b8), Chow(c5, c6, c7)), MixedShiftedChow),
-        (List(Chow(s4, s5, s6), Chow(b1, b2, b3), Chow(b6, b7, b8), Chow(c5, c6, c7)), AllChows),
-        (List(Chow(b1, b2, b3)), EdgeWait),
-        (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
-      )
+      List((List(Chow(s4, s5, s6), Chow(b6, b7, b8), Chow(c5, c6, c7)), MixedShiftedChow), (List(Chow(s4, s5, s6),
+        Chow(b1, b2, b3), Chow(b6, b7, b8), Chow(c5, c6, c7)), AllChows), (List(Chow(b1, b2, b3)), EdgeWait),
+        (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
 
@@ -316,14 +279,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Chow(c1, c2, c3), Pung(ww), Dui(ws))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(b9), Pung(dr), Chow(c1, c2, c3), Pung(ww), Dui(ws)), OutsideHand),
-        (List(Pung(dr)), DragonPung),
-        (List(Pung(ww)), SeatWind),
-        (List(Pung(b9)), PungOfTerminalsOrHonors),
-        (List(Pung(b9), Chow(c1, c2, c3)), OneVoidedSuit),
-        (List(Bonus(List(sa))), FlowerTiles)
-      )
+      List((List(Pung(b9), Pung(dr), Chow(c1, c2, c3), Pung(ww), Dui(ws)), OutsideHand), (List(Pung(dr)),
+        DragonPung), (List(Pung(ww)), SeatWind), (List(Pung(b9)), PungOfTerminalsOrHonors), (List(Pung(b9), Chow(c1,
+        c2, c3)), OneVoidedSuit), (List(Bonus(List(sa))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 11)
 
@@ -342,11 +300,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Pung(c9), Pung(ww), Dui(b2))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(c9)), PungOfTerminalsOrHonors),
-        (List(Pung(ww)), PungOfTerminalsOrHonors),
-        (List(Pung(c8), Pung(c9), Chow(b1, b2, b3), Dui(b2)), OneVoidedSuit)
-      )
+      List((List(Pung(c9)), PungOfTerminalsOrHonors), (List(Pung(ww)), PungOfTerminalsOrHonors), (List(Pung(c8),
+        Pung(c9), Chow(b1, b2, b3), Dui(b2)), OneVoidedSuit))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 3)
 
@@ -364,14 +319,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Chow(c3, c4, c5), Chow(s6, s7, s8), Dui(c2))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6)), MixedShiftedChow),
-        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8)), AllChows),
-        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8), Dui(c2)), AllSimples),
+      List((List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6)), MixedShiftedChow), (List(Chow(b2, b3, b4),
+        Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8)), AllChows), (List(Chow(b2, b3, b4), Chow(c3, c4, c5),
+        Chow(s4, s5, s6), Chow(s6, s7, s8), Dui(c2)), AllSimples),
         //(List(Dui(c2)), SingleWait),
-        (List(Dui(c2)), SelfDrawnComb),
-        (List(Bonus(List(fp, fo, fc))), FlowerTiles)
-      )
+        (List(Dui(c2)), SelfDrawnComb), (List(Bonus(List(fp, fo, fc))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 14)
 
@@ -389,13 +341,10 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Dui(s9))
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), MeldedHand),
-        (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), OutsideHand),
-        (List(Chow(b1, b2, b3), Chow(b1, b2, b3)), PureDoubleChows),
-        (List(Pung(s1)), PungOfTerminalsOrHonors),
-        (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), NoHonors)
-      )
+      List((List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), MeldedHand),
+        (List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), OutsideHand), (List(Chow(b1,
+          b2, b3), Chow(b1, b2, b3)), PureDoubleChows), (List(Pung(s1)), PungOfTerminalsOrHonors), (List(Pung(s1),
+          Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9), Dui(s9)), NoHonors))
 
     test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, 13)
 
@@ -415,14 +364,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Chow(s3), Dui(s3))
     val thenPoints = 36
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(dg), Kong(wn), Kong(c5)), ThreeKongs),
-        (List(Kong(dg)), DragonPung),
-        (List(Kong(wn)), PungOfTerminalsOrHonors),
-        (List(Kong(c5), Chow(s3), Dui(s3)), OneVoidedSuit)
-      )
+      List((List(Kong(dg), Kong(wn), Kong(c5)), ThreeKongs), (List(Kong(dg)), DragonPung), (List(Kong(wn)),
+        PungOfTerminalsOrHonors), (List(Kong(c5), Chow(s3), Dui(s3)), OneVoidedSuit))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -441,16 +387,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(s1), Dui(s2))
     val thenPoints = 19
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(b3), Pung(c2), Pung(s1)), MixedShiftedPung),
-        (List(Kong(b3), Pung(c2), Pung(s1), Pung(ws)), AllPungs),
-        (List(Pung(ws)), PrevalentWind),
-        (List(Pung(s1)), PungOfTerminalsOrHonors),
-        (List(Kong(b3)), MeldedKong),
-        (List(Pung(s1)), SelfDrawnComb)
-      )
+      List((List(Kong(b3), Pung(c2), Pung(s1)), MixedShiftedPung), (List(Kong(b3), Pung(c2), Pung(s1), Pung(ws)),
+        AllPungs), (List(Pung(ws)), PrevalentWind), (List(Pung(s1)), PungOfTerminalsOrHonors), (List(Kong(b3)),
+        MeldedKong), (List(Pung(s1)), SelfDrawnComb))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -468,14 +410,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Dui(s4))
     val thenPoints = 9
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), MeldedHand),
-        (List(Chow(s1), Chow(s7)), TwoTerminalChows),
-        (List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), OneVoidedSuit),
-        (List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), NoHonors)
-      )
+      List((List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), MeldedHand), (List(Chow(s1), Chow(s7)),
+        TwoTerminalChows), (List(Pung(s6), Chow(b2), Chow(s1), Chow(s7), Dui(s4)), OneVoidedSuit), (List(Pung(s6),
+        Chow(b2), Chow(s1), Chow(s7), Dui(s4)), NoHonors))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -494,17 +434,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(c8), Dui(b6))
     val thenPoints = 27
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(c6), Kong(s8), Pung(c8), Pung(s9), Dui(b6)), UpperFour),
-        (List(Kong(c6), Kong(s8), Pung(c8), Pung(s9)), AllPungs),
-        (List(Kong(c6), Kong(s8)), TwoMeldedKongs),
-        (List(Kong(s8), Pung(c8)), DoublePung),
-        (List(Kong(c6)), ConcealedKong),
-        (List(Pung(s9)), PungOfTerminalsOrHonors)
-      )
+      List((List(Kong(c6), Kong(s8), Pung(c8), Pung(s9), Dui(b6)), UpperFour), (List(Kong(c6), Kong(s8), Pung(c8),
+        Pung(s9)), AllPungs), (List(Kong(c6), Kong(s8)), TwoMeldedKongs), (List(Kong(s8), Pung(c8)), DoublePung),
+        (List(Kong(c6)), ConcealedKong), (List(Pung(s9)), PungOfTerminalsOrHonors))
 
-    test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext,
-      thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
 
   }
 
@@ -522,15 +457,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(b1), Pung(b4), Pung(b7), Dui(dw))
     val thenPoints = 17
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(b1), Pung(b4), Pung(b7), Pung(dg)), AllPungs),
-        (List(Pung(b1), Pung(b4), Pung(b7), Pung(dg), Dui(dw)), HalfFlush),
-        (List(Pung(dg)), DragonPung),
-        (List(Pung(b4), Pung(b7)), TwoConcealedPungs),
-        (List(Pung(b1)), PungOfTerminalsOrHonors)
-      )
+      List((List(Pung(b1), Pung(b4), Pung(b7), Pung(dg)), AllPungs), (List(Pung(b1), Pung(b4), Pung(b7), Pung(dg),
+        Dui(dw)), HalfFlush), (List(Pung(dg)), DragonPung), (List(Pung(b4), Pung(b7)), TwoConcealedPungs),
+        (List(Pung(b1)), PungOfTerminalsOrHonors))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -548,17 +480,14 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Dui(c8))
     val thenPoints = 53
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), FullFlush),
-        (List(Chow(c3), Chow(c4), Chow(c5)), PureShiftedChow),
-        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), MeldedHand),
-        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5)), AllChows),
-        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5)), TileHog),
-        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), AllSimples),
-        (List(Chow(c3), Chow(c3)), PureDoubleChows)
-      )
+      List((List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), FullFlush), (List(Chow(c3), Chow(c4), Chow(c5)),
+        PureShiftedChow), (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), MeldedHand), (List(Chow(c3),
+        Chow(c3), Chow(c4), Chow(c5)), AllChows), (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5)), TileHog),
+        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), AllSimples), (List(Chow(c3), Chow(c3)),
+          PureDoubleChows))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -576,17 +505,13 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(c1), Chow(s3), Dui(s2))
     val thenPoints = 11
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(SingleTile(s3)), LastTile),
-        (List(Pung(s3), Chow(s3)), TileHog),
-        (List(Kong(c9)), PungOfTerminalsOrHonors),
-        (List(Pung(c1)), PungOfTerminalsOrHonors),
-        (List(Kong(c9)), MeldedKong),
-        (List(Kong(c9), Pung(c1), Pung(s3), Chow(s3), Dui(s2)), OneVoidedSuit),
-        (List(Kong(c9), Pung(c1), Pung(s3), Chow(s3), Dui(s2)), NoHonors)
-      )
+      List((List(SingleTile(s3)), LastTile), (List(Pung(s3), Chow(s3)), TileHog), (List(Kong(c9)),
+        PungOfTerminalsOrHonors), (List(Pung(c1)), PungOfTerminalsOrHonors), (List(Kong(c9)), MeldedKong),
+        (List(Kong(c9), Pung(c1), Pung(s3), Chow(s3), Dui(s2)), OneVoidedSuit), (List(Kong(c9), Pung(c1), Pung(s3),
+          Chow(s3), Dui(s2)), NoHonors))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -605,14 +530,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Dui(s1))
     val thenPoints = 14
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(dr), Pung(dg), Chow(c1), Chow(c4), Dui(s1)), MeldedHand),
-        (List(Pung(dr), Pung(dg)), TwoDragonPungs),
-        (List(Chow(c1), Chow(c4)), ShortStraight),
-        (List(Chow(c1), Chow(c4), Dui(s1)), OneVoidedSuit)
-      )
+      List((List(Pung(dr), Pung(dg), Chow(c1), Chow(c4), Dui(s1)), MeldedHand), (List(Pung(dr), Pung(dg)),
+        TwoDragonPungs), (List(Chow(c1), Chow(c4)), ShortStraight), (List(Chow(c1), Chow(c4), Dui(s1)), OneVoidedSuit))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -630,15 +552,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(c1), Pung(s7), Pung(dr), Dui(ws))
     val thenPoints = 12
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(c1), Pung(s4), Pung(s7), Pung(dr)), AllPungs),
-        (List(Pung(dr)), DragonPung),
-        (List(Pung(c1), Pung(dr)), TwoConcealedPungs),
-        (List(Pung(c1)), PungOfTerminalsOrHonors),
-        (List(Pung(c1), Pung(s4), Pung(s7)), OneVoidedSuit)
-      )
+      List((List(Pung(c1), Pung(s4), Pung(s7), Pung(dr)), AllPungs), (List(Pung(dr)), DragonPung), (List(Pung(c1),
+        Pung(dr)), TwoConcealedPungs), (List(Pung(c1)), PungOfTerminalsOrHonors), (List(Pung(c1), Pung(s4),
+        Pung(s7)), OneVoidedSuit))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -657,16 +576,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Pung(s4), Chow(c2), Dui(s2))
     val thenPoints = 19
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(c1), Pung(s4), Chow(c2), Chow(s1), Dui(s2)), LowerFour),
-        (List(Kong(c1), Pung(s4)), TwoConcealedPungs),
-        (List(Kong(c1)), ConcealedKong),
-        (List(Kong(c1)), PungOfTerminalsOrHonors),
-        (List(Kong(c1), Pung(s4), Chow(c2), Chow(s1), Dui(s2)), OneVoidedSuit),
-        (List(Chow(c2)), SelfDrawnComb)
-      )
+      List((List(Kong(c1), Pung(s4), Chow(c2), Chow(s1), Dui(s2)), LowerFour), (List(Kong(c1), Pung(s4)),
+        TwoConcealedPungs), (List(Kong(c1)), ConcealedKong), (List(Kong(c1)), PungOfTerminalsOrHonors),
+        (List(Kong(c1), Pung(s4), Chow(c2), Chow(s1), Dui(s2)), OneVoidedSuit), (List(Chow(c2)), SelfDrawnComb))
 
-    test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenConcealedKong, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
 
   }
 
@@ -686,16 +601,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 11
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(SingleTile(s8)), LastTile),
-        (allFigures, ConcealedHand),
-        (List(Chow(b3), Chow(b6), Chow(c6), Chow(s7)), AllChows),
-        (List(Chow(b6), Chow(c6)), MixedDoubleChows),
-        (List(Chow(b3), Chow(b6)), ShortStraight),
-        (List(Chow(s7)), ClosedWait)
-      )
+      List((List(SingleTile(s8)), LastTile), (allFigures, ConcealedHand), (List(Chow(b3), Chow(b6), Chow(c6),
+        Chow(s7)), AllChows), (List(Chow(b6), Chow(c6)), MixedDoubleChows), (List(Chow(b3), Chow(b6)),
+        ShortStraight), (List(Chow(s7)), ClosedWait))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -715,11 +626,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 10
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(b2), Kong(c3)), TwoConcealedKongs),
-        (allFigures, NoHonors),
-        (List(Dui(c1)), SingleWait)
-      )
+      List((List(Kong(b2), Kong(c3)), TwoConcealedKongs), (allFigures, NoHonors), (List(Dui(c1)), SingleWait))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -742,13 +649,11 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 11
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(SingleTile(b5)), RobbingTheKong),
-        (List(Pung(dw)), DragonPung),
-        (List(Chow(b3), Chow(c2), Chow(c6), Dui(c6)), OneVoidedSuit)
-      )
+      List((List(SingleTile(b5)), RobbingTheKong), (List(Pung(dw)), DragonPung), (List(Chow(b3), Chow(c2), Chow(c6),
+        Dui(c6)), OneVoidedSuit))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -768,15 +673,10 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 11
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(SingleTile(c4)), OutWithRemplacementTile),
-        (List(Kong(b2)), ConcealedKong),
-        (allFigures, NoHonors)
-      )
+      List((List(SingleTile(c4)), OutWithRemplacementTile), (List(Kong(b2)), ConcealedKong), (allFigures, NoHonors))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
-      thenCombinations,
-      thenPoints)
+      thenCombinations, thenPoints)
 
   }
 
@@ -797,17 +697,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 33
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(c4), Kong(c9), Pung(c1)), ThreeConcealedPungs),
-        (List(Kong(c4), Kong(c9)), TwoConcealedKongs),
-        (List(Kong(c4), Kong(c9), Pung(c1), Chow(c5), Dui(dr)), HalfFlush),
-        (List(Kong(c9)), PungOfTerminalsOrHonors),
-        (List(Pung(c1)), PungOfTerminalsOrHonors),
-        (List(Dui(dr)), SingleWait)
-      )
+      List((List(Kong(c4), Kong(c9), Pung(c1)), ThreeConcealedPungs), (List(Kong(c4), Kong(c9)), TwoConcealedKongs),
+        (List(Kong(c4), Kong(c9), Pung(c1), Chow(c5), Dui(dr)), HalfFlush), (List(Kong(c9)),
+          PungOfTerminalsOrHonors), (List(Pung(c1)), PungOfTerminalsOrHonors), (List(Dui(dr)), SingleWait))
 
-    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
-      thenPoints)
+    test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenPoints)
 
   }
 
@@ -827,16 +722,12 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 21
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(b7), Chow(c1), Chow(s4)), MixedStraight),
-        (List(SingleTile(c2)), LastTileClaimComb),
-        (List(Chow(b1), Chow(b7), Chow(c1), Chow(s4)), AllChows),
-        (List(Chow(b1), Chow(c1)), MixedDoubleChows),
-        (List(Chow(b1), Chow(b7)), TwoTerminalChows),
-        (List(Chow(c1)), ClosedWait)
-      )
+      List((List(Chow(b7), Chow(c1), Chow(s4)), MixedStraight), (List(SingleTile(c2)), LastTileClaimComb),
+        (List(Chow(b1), Chow(b7), Chow(c1), Chow(s4)), AllChows), (List(Chow(b1), Chow(c1)), MixedDoubleChows),
+        (List(Chow(b1), Chow(b7)), TwoTerminalChows), (List(Chow(c1)), ClosedWait))
 
-    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenPoints)
+    test(givenClosed, givenMelded, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations,
+      thenPoints)
 
   }
 
@@ -857,16 +748,14 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 162
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(dr), Pung(dg), Pung(dw)), BigThreeDragons), //88
+      List((List(Kong(dr), Pung(dg), Pung(dw)), BigThreeDragons), //88
         (allFigures, AllHonors), //64
         (List(SingleTile(ws)), LastTileDrawComb), // 8
         (List(Kong(dr)), MeldedKong), // 1
-        (List(Dui(ws)), SingleWait) //1
-      )
+        (List(Dui(ws)), SingleWait) //1)
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
-      thenCombinations, thenPoints)
+          thenCombinations, thenPoints)
 
   }
   test(
@@ -885,9 +774,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 8
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, ChickenHand)
-      )
+      List((allFigures, ChickenHand))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -910,10 +797,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 10
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, ChickenHand),
-        (List(Bonus(List(fp, ss))), FlowerTiles)
-      )
+      List((allFigures, ChickenHand), (List(Bonus(List(fp, ss))), FlowerTiles))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -936,14 +820,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 25
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, ReversibleTiles),
-        (List(Kong(dw), Pung(b5), Pung(b8), Pung(s8)), AllPungs),
-        (allFigures, MeldedHand),
-        (List(Kong(dw)), DragonPung),
-        (List(Pung(b8), Pung(s8)), DoublePung),
-        (List(Kong(dw)), MeldedKong)
-      )
+      List((allFigures, ReversibleTiles), (List(Kong(dw), Pung(b5), Pung(b8), Pung(s8)), AllPungs), (allFigures,
+        MeldedHand), (List(Kong(dw)), DragonPung), (List(Pung(b8), Pung(s8)), DoublePung), (List(Kong(dw)), MeldedKong))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -966,13 +844,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 23
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(wn), Pung(ww), Pung(ws)), BigThreeWind),
-        (List(Pung(b5), Pung(wn), Pung(ww), Pung(ws)), AllPungs),
-        (List(Pung(wn)), PrevalentWind),
-        (List(Pung(ww)), SeatWind),
-        (List(Pung(b5), Dui(c9)), OneVoidedSuit)
-      )
+      List((List(Pung(wn), Pung(ww), Pung(ws)), BigThreeWind), (List(Pung(b5), Pung(wn), Pung(ww), Pung(ws)),
+        AllPungs), (List(Pung(wn)), PrevalentWind), (List(Pung(ww)), SeatWind), (List(Pung(b5), Dui(c9)),
+        OneVoidedSuit))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -995,15 +869,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 25
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(wn), Pung(ww), Pung(ws)), BigThreeWind),
-        (List(Pung(c9), Pung(wn), Pung(ww), Pung(ws)), AllPungs),
-        (List(Pung(wn)), PrevalentWind),
-        (List(Pung(ww)), SeatWind),
-        (List(Pung(c9)), PungOfTerminalsOrHonors),
-        (List(Pung(c9), Dui(b5)), OneVoidedSuit),
-        (List(Dui(b5)), SingleWait)
-      )
+      List((List(Pung(wn), Pung(ww), Pung(ws)), BigThreeWind), (List(Pung(c9), Pung(wn), Pung(ww), Pung(ws)),
+        AllPungs), (List(Pung(wn)), PrevalentWind), (List(Pung(ww)), SeatWind), (List(Pung(c9)),
+        PungOfTerminalsOrHonors), (List(Pung(c9), Dui(b5)), OneVoidedSuit), (List(Dui(b5)), SingleWait))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1026,10 +894,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 18
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(b5), Pung(c5), Pung(s5)), TriplePungs),
-        (allFigures, AllSimples)
-      )
+      List((List(Pung(b5), Pung(c5), Pung(s5)), TriplePungs), (allFigures, AllSimples))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1052,12 +917,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 21
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, AllFive),
-        (List(Pung(c5), Chow(c4)), TileHog),
-        (List(Pung(b5), Pung(c5)), DoublePung),
-        (List(Chow(c4)), ClosedWait)
-      )
+      List((allFigures, AllFive), (List(Pung(c5), Chow(c4)), TileHog), (List(Pung(b5), Pung(c5)), DoublePung),
+        (List(Chow(c4)), ClosedWait))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1080,10 +941,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 22
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, ThreeSuitedTerminalChows),
-        (allFigures, MeldedHand)
-      )
+      List((allFigures, ThreeSuitedTerminalChows), (allFigures, MeldedHand))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1106,13 +964,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 30
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, FullFlush),
-        (List(Pung(b3), Chow(b3)), TileHog),
-        (List(Pung(b7), Chow(b7)), TileHog),
-        (List(Dui(b2)), SingleWait),
-        (List(Dui(b2)), SelfDrawnComb)
-      )
+      List((allFigures, FullFlush), (List(Pung(b3), Chow(b3)), TileHog), (List(Pung(b7), Chow(b7)), TileHog),
+        (List(Dui(b2)), SingleWait), (List(Dui(b2)), SelfDrawnComb))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1134,13 +987,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 45
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, FullFlush),
-        (List(Chow(b1), Chow(b4), Chow(b7)), PureStraight),
-        (List(Chow(b1), Chow(b4), Chow(b6), Chow(b7)), AllChows),
-        (List(Chow(b6), Chow(b7), Dui(b8)), TileHog),
-        (List(Chow(b6)), SelfDrawnComb)
-      )
+      List((allFigures, FullFlush), (List(Chow(b1), Chow(b4), Chow(b7)), PureStraight), (List(Chow(b1), Chow(b4),
+        Chow(b6), Chow(b7)), AllChows), (List(Chow(b6), Chow(b7), Dui(b8)), TileHog), (List(Chow(b6)), SelfDrawnComb))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1164,13 +1012,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 83
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(b1), Chow(b1), Chow(b1), Chow(b1)), QuadrupleChows),
-        (allFigures, LowerTiles),
-        (allFigures, MeldedHand),
-        (allFigures, OutsideHand),
-        (List(Chow(b1), Chow(b1), Chow(b1), Chow(b1), Dui(c1)), OneVoidedSuit)
-      )
+      List((List(Chow(b1), Chow(b1), Chow(b1), Chow(b1)), QuadrupleChows), (allFigures, LowerTiles), (allFigures,
+        MeldedHand), (allFigures, OutsideHand), (List(Chow(b1), Chow(b1), Chow(b1), Chow(b1), Dui(c1)), OneVoidedSuit))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1194,14 +1037,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 61
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(b7), Chow(b7), Chow(b7)), PureTripleChows),
-        (allFigures, UpperTiles),
-        (allFigures, MeldedHand),
-        (allFigures, OutsideHand),
-        (List(Chow(b7), Chow(b7), Chow(b7), Chow(s7)), AllChows),
-        (List(Chow(b7), Chow(s7)), MixedDoubleChows)
-      )
+      List((List(Chow(b7), Chow(b7), Chow(b7)), PureTripleChows), (allFigures, UpperTiles), (allFigures, MeldedHand),
+        (allFigures, OutsideHand), (List(Chow(b7), Chow(b7), Chow(b7), Chow(s7)), AllChows), (List(Chow(b7),
+          Chow(s7)), MixedDoubleChows))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1224,11 +1062,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 92
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(b2), Pung(b4), Pung(c6), Pung(s8)), FourConcealedPungs),
-        (allFigures, AllEvenPungs),
-        (allFigures, FullyConcealedHand)
-      )
+      List((List(Pung(b2), Pung(b4), Pung(c6), Pung(s8)), FourConcealedPungs), (allFigures, AllEvenPungs),
+        (allFigures, FullyConcealedHand))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1252,13 +1087,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 62
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(b4), Pung(b5), Pung(b6)), PureShiftedPungs),
-        (allFigures, MiddleTiles),
-        (List(Pung(b4), Pung(b5), Pung(b6), Pung(s4)), AllPungs),
-        (allFigures, MeldedHand),
-        (List(Pung(b4), Pung(s4)), DoublePung)
-      )
+      List((List(Pung(b4), Pung(b5), Pung(b6)), PureShiftedPungs), (allFigures, MiddleTiles), (List(Pung(b4),
+        Pung(b5), Pung(b6), Pung(s4)), AllPungs), (allFigures, MeldedHand), (List(Pung(b4), Pung(s4)), DoublePung))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1282,12 +1112,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 45
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(b1), Chow(b2), Chow(b3), Chow(b4)), FourShiftedChows),
-        (allFigures, HalfFlush),
-        (allFigures, MeldedHand),
-        (List(Chow(b1), Chow(b4)), ShortStraight)
-      )
+      List((List(Chow(b1), Chow(b2), Chow(b3), Chow(b4)), FourShiftedChows), (allFigures, HalfFlush), (allFigures,
+        MeldedHand), (List(Chow(b1), Chow(b4)), ShortStraight))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1311,12 +1137,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 45
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Chow(b1), Chow(b3), Chow(b5), Chow(b7)), FourShiftedChows),
-        (allFigures, HalfFlush),
-        (allFigures, MeldedHand),
-        (List(Chow(b1), Chow(b7)), TwoTerminalChows)
-      )
+      List((List(Chow(b1), Chow(b3), Chow(b5), Chow(b7)), FourShiftedChows), (allFigures, HalfFlush), (allFigures,
+        MeldedHand), (List(Chow(b1), Chow(b7)), TwoTerminalChows))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1340,12 +1162,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 48 + 6 + 1 + 1
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(s6), Pung(s7), Pung(s8), Pung(s9)), FourPureShiftedPungs),
-        (allFigures, MeldedHand),
-        (List(Pung(s9)), PungOfTerminalsOrHonors),
-        (allFigures, OneVoidedSuit)
-      )
+      List((List(Pung(s6), Pung(s7), Pung(s8), Pung(s9)), FourPureShiftedPungs), (allFigures, MeldedHand),
+        (List(Pung(s9)), PungOfTerminalsOrHonors), (allFigures, OneVoidedSuit))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1368,9 +1186,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 64
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, PureTerminalChows)
-      )
+      List((allFigures, PureTerminalChows))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1393,10 +1209,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 65
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(dg), Pung(dw), Dui(dr)), LittleThreeDragons),
-        (List(Chow(b2), Chow(c4)), OneVoidedSuit)
-      )
+      List((List(Pung(dg), Pung(dw), Dui(dr)), LittleThreeDragons), (List(Chow(b2), Chow(c4)), OneVoidedSuit))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1419,13 +1232,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 109
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(wn), Pung(ww), Pung(ws), Dui(we)), LittleFourWinds),
-        (allFigures, AllTerminalsAndHonors),
-        (List(Pung(c1), Pung(wn), Pung(ww), Pung(ws)), AllPungs),
-        (allFigures, HalfFlush),
-        (List(Pung(c1)), PungOfTerminalsOrHonors)
-      )
+      List((List(Pung(wn), Pung(ww), Pung(ws), Dui(we)), LittleFourWinds), (allFigures, AllTerminalsAndHonors),
+        (List(Pung(c1), Pung(wn), Pung(ww), Pung(ws)), AllPungs), (allFigures, HalfFlush), (List(Pung(c1)),
+          PungOfTerminalsOrHonors))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1448,12 +1257,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 74
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, AllTerminals),
-        (allFigures, MeldedHand),
-        (List(Pung(b1), Pung(s1)), DoublePung),
-        (List(Pung(b9), Pung(s9)), DoublePung)
-      )
+      List((allFigures, AllTerminals), (allFigures, MeldedHand), (List(Pung(b1), Pung(s1)), DoublePung),
+        (List(Pung(b9), Pung(s9)), DoublePung))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1476,16 +1281,13 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 90
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, SevenShiftedPairs),
-        (allFigures, AllSimples)
+      List((allFigures, SevenShiftedPairs), (allFigures, AllSimples)
         //        (List(),),
         //        (List(),),
-        //        (List(),)
-      )
+        //        (List(),))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
-      thenCombinations, thenPoints)
+        thenCombinations, thenPoints)
 
   }
 
@@ -1507,15 +1309,10 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 133
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Kong(c1), Kong(c2), Kong(c3), Kong(dr)), FourKongs),
-        (List(Kong(c1), Kong(c2), Kong(c3)), PureShiftedPungs),
-        (List(Kong(c1), Kong(c2), Kong(c3)), ThreeConcealedPungs),
-        (List(Kong(dr)), DragonPung),
-        (List(Kong(c1)), PungOfTerminalsOrHonors),
-        (List(Kong(dr)), MeldedKong),
-        (List(Kong(c1), Kong(c2), Kong(c3), Dui(b1)), OneVoidedSuit)
-      )
+      List((List(Kong(c1), Kong(c2), Kong(c3), Kong(dr)), FourKongs), (List(Kong(c1), Kong(c2), Kong(c3)),
+        PureShiftedPungs), (List(Kong(c1), Kong(c2), Kong(c3)), ThreeConcealedPungs), (List(Kong(dr)), DragonPung),
+        (List(Kong(c1)), PungOfTerminalsOrHonors), (List(Kong(dr)), MeldedKong), (List(Kong(c1), Kong(c2), Kong(c3),
+          Dui(b1)), OneVoidedSuit))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1538,13 +1335,8 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 100
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, AllGreen),
-        (allFigures, HalfFlush),
-        (List(Kong(dg)), DragonPung),
-        (List(Pung(b3), Chow(b2)), TileHog),
-        (List(Kong(dg)), ConcealedKong)
-      )
+      List((allFigures, AllGreen), (allFigures, HalfFlush), (List(Kong(dg)), DragonPung), (List(Pung(b3), Chow(b2)),
+        TileHog), (List(Kong(dg)), ConcealedKong))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1567,10 +1359,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 89
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (allFigures, NineGates),
-        (List(Chow(b2), Chow(b5)), ShortStraight)
-      )
+      List((allFigures, NineGates), (List(Chow(b2), Chow(b5)), ShortStraight))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
@@ -1593,76 +1382,38 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
     val thenPoints = 219
     val thenCombinations: List[(List[Figure], Combination)] =
-      List(
-        (List(Pung(we), Pung(wn), Pung(ww), Pung(ws)), BigFourWinds),
-        (allFigures, AllHonors),
-        (List(Pung(we), Pung(wn), Pung(ww), Pung(ws)), FourConcealedPungs),
-        (allFigures, ConcealedHand),
-        (List(Dui(dr)), SingleWait)
-      )
+      List((List(Pung(we), Pung(wn), Pung(ww), Pung(ws)), BigFourWinds), (allFigures, AllHonors), (List(Pung(we),
+        Pung(wn), Pung(ww), Pung(ws)), FourConcealedPungs), (allFigures, ConcealedHand), (List(Dui(dr)), SingleWait))
 
     test(givenClosed, givenMelded, givenConcealedKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
       thenCombinations, thenPoints)
 
   }
 
-  private def test(
-                    givenClosed: TileSet,
-                    givenMelded: List[Figure],
-                    givenContextualTile: ContextualTile,
-                    givenBonus: Bonus,
-                    givenContext: PlayerContext,
-                    thenClosed: List[Figure],
-                    thenCombinations: List[(List[Figure], Combination)],
-                    thenTotal: Int
-                    ) {
-    test(givenClosed, givenMelded, noKongs, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenTotal)
+  private def test(givenClosed: TileSet, givenMelded: List[Figure], givenContextualTile: ContextualTile,
+    givenBonus: Bonus, givenContext: PlayerContext, thenClosed: List[Figure], thenCombinations: List[(List[Figure],
+    Combination)], thenTotal: Int) {
+    test(givenClosed, givenMelded, noKongs, givenContextualTile, givenBonus, givenContext, thenClosed,
+      thenCombinations, thenTotal)
   }
 
 
-  private def test(
-                    givenClosed: TileSet,
-                    givenMelded: List[Figure],
-                    givenContextualTile: ContextualTile,
-                    givenContext: PlayerContext,
-                    thenClosed: List[Figure],
-                    thenCombinations: List[(List[Figure], Combination)],
-                    thenTotal: Int
-                    ) {
-    test(givenClosed, givenMelded, noKongs, givenContextualTile, Bonus(Nil), givenContext, thenClosed, thenCombinations, thenTotal)
+  private def test(givenClosed: TileSet, givenMelded: List[Figure], givenContextualTile: ContextualTile,
+    givenContext: PlayerContext, thenClosed: List[Figure], thenCombinations: List[(List[Figure], Combination)],
+    thenTotal: Int) {
+    test(givenClosed, givenMelded, noKongs, givenContextualTile, Bonus(Nil), givenContext, thenClosed,
+      thenCombinations, thenTotal)
   }
 
-  private def test(
-                    givenClosed: TileSet,
-                    givenMelded: List[Figure],
-                    givenConcealedKongs: List[Kong],
-                    givenContextualTile: ContextualTile,
-                    givenBonus: Bonus,
-                    givenContext: PlayerContext,
-                    thenClosed: List[Figure],
-                    thenCombinations: List[(List[Figure], Combination)],
-                    thenTotal: Int
-                    ) {
+  private def test(givenClosed: TileSet, givenMelded: List[Figure], givenConcealedKongs: List[Kong], givenContextualTile: ContextualTile, givenBonus: Bonus, givenContext: PlayerContext, thenClosed: List[Figure], thenCombinations: List[(List[Figure], Combination)], thenTotal: Int) {
 
-    val pts = PlayerTiles(ConcealedTiles(givenClosed, givenContextualTile),
-      givenMelded.sorted(OrdFigure),
-      givenConcealedKongs,
-      givenBonus)
+    val pts = PlayerTiles(ConcealedTiles(givenClosed, givenContextualTile), givenMelded.sorted(OrdFigure), givenConcealedKongs, givenBonus)
 
     val actual = HuFinder(pts, givenContext).find
-
-    val expected = List(
-      DetailedPoints(
-        HuLe(thenClosed.sorted(OrdFigure),
-          givenMelded.sorted(OrdFigure),
-          givenContextualTile,
-          givenContext,
-          givenConcealedKongs,
-          givenBonus),
-        thenCombinations.map {
-          case (figures, combination) => (figures.sorted(OrdFigure), combination)
-        })
-    )
+    val waits = UniqueWait.waitingTiles(givenClosed.removed(givenContextualTile.tile), givenMelded, givenConcealedKongs)
+    val expected = List(DetailedPoints(HuLe(thenClosed.sorted(OrdFigure), givenMelded.sorted(OrdFigure), givenContextualTile, givenContext, waits, givenConcealedKongs, givenBonus), thenCombinations.map {
+      case (figures, combination) => (figures.sorted(OrdFigure), combination)
+    }))
 
 
     assert(actual.size != 0, "No mahjong found : " + pts)

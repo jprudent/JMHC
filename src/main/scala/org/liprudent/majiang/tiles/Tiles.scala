@@ -580,6 +580,13 @@ case class ConcealedTiles(tileSet: TileSet, lastTileContext: ContextualTile) {
   }
 
   /**
+   *
+   * @return This set minus the last tile
+   */
+  def withoutLastTile: ConcealedTiles =
+    ConcealedTiles(tileSet.removed(lastTileContext.tile), lastTileContext)
+
+  /**
    * Add a new tile in hand
    *
    * @param contextualTile The new tile to add
