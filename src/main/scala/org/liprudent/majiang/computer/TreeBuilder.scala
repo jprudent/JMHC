@@ -59,7 +59,7 @@ case class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
    */
   def allFiguresCombinations: Set[Types.Figures] = {
     val tiles: List[Tile] = tileset.toTiles.toSet.toList
-    tiles.map(t => discoverBranch(t, tileset.toTiles, Nil)).flatten.toSeq.toSet
+    tiles.par.map(t => discoverBranch(t, tileset.toTiles, Nil)).flatten.toList.toSet
   }
 
   //  private def discoverTree(t:Tile,remainingTile:List[Tile],result:Types.Figures):Set[Types.Figures] = {

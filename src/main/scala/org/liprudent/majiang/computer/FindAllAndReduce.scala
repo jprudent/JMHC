@@ -133,7 +133,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
     figuresComputer.allFigures match {
       case Nil => Set()
       case all => {
-        all.map {
+        all.toSet[Figure].par.map {
           figure => {
             val next: Set[Figures] = findFigures(FindAllAndReduce(figuresComputer.tileSet.removed(figure.toTiles)))
             next match {
@@ -141,7 +141,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
               case _ => next.map(figures => (figure :: figures))
             }
           }
-        }.flatten.toSet[Figures].map(figures => figures.sorted(OrdFigure))
+        }.flatten.toList.toSet[Figures].map(figures => figures.sorted(OrdFigure))
       }
     }
   }
