@@ -36,7 +36,7 @@ package object mahjong {
    *       TODO there are too much parameters.
    */
   case class PlayerTiles(hand: ConcealedTiles, melded: Figures, concealedKongs: List[Kong] = noKongs,
-                         bonus: Bonus = Bonus(Nil)) {
+    bonus: Bonus = Bonus(Nil)) {
 
     require(melded.sorted(OrdFigure) == melded, "melded not sorted")
 
@@ -72,7 +72,7 @@ package object mahjong {
    * @param bonus flowers and seasons
    */
   case class HuLe(closed: Figures, melded: Figures, lastTileContext: ContextualTile, context: PlayerContext,
-                  concealedKongs: List[Kong] = noKongs, bonus: Bonus = Bonus(Nil)) {
+    concealedKongs: List[Kong] = noKongs, bonus: Bonus = Bonus(Nil)) {
 
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(melded == melded.sorted(OrdFigure), "not sorted")
@@ -258,12 +258,10 @@ package object mahjong {
             val result: Result = combination.find(huLe)
 
             if (result == EmptyResult) {
-
               //if result is empty, filters out
               res
 
             } else {
-
               //map result to a list of (Figures,Combination)
               val newDetailedPoints = result.figures.map((_, combination)) ::: res._1
 
@@ -329,7 +327,6 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
    * @return A list ordered by desc total. Each element is a detailed solution for given <code>ptiles</code>.
    */
   lazy val find: List[DetailedPoints] = {
-
     if (!quickValid) Nil
     else {
       val computer = FindAllAndReduce(ptiles.hand.tileSet)
@@ -405,18 +402,27 @@ object HuFinder {
 
 object UniqueWait {
 
-  def waitingTiles(concealed: TileSet, disclosed: List[Figure], concealedKongs: List[Kong]): List[Tile] = {
+  /**
+   *
+   * @param concealed tiles before winning
+   * @param melded figures
+   * @param concealedKongs
+   * @return the list of waiting tiles
+   */
+  def waitingTiles(concealed: TileSet, melded: List[Figure], concealedKongs: List[Kong]): List[Tile] = {
 
 
     def satisfy(tile: Tile): Boolean = {
       val added: TileSet = concealed.added(tile)
       val allCombinations = computer.FindAllAndReduce(added).allFiguresCombinations
-      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed, concealedKongs)).size > 0
+      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, melded,
+        concealedKongs)).size > 0
     }
 
+    //all tiles to try. Filter out tiles that has 4 occurence (there can not be 5)
     val tilesToTry = Tile.allButBonus.filter(tile => concealed.occurence(tile) < 4)
+
     tilesToTry.filter(satisfy).toList.sorted
   }
-
 
 }

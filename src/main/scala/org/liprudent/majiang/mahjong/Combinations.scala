@@ -91,7 +91,7 @@ sealed trait Combination {
    * @param y the other combination
    * @return true if y is implied by this combination. false otherwise
    * @see [[org.liprudent.majiang.mahjong.Combination# e x c l u d e s ( o r g.l i p r u d e n t.m a j i a n g.m a h
-   *     j o n g.C o m b i n a t i o n )]]
+   *      j o n g.C o m b i n a t i o n )]]
    */
   def implies(y: Combination): Boolean =
     implied.exists(_ == y) || implied.exists(_.implies(y))
@@ -102,7 +102,7 @@ sealed trait Combination {
    * @param y the other combination
    * @return true if y is implied by this combination. false otherwise
    * @see [[org.liprudent.majiang.mahjong.Combination# i m p l i e s ( o r g.l i p r u d e n t.m a j i a n g.m a h j
-   *     o n g.C o m b i n a t i o n )]]
+   *      o n g.C o m b i n a t i o n )]]
    */
   def excludes(y: Combination): Boolean =
     excluded.exists(_ == y) || excluded.exists(_.excludes(y))
@@ -112,22 +112,17 @@ sealed trait Combination {
 
 object Combination {
 
-  def findTwoFigures[FigureType <: Figure](figures: List[FigureType])(cond1: (FigureType) => Boolean)(cond2:
-                                                                                                      (FigureType,
-                                                                                                        FigureType)
-                                                                                                        => Boolean):
-  List[List[FigureType]] = {
+  def findTwoFigures[FigureType <: Figure](figures: List[FigureType]) //
+    (cond1: (FigureType) => Boolean) //
+    (cond2: (FigureType, FigureType) => Boolean): List[List[FigureType]] = {
     for {f1 <- figures if cond1(f1)
          f2 <- figures.dropWhile(_ != f1).tail if cond2(f1, f2)} yield (List(f1, f2).sorted(OrdFigure))
 
   }
 
   def findThreeFigures[FigureType <: Figure](figures: List[FigureType])(cond1: (FigureType) => Boolean)(cond2:
-                                                                                                        (FigureType,
-                                                                                                          FigureType)
-                                                                                                          => Boolean)
-                                            (cond3: (FigureType, FigureType,
-                                              FigureType) => Boolean): List[List[FigureType]] = {
+  (FigureType, FigureType)
+    => Boolean)(cond3: (FigureType, FigureType, FigureType) => Boolean): List[List[FigureType]] = {
     for {f1 <- figures if cond1(f1)
          f2 <- figures if cond2(f1, f2)
          f3 <- figures if cond3(f1, f2, f3)} yield (List(f1, f2, f3).sorted(OrdFigure))
@@ -248,7 +243,6 @@ object SelfDrawnComb extends Combination {
   override def find(m: HuLe): Result = {
     m.lastTileContext.origin == SelfDrawn match {
       case true => {
-
         m.closed.find(_.toTiles.contains(m.lastTileContext.tile)) match {
           case None => EmptyResult
           case Some(f) => Result(f)
@@ -265,12 +259,10 @@ sealed trait WaitCombination extends Combination {
   def matchingWait(figure: Figure, waitingTile: Tile): Boolean
 
   def find(m: HuLe): Result = {
-
     val tilesBeforeWinning: TileSet = TileSet(m.allClosedTiles).removed(m.lastTileContext.tile)
     val waitingTiles = UniqueWait.waitingTiles(tilesBeforeWinning, m.melded, m.concealedKongs)
 
     waitingTiles match {
-
       //a single waiting tile
       case w :: Nil => {
         val waitingFigures = m.closed.filter(figure => matchingWait(figure, w))
@@ -739,7 +731,6 @@ object HalfFlush extends Combination {
 
   def find(m: HuLe): Result =
     SomeResult(m.allFigures) {
-
       val (honors, straight) = m.allTiles.partition(_.family.isInstanceOf[HonorFamily])
 
       honors.size > 0 &&
@@ -1051,7 +1042,6 @@ object ThreeSuitedTerminalChows extends Combination {
 
     SomeResult(m.allFigures) {
       m.allPungsLike == Nil && m.standardHand && {
-
         val hasPairOf5InThirdFamily =
           m.allDuis.exists(d => d.tile.value == 5 && !m.allChows.exists(_.t1.sameFamily(d.tile)))
 
@@ -1502,7 +1492,8 @@ object BigFourWinds extends Combination {
   val name = "Big Four Winds"
   val description = "4 wind pungs"
 
-  override val excluded = List(BigThreeWind, AllPungs, PrevalentWind, SeatWind, PungOfTerminalsOrHonors, ChickenHand, ChickenHand)
+  override val excluded = List(BigThreeWind, AllPungs, PrevalentWind, SeatWind, PungOfTerminalsOrHonors, ChickenHand,
+    ChickenHand)
 
   def find(m: HuLe): Result =
     SomeResult(m.allWindPungsLike) {

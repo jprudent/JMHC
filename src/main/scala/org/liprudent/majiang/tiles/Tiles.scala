@@ -380,6 +380,12 @@ case object LastTileClaim extends LastTileSituation
  */
 case object LastTileDraw extends LastTileSituation
 
+/**
+ *
+ * @param tile Last tile
+ * @param origin Where does last tile comes from ?
+ * @param lastTileSituation Property of the tile
+ */
 case class ContextualTile(tile: Tile, origin: TileOrigin, lastTileSituation: LastTileSituation) {
 
   require((lastTileSituation == LastTileClaim && origin == Discarded) || lastTileSituation != LastTileClaim,
