@@ -222,43 +222,71 @@ package object mahjong {
   object HulePointsComputer {
 
     //TODO move it to Combination
-    val combinations = List[Combination](FlowerTiles, SelfDrawnComb, SingleWait, ClosedWait, EdgeWait, NoHonors,
-      OneVoidedSuit, MeldedKong, PungOfTerminalsOrHonors, TwoTerminalChows, ShortStraight, MixedDoubleChows,
-      PureDoubleChows, AllSimples, ConcealedKong, TwoConcealedPungs, DoublePung, TileHog, AllChows, ConcealedHand,
-      SeatWind, PrevalentWind, DragonPung, AllPungs, TwoConcealedKongs, RobbingTheKong, OutWithRemplacementTile,
-      LastTileClaimComb, LastTileDrawComb, ChickenHand, LastTile, TwoMeldedKongs, FullyConcealedHand, OutsideHand,
-      TwoDragonPungs, MeldedHand, AllTypes, MixedShiftedChow, HalfFlush, MixedShiftedPung, MixedTripleChows,
-      ReversibleTiles, MixedStraight, BigThreeWind, LowerFour, UpperFour, KnittedStraight,
+    val combinations = List[Combination](ChickenHand, FlowerTiles, SelfDrawnComb, SingleWait, ClosedWait, EdgeWait,
+      NoHonors, OneVoidedSuit, MeldedKong, PungOfTerminalsOrHonors, TwoTerminalChows, ShortStraight,
+      MixedDoubleChows, PureDoubleChows, AllSimples, ConcealedKong, TwoConcealedPungs, DoublePung, TileHog, AllChows,
+      ConcealedHand, SeatWind, PrevalentWind, DragonPung, AllPungs, TwoConcealedKongs, RobbingTheKong,
+      OutWithRemplacementTile, LastTileClaimComb, LastTileDrawComb, LastTile, TwoMeldedKongs, FullyConcealedHand,
+      OutsideHand, TwoDragonPungs, MeldedHand, AllTypes, MixedShiftedChow, HalfFlush, MixedShiftedPung,
+      MixedTripleChows, ReversibleTiles, MixedStraight, BigThreeWind, LowerFour, UpperFour, KnittedStraight,
       LesserHonorsAndKnittedTiles, ThreeConcealedPungs, TriplePungs, AllFive, PureShiftedChow,
       ThreeSuitedTerminalChows, PureStraight, LowerTiles, MiddleTiles, UpperTiles, PureShiftedPungs, PureTripleChows,
       FullFlush, AllEvenPungs, GreaterHonorsAndKnittedTiles, SevenPairs, AllTerminalsAndHonors, ThreeKongs,
       FourPureShiftedPungs, FourShiftedChows, QuadrupleChows, PureTerminalChows, FourConcealedPungs, AllHonors,
       LittleThreeDragons, LittleFourWinds, AllTerminals, ThirteenOrphansComb, SevenShiftedPairs, FourKongs,
-      NineGates, AllGreen, BigThreeDragons, BigFourWinds)
+      NineGates, AllGreen, BigThreeDragons, BigFourWinds).reverse
 
     require(combinations.size == 81)
 
+    //chicken hand is the last one computed
+    require(combinations.last == ChickenHand)
+
+    //starts with the biggest
+    require(combinations.head.points == 88)
+
     def apply(huLe: HuLe): DetailedPoints = {
 
-      val allDetailedPoints: List[(Figures, Combination)] = combinations.foldLeft(List[(Figures, Combination)]()) {
-        (res, combination) =>
-        //compute the combination against hule
-          val result: Result = combination.find(huLe)
+      type DetailedPointType = (Figures, Combination)
 
-          if (result == EmptyResult) {
-            //if result is empty, filters out
+      val allDetailedPoints: List[DetailedPointType] = combinations.foldLeft((List[DetailedPointType](),
+        Set[Combination]())) {
+        (res, combination) =>
+
+          def findCombination = {
+
+            //compute the combination against hule
+            val result: Result = combination.find(huLe)
+
+            if (result == EmptyResult) {
+
+              //if result is empty, filters out
+              res
+
+            } else {
+
+              //map result to a list of (Figures,Combination)
+              val newDetailedPoints = result.figures.map((_, combination)) ::: res._1
+
+              //enhance the exclusion list
+              val newExclusionList = res._2 ++ combination.excluded
+
+              (newDetailedPoints, newExclusionList)
+            }
+          }
+
+
+          //skip if combination is already excluded
+          if (res._2.contains(combination)) {
             res
           } else {
-            //map result to a list of (Figures,Combination)
-            result.figures.map((_, combination)) ::: res
+            findCombination
           }
-      }.sorted(OrdDetailedPoint)
 
+      }._1.sorted(OrdDetailedPoint)
 
+      val filteredDetailedPoints = applyExclusion(allDetailedPoints)
 
-      val detailedPoints = applyExclusion(allDetailedPoints)
-
-      DetailedPoints(huLe, detailedPoints)
+      DetailedPoints(huLe, filteredDetailedPoints)
     }
 
 
@@ -383,8 +411,7 @@ object UniqueWait {
     def satisfy(tile: Tile): Boolean = {
       val added: TileSet = concealed.added(tile)
       val allCombinations = computer.FindAllAndReduce(added).allFiguresCombinations
-      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed,
-        concealedKongs)).size > 0
+      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed, concealedKongs)).size > 0
     }
 
     val tilesToTry = Tile.allButBonus.filter(tile => concealed.occurence(tile) < 4)
