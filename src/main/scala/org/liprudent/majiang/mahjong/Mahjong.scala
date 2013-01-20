@@ -239,14 +239,21 @@ package object mahjong {
     require(combinations.size == 81)
 
     def apply(huLe: HuLe): DetailedPoints = {
-      val res: List[Result] = combinations.map(combination => combination.find(huLe))
-      val zipped: List[(Result, Combination)] = res.zip(combinations)
-      val allDetailedPoints: List[(Figures, Combination)] = zipped.filter {
-        case (result, _) => result != EmptyResult
-      }.map {
-        case (result, combination) => result.figures.map(figures => (figures, combination))
-      } //List[List[(figures,combination)]]
-        .flatten.sorted(OrdDetailedPoint)
+
+      val allDetailedPoints: List[(Figures, Combination)] = combinations.foldLeft(List[(Figures, Combination)]()) {
+        (res, combination) =>
+        //compute the combination against hule
+          val result: Result = combination.find(huLe)
+
+          if (result == EmptyResult) {
+            //if result is empty, filters out
+            res
+          } else {
+            //map result to a list of (Figures,Combination)
+            result.figures.map((_, combination)) ::: res
+          }
+      }.sorted(OrdDetailedPoint)
+
 
 
       val detailedPoints = applyExclusion(allDetailedPoints)
@@ -294,13 +301,20 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
    * @return A list ordered by desc total. Each element is a detailed solution for given <code>ptiles</code>.
    */
   lazy val find: List[DetailedPoints] = {
+
     if (!quickValid) Nil
     else {
       val computer = FindAllAndReduce(ptiles.hand.tileSet)
-      computer.allFiguresCombinations.filter(closedCombination => HuFinder.isWellFormedMahjong(closedCombination,
-        ptiles.melded, ptiles.concealedKongs)).map(closedCombination =>
-        HulePointsComputer(HuLe(closedCombination, ptiles.melded, ptiles.hand.lastTileContext, context,
-          ptiles.concealedKongs, ptiles.bonus))).toList.sortWith((detail1, detail2) => detail1.total >= detail2.total)
+
+      computer.allFiguresCombinations.foldLeft(List[DetailedPoints]()) {
+        (res, concealed) =>
+          if (HuFinder.isWellFormedMahjong(concealed, ptiles.melded, ptiles.concealedKongs)) {
+            HulePointsComputer(HuLe(concealed, ptiles.melded, ptiles.hand.lastTileContext, context,
+              ptiles.concealedKongs, ptiles.bonus)) :: res
+          } else {
+            res
+          }
+      }.sortWith((detail1, detail2) => detail1.total >= detail2.total)
     }
   }
 
@@ -369,7 +383,8 @@ object UniqueWait {
     def satisfy(tile: Tile): Boolean = {
       val added: TileSet = concealed.added(tile)
       val allCombinations = computer.FindAllAndReduce(added).allFiguresCombinations
-      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed, concealedKongs)).size > 0
+      allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, disclosed,
+        concealedKongs)).size > 0
     }
 
     val tilesToTry = Tile.allButBonus.filter(tile => concealed.occurence(tile) < 4)
