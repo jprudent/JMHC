@@ -526,7 +526,7 @@ case class TileSet(private val tocs: List[TileOccurence]) {
    * @return true if `this` is subset of of other
    */
   def isSubsetOf(other: TileSet): Boolean =
-    toTiles.intersect(other.toTiles) == other.toTiles
+    toTiles.intersect(other.toTiles) == toTiles
 
   /**
    * Remove a tile from list of tiles.

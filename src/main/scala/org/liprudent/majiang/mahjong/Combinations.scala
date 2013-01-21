@@ -1441,15 +1441,8 @@ object NineGates extends Combination {
           val pattern = List[Types.TileOccurence](
             t(1, 3), t(2, 1), t(3, 1), t(4, 1), t(5, 1), t(6, 1), t(7, 1), t(8, 1), t(9, 3)
           )
-          //
-          //
-          //          val actual = TileSet(m.allTiles).tocs
-          //
-          //          pattern.zip(actual).forall {
-          //            case ((t1, occMin), (t2, occActual)) => t1 == t2 && occActual >= occMin
-          //          }
 
-          TileSet(m.allTiles).isSubsetOf(TileSet(pattern))
+          TileSet(pattern).isSubsetOf(m.allTileset)
         }
       }
 

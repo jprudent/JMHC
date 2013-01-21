@@ -146,6 +146,9 @@ package object mahjong {
     /* TILES */
     lazy val allTiles: List[Tile] = allFigures.map(_.toTiles).flatten
 
+    lazy val allTileset: TileSet = TileSet(allTiles)
+
+
     lazy val allClosedTiles: List[Tile] = closed.map(_.toTiles).flatten
 
 
