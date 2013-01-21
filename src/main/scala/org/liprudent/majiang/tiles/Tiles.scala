@@ -427,7 +427,7 @@ object OrdListTileOccurence extends Ordering[List[TileOccurence]] {
 //TODO tocs is a way of representing tiles internally in TileSet. So this implementation detail should be masked from
 // API
 //TODO action => tocs should be private
-case class TileSet(tocs: List[TileOccurence]) {
+case class TileSet(private val tocs: List[TileOccurence]) {
 
   require(tocs.forall {
     to => to._2 >= 1 && to._2 <= 4
@@ -472,7 +472,7 @@ case class TileSet(tocs: List[TileOccurence]) {
 
   def filter(p: (Tile) => Boolean): TileSet = TileSet(toTiles.filter(p))
 
-  lazy val allUnique = !exists((tile: Tile) => occurence(tile) > 1)
+  lazy val isAllUnique = !exists((tile: Tile) => occurence(tile) > 1)
 
   /**
    * a list of tilesets where tiles are all the sameof the same family
@@ -487,10 +487,23 @@ case class TileSet(tocs: List[TileOccurence]) {
   /**
    * a list of sub-list containing ordered TileOccurence of the same family
    */
-  val splitByFamily: List[List[TileOccurence]] = {
+  lazy val splitByFamily: List[List[TileOccurence]] = {
     tocs.groupBy {
       e => e._1.family
     }.values.toList.sorted(OrdListTileOccurence)
+  }
+
+
+  lazy val allTripletsOrQuadruplets: List[Tile] = findTilesWhereOcc(3)
+
+  lazy val allQuadruplets: List[Tile] = findTilesWhereOcc(4)
+
+  /**
+   * @return all the tiles that can be used to form a pair.
+   *         if a tile has 4 occurrences, then it'll be twice in result
+   */
+  lazy val allPairs: List[Tile] = {
+    (findTilesWhereOcc(2) ::: allQuadruplets).sorted
   }
 
   /**
@@ -506,6 +519,14 @@ case class TileSet(tocs: List[TileOccurence]) {
    */
   lazy val toTiles: List[Tile] =
     tocs.map(toc => for {i <- 1 to toc._2} yield (toc._1)).flatten
+
+  /**
+   *
+   * @param other
+   * @return true if `this` is subset of of other
+   */
+  def isSubsetOf(other: TileSet): Boolean =
+    toTiles.intersect(other.toTiles) == other.toTiles
 
   /**
    * Remove a tile from list of tiles.
@@ -545,6 +566,9 @@ case class TileSet(tocs: List[TileOccurence]) {
 
     added.sorted
   }
+
+  private def findTilesWhereOcc(minOccurence: Int): List[Tile] =
+    tocs.filter(t => t._2 >= minOccurence).map(_._1)
 
 }
 

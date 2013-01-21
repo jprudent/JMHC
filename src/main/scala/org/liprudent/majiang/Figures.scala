@@ -113,11 +113,11 @@ package object figures {
 
     require(knitted.forall(!_.isHonor), "wrong kind of tiles for knitted tiles")
     require(knitted == knitted.sorted, "sorted required for knitted tiles")
-    require(TileSet(knitted).tocs.size == knitted.size, "no pair, no pung allowed in knitted tiles")
+    require(TileSet(knitted).isAllUnique, "no pair, no pung allowed in knitted tiles : " + knitted)
 
     require(honors.forall(_.isHonor), "wrong kind of tiles for honors")
     require(honors == honors.sorted, "sorted required for honors")
-    require(TileSet(honors).tocs.size == honors.size, "no pair, no pung allowed in honors")
+    require(TileSet(honors).isAllUnique, "no pair, no pung allowed in honors : " + honors)
 
     val properties = SomeKnittedWithSomeDragons
 
@@ -368,7 +368,7 @@ package object figures {
 
     require(bonus.forall(_.isBonus), "Only bonus tiles are accepted")
     require(bonus == bonus.sorted, "Tiles should be sorted")
-    require(TileSet(bonus).allUnique, "All tiles must be unique")
+    require(TileSet(bonus).isAllUnique, "All tiles must be unique")
 
     // TODO centralize in companion
     val properties = new FigureProperties {

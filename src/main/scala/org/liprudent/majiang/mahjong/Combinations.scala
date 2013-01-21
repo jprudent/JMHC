@@ -112,16 +112,16 @@ sealed trait Combination {
 object Combination {
 
   def findTwoFigures[FigureType <: Figure](figures: List[FigureType]) //
-    (cond1: (FigureType) => Boolean) //
-    (cond2: (FigureType, FigureType) => Boolean): List[List[FigureType]] = {
+                                          (cond1: (FigureType) => Boolean) //
+                                          (cond2: (FigureType, FigureType) => Boolean): List[List[FigureType]] = {
     for {f1 <- figures if cond1(f1)
          f2 <- figures.dropWhile(_ != f1).tail if cond2(f1, f2)} yield (List(f1, f2).sorted(OrdFigure))
 
   }
 
   def findThreeFigures[FigureType <: Figure](figures: List[FigureType])(cond1: (FigureType) => Boolean)(cond2:
-  (FigureType, FigureType)
-    => Boolean)(cond3: (FigureType, FigureType, FigureType) => Boolean): List[List[FigureType]] = {
+                                                                                                        (FigureType, FigureType)
+                                                                                                          => Boolean)(cond3: (FigureType, FigureType, FigureType) => Boolean): List[List[FigureType]] = {
     for {f1 <- figures if cond1(f1)
          f2 <- figures if cond2(f1, f2)
          f3 <- figures if cond3(f1, f2, f3)} yield (List(f1, f2, f3).sorted(OrdFigure))
@@ -503,13 +503,13 @@ object TileHog extends Combination {
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result = {
-    val allFiguresButKong = m.allFigures.filterNot(_.isInstanceOf[Kong])
-    val allTilesButKong = allFiguresButKong.map(f => f.toTiles).flatten
-    val allTileHogs = TileSet(allTilesButKong).tocs.filter {
-      case (tile, occurence) if occurence == 4 => true
-      case _ => false
-    }.map {
-      case (tile, occurence) => allFiguresButKong.filter(_.toTiles.contains(tile))
+    //get all the tiles except those from kongs
+    val allTilesButKong = TileSet(m.allButKongs.map(f => f.toTiles).flatten)
+
+    //and find all figures where a tile that has 4 occurences appear
+    val allTileHogs = allTilesButKong.allQuadruplets.map {
+      tile =>
+        m.allButKongs.filter(_.toTiles.contains(tile))
     }
 
     Result(allTileHogs)
@@ -1437,13 +1437,19 @@ object NineGates extends Combination {
           val fam = m.allTiles.head.family
 
           def t(value: Int, occ: Int) = (Tile(fam, value), occ)
-          val pattern = List[Types.TileOccurence](t(1, 3), t(2, 1), t(3, 1), t(4, 1), t(5, 1), t(6, 1), t(7, 1), t(8,
-            1), t(9, 3))
-          val actual = TileSet(m.allTiles).tocs
 
-          pattern.zip(actual).forall {
-            case ((t1, occMin), (t2, occActual)) => t1 == t2 && occActual >= occMin
-          }
+          val pattern = List[Types.TileOccurence](
+            t(1, 3), t(2, 1), t(3, 1), t(4, 1), t(5, 1), t(6, 1), t(7, 1), t(8, 1), t(9, 3)
+          )
+          //
+          //
+          //          val actual = TileSet(m.allTiles).tocs
+          //
+          //          pattern.zip(actual).forall {
+          //            case ((t1, occMin), (t2, occActual)) => t1 == t2 && occActual >= occMin
+          //          }
+
+          TileSet(m.allTiles).isSubsetOf(TileSet(pattern))
         }
       }
 

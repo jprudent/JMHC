@@ -41,7 +41,11 @@ case class GraphBuilder(filename: String) {
 
   private def printToFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
     val p = new java.io.PrintWriter(f)
-    try {op(p)} finally {p.close()}
+    try {
+      op(p)
+    } finally {
+      p.close()
+    }
   }
 }
 
@@ -75,7 +79,9 @@ case class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
       case Nil => Nil
       case _ => {
 
-        val allButT = TreeBuilder.removeFirst(remainingTile) {_ == t}
+        val allButT = TreeBuilder.removeFirst(remainingTile) {
+          _ == t
+        }
         assert(allButT.size == remainingTile.size - 1)
 
         allButT match {
@@ -237,9 +243,11 @@ object PartialKnitted extends PartialNature {
     //only straight
     tiles.forall(_.isStraight) &&
       //all unique
-      TileSet(tiles).allUnique &&
+      TileSet(tiles).isAllUnique &&
       //shifted by 3
-      byFamily.forall {case (family, tiles) => arePurelyShifed(tiles)} &&
+      byFamily.forall {
+        case (family, tiles) => arePurelyShifed(tiles)
+      } &&
       //and in proper sets of values
       areInProperGroups(byFamily.values.toList, Set(Set(1, 4, 7), Set(2, 5, 8), Set(3, 6, 9)))
   }
@@ -279,7 +287,9 @@ object PartialKnitted extends PartialNature {
       case Nil => true
       case tiles :: t => {
         val tilesAsSet = tiles.map(_.value).toSet
-        val in = groups.filter {group => group.intersect(tilesAsSet).size != 0}
+        val in = groups.filter {
+          group => group.intersect(tilesAsSet).size != 0
+        }
         in.size == 1 && areInProperGroups(t, groups - in.head)
       }
     }
@@ -291,7 +301,7 @@ object PartialSomeKnittedWithSomeDragons extends PartialNature {
     val (straights, honors) = splitStaightDragons(tiles)
     PartialKnitted.isValid(straights) &&
       honors != Nil &&
-      TileSet(honors).allUnique
+      TileSet(honors).isAllUnique
   }
 
   protected def optionalConcrete(tiles: List[Tile]) =
@@ -319,7 +329,7 @@ object PartialThirteenOrphans extends PartialNature {
   protected def optionalConcrete(tiles: List[Tile]) = {
     tiles.size == 14 match {
       case true => {
-        val extraTile = TileSet(tiles).tocs.find {case (tile, occ) => occ == 2}.get._1 //I know this will be found
+        val extraTile = TileSet(tiles).allPairs.head //I know this will be found
         Some(ThirteenOrphans(extraTile))
       }
       case false => None

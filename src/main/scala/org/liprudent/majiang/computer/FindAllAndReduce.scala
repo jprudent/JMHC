@@ -26,8 +26,8 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
    * an ordered list of possible pungs
    */
   protected[computer] val pungs: List[Pung] = {
-    tileSet.tocs.filter(t => t._2 >= Pung.size).map {
-      t => new Pung(t._1)
+    tileSet.allTripletsOrQuadruplets.map {
+      Pung(_)
     }
   }
 
@@ -42,13 +42,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
    * an ordered list of possible duis
    */
   protected[computer] lazy val duis: List[Dui] = {
-    tileSet.tocs.filter(t => t._2 >= DuiProperties.size).map {
-      t => {
-        val d = new Dui(t._1)
-        if (t._2 == 4) List(d, d)
-        else List(d)
-      }
-    }.flatten
+    tileSet.allPairs.map(Dui(_))
   }
 
   /**
@@ -59,11 +53,9 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
     //quick fail
     if (tileSet.size < 9 || chows.size >= 2 || pungs.size >= 2) Nil
     else {
-      List(Bamboo, Character, Stone).permutations // all combinations of those 3 families
-        .map(families => Knitted(families(0), families(1), families(2))).toList // as Knitted
-        .filter(knitted => knitted.toTiles.forall(tile => tileSet.exists(t => t == tile))) // where each knitted tile
-        // exists in tileSet
-        .toList
+      Knitted.allPossible
+        // where each knitted tile exists in tileSet
+        .filter(knitted => knitted.toTiles.forall(tile => tileSet.exists(t => t == tile)))
     }
   }
 
@@ -109,9 +101,10 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
   protected[computer] lazy val thirteenOrphans: List[ThirteenOrphans] = {
     val containsFixed = ThirteenOrphans.fixedTiles.forall(tile => tileSet.exists(_ == tile))
     if (containsFixed) {
-      val extra = tileSet.tocs.filter(toc => toc._2 == 2)
+      val extra = tileSet.allPairs
       extra match {
-        case (tile, occ) :: Nil if tile.family.isInstanceOf[HonorFamily] => List(ThirteenOrphans(tile))
+        // TODO extra tile should really be honor ?
+        case tile :: Nil if tile.isHonor => List(ThirteenOrphans(tile))
         case _ => Nil
       }
     } else {
@@ -158,7 +151,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
 
 
   private def hasTwins(tileSet: TileSet) =
-    tileSet.tocs.forall(_._2 >= 2)
+    !tileSet.allPairs.isEmpty
 
   private def hasChowsOrTwins(computer: FindAllAndReduce) =
     List(computer.chows, computer.pungs, computer.duis).exists(_.size != 0)

@@ -36,7 +36,7 @@ package object mahjong {
    *       TODO there are too much parameters.
    */
   case class PlayerTiles(concealed: ConcealedTiles, melded: Figures, concealedKongs: List[Kong] = noKongs,
-    bonus: Bonus = Bonus(Nil)) {
+                         bonus: Bonus = Bonus(Nil)) {
 
     require(melded.sorted(OrdFigure) == melded, "melded not sorted")
 
@@ -73,7 +73,7 @@ package object mahjong {
    * @param bonus flowers and seasons
    */
   case class HuLe(closed: Figures, melded: Figures, lastTileContext: ContextualTile, context: PlayerContext,
-    waitingTiles: List[Tile], concealedKongs: List[Kong] = noKongs, bonus: Bonus = Bonus(Nil)) {
+                  waitingTiles: List[Tile], concealedKongs: List[Kong] = noKongs, bonus: Bonus = Bonus(Nil)) {
 
     require(closed == closed.sorted(OrdFigure), "not sorted")
     require(melded == melded.sorted(OrdFigure), "not sorted")
@@ -98,6 +98,8 @@ package object mahjong {
 
     lazy val allWindFigures: List[Figure] =
       allWindPungsLike ::: allDuis.filter(_.tile.isWind)
+
+    lazy val allButKongs = allFigures.filterNot(_.isInstanceOf[Kong])
 
 
     /* KONGS */
