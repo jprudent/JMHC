@@ -340,10 +340,15 @@ case class HuFinder(ptiles: PlayerTiles, context: PlayerContext) {
       computer.allFiguresCombinations.foldLeft(List[DetailedPoints]()) {
         (res, concealed) =>
           if (HuFinder.isWellFormedMahjong(concealed, ptiles.melded, ptiles.concealedKongs)) {
-            val waitingTiles = UniqueWait.waitingTiles(ptiles.concealed.withoutLastTile.tileSet, ptiles.melded,
-              ptiles.concealedKongs)
+            val lastTile = ptiles.concealed.lastTileContext.tile
+            val waitingTiles = (lastTile ::
+              UniqueWait.waitingTiles(ptiles.concealed.withoutLastTile.tileSet, ptiles.melded,
+                ptiles.concealedKongs, List(lastTile))
+              ).sorted
+
             val hule = HuLe(concealed, ptiles.melded, ptiles.concealed.lastTileContext, context, waitingTiles,
               ptiles.concealedKongs, ptiles.bonus)
+
             HulePointsComputer(hule) :: res
           } else {
             res
@@ -416,9 +421,13 @@ object UniqueWait {
    * @param concealed tiles before winning
    * @param melded figures
    * @param concealedKongs
+   * @param exclude A collection of tiles to exclude from result.
+   *                Typically if you already computed a valid mahjong, you know that last tile is
+   *                a result and you don't want to recompute that.
+   *                Default is `Nil`
    * @return the list of waiting tiles
    */
-  def waitingTiles(concealed: TileSet, melded: List[Figure], concealedKongs: List[Kong]): List[Tile] = {
+  def waitingTiles(concealed: TileSet, melded: List[Figure], concealedKongs: List[Kong], exclude: Seq[Tile] = Nil): List[Tile] = {
 
 
     def satisfy(tile: Tile): Boolean = {
@@ -429,7 +438,9 @@ object UniqueWait {
     }
 
     //all tiles to try. Filter out tiles that has 4 occurence (there can not be 5)
-    val tilesToTry = Tile.allButBonus.filter(tile => concealed.occurence(tile) < 4)
+    val tilesToTry = Tile.allButBonus.filterNot(tile =>
+      concealed.occurence(tile) >= 4 || exclude.contains(tile)
+    )
 
     tilesToTry.filter(satisfy).toList.sorted
   }

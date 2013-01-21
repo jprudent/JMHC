@@ -81,11 +81,24 @@ class MahjongSuite extends FunSuite {
 
   test("HuLe Finder knitted straight lesser dragon (5): b1b4b7s2s5s8c3c6c9wwwewswndr") {
     new Hands {
-      val actual = HuFinder(knittedStraightLesserDragon5, PlayerContext(WestWind, WestWind)).find
-      val expected = List(DetailedPoints(HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5,
-        s8), List(we, wn, ww, ws, dr))), Nil, b1ContextualTile, PlayerContext(WestWind, WestWind), List(b1, dg, dw)),
-        List((List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))),
-          LesserHonorsAndKnittedTiles))))
+      val actual = HuFinder(
+        knittedStraightLesserDragon5,
+        PlayerContext(WestWind, WestWind)
+      ).find
+
+      val expected = List(
+        DetailedPoints(
+          HuLe(
+            List(
+              SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))
+            ),
+            Nil,
+            b1ContextualTile,
+            PlayerContext(WestWind, WestWind),
+            List(b1, dg, dw)
+          ),
+          List((List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c3, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr))),
+            LesserHonorsAndKnittedTiles))))
       assert(actual === expected)
     }
   }
@@ -94,10 +107,16 @@ class MahjongSuite extends FunSuite {
     new Hands {
       val actual = HuFinder(knittedStraightLesserDragon6, PlayerContext(WestWind, WestWind)).find
 
-      val expected = List(DetailedPoints(HuLe(List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8),
-        List(we, wn, ww, ws, dr, dg))), Nil, b1ContextualTile, PlayerContext(WestWind, WestWind), List(b1, c3, dw)),
-        List((List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))),
-          LesserHonorsAndKnittedTiles))))
+      val expected = List(
+        DetailedPoints(
+          HuLe(
+            List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))),
+            Nil,
+            b1ContextualTile,
+            PlayerContext(WestWind, WestWind),
+            List(b1, c3, dw)),
+          List((List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c6, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg))),
+            LesserHonorsAndKnittedTiles))))
       assert(actual === expected)
     }
   }
