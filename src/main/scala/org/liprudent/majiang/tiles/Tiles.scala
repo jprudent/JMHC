@@ -521,6 +521,16 @@ case class TileSet(private val tocs: List[TileOccurence]) {
     tocs.map(toc => for {i <- 1 to toc._2} yield (toc._1)).flatten
 
   /**
+   * @return All honor tiles
+   */
+  lazy val allHonors:List[Tile] = toTiles.filter(_.isHonor)
+
+  /**
+   * @return All straight tiles
+   */
+  lazy val allStraights:List[Tile] = toTiles.filter(_.isStraight)
+
+  /**
    *
    * @param other
    * @return true if `this` is subset of of other

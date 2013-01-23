@@ -64,35 +64,28 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
    */
   protected[computer] lazy val someKnittedSomeDragons: List[SomeKnittedWithSomeDragons] = {
 
+    val condition = tileSet.size != 14 || tileSet.allHonors.size < 5 || !(pungs ::: chows ::: duis).isEmpty
+
     //quick fail
-    if (tileSet.size != 14) Nil
+    if (condition) Nil
     else {
-      val honors = tileSet.filter(_.isHonor)
-      if (hasTwins(honors) || honors.size < 5) {
-        Nil
+      val knitted = TileSet(tileSet.allStraights)
+      val tiles147 = knitted.filter(tile => tile.value == 1 || tile.value == 4 || tile.value == 7)
+      val tiles258 = knitted.filter(tile => tile.value == 2 || tile.value == 5 || tile.value == 8)
+      val tiles369 = knitted.filter(tile => tile.value == 3 || tile.value == 6 || tile.value == 9)
+      val knitteds: List[TileSet] = List(tiles147, tiles258, tiles369)
+
+      //all tiles should be the same family
+      if (knitteds.forall(tileSet => tileSet.isSingleFamily)) {
+        val allKnitted: List[Tile] = knitteds.map(_.toTiles).flatten.sorted
+        assert(allKnitted.size == 14 - tileSet.allHonors.size)
+        List(SomeKnittedWithSomeDragons(allKnitted, tileSet.allHonors))
       } else {
-        val knitted = tileSet.filter(_.isStraight)
-        val knittedComputer: FindAllAndReduce = FindAllAndReduce(tileSet)
-        if (knitted.size != 14 - honors.size || hasChowsOrTwins(knittedComputer)) {
-          Nil
-        } else {
-
-          val tiles147 = knitted.filter(tile => tile.value == 1 || tile.value == 4 || tile.value == 7)
-          val tiles258 = knitted.filter(tile => tile.value == 2 || tile.value == 5 || tile.value == 8)
-          val tiles369 = knitted.filter(tile => tile.value == 3 || tile.value == 6 || tile.value == 9)
-          val knitteds: List[TileSet] = List(tiles147, tiles258, tiles369)
-
-          //all tiles should be the same family
-          if (knitteds.forall(tileSet => tileSet.isSingleFamily)) {
-            val allKnitted: List[Tile] = knitteds.map(_.toTiles).flatten.sorted
-            assert(allKnitted.size == 14 - honors.size)
-            List(SomeKnittedWithSomeDragons(allKnitted, honors.toTiles))
-          } else {
-            Nil
-          }
-        }
+        Nil
       }
     }
+
+
   }
 
   /**
