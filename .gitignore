@@ -5,3 +5,5 @@ bin
 lib_managed
 *.swp
 *.sc
+.idea/*
+.idea_modules/*
