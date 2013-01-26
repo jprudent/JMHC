@@ -523,12 +523,12 @@ case class TileSet(private val tocs: List[TileOccurence]) {
   /**
    * @return All honor tiles
    */
-  lazy val allHonors:List[Tile] = toTiles.filter(_.isHonor)
+  lazy val allHonors: List[Tile] = toTiles.filter(_.isHonor)
 
   /**
    * @return All straight tiles
    */
-  lazy val allStraights:List[Tile] = toTiles.filter(_.isStraight)
+  lazy val allStraights: List[Tile] = toTiles.filter(_.isStraight)
 
   /**
    *
