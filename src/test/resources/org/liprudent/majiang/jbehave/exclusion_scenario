@@ -1,0 +1,46 @@
+!--
+!-- Conventions:
+!-- ------------
+!--
+!-- -- TILES --
+!-- there is a 2 characters length string available to describe any tile
+!--  *) Bamboos    : b1 b2 b3 b4 b5 b6 b7 b8 b9  [ b(amboo)                                           ]
+!--  *) Characters : c1 c2 c3 c4 c5 c6 c7 c8 c9  [ c(haracter)                                        ]
+!--  *) Stones     : s1 s2 s3 s4 s5 s6 s7 s8 s9  [ s(tone)                                            ]
+!--  *) Honors     : dg dr dw                    [ d(ragon) g(reen)  r(ed)    w(hite)                 ]
+!--  *) Winds      : we wn ww ws                 [ w(ind)   e(ast)   n(orth)  w(est)   s(outh)        ]
+!--  *) Flowers    : fp fo fc fb                 [ f(lower) p(lumb)  o(rchid) b(amboo) c(hrysantheum) ]
+!--  *) Seasons    : ss su sa sw                 [ s(eason) s(pring) s(u)mmer a(utomn) w(inter)       ]
+!--
+!--  -- FIGURES --
+!-- You can associate tiles to form figures:
+!--  *) Dui/Pair           : dg-dg       c1-c1       ...
+!--  *) Chow/Straight/Suit : c1-c2-c3    s7-s8-s9    ...
+!--  *) Pung/Triplet       : ww-ww-ww    dr-dr-dr    c1-c1-c1    ...
+!--  *) Kong/Quartet       : ww-ww-ww-ww dr-dr-dr-dr c1-c1-c1-c1 ...
+!--  *) Flowers/Bonus      : fp-ss-sw    ...
+!-- Some figures are invalid like: dg-dr c1-c2-c4 c1-c2-c2 ww-ww-ws ...
+!-- You can describe a set of figures within double quotes (") separating each figure by a space
+!-- For instance : "dg-dg c1-c2-c3 dr-dr-dr ww-ww-ww-ww fp-ss" represents a pair of green dragon,
+!--                a chow of 1-2-3 characters, a pung of red dragon, a kong of west wind and a
+!--                2 tiles bonus (plumb flower and spring season)
+!-- Another example with a list of single tiles: "b1 b3 b2 b2 b2 b3 b1 b1 b3" which makes no
+!-- assumption of possible figures ("b1-b2-b3 b1-b2-b3 b1-b2-b3" or "b1-b1-b1 b2-b2-b2 b3-b3-b3").
+
+
+
+
+Scenario: on ne peut pas compter deux fois "grande suite (mixte)"
+à cause du principe de non-identique :
+Lorsque un élément est utilisé pour former une combinaison,
+il n'est pas autorisé de réutiliser cet élément avec d’autres pour former la même combinaison.
+
+Given concealed "s4-s5-s6 c7-c8-c9 c7-c8-c9 dr-dr"
+Given melded "b1-b2-b3"
+Given player goes out on "s4" "Discarded"
+Given prevalent wind is East
+Given player wind is East
+When scoring
+Then "Mixed Straight" is scored only once
+Then "Pure Double Chows" is scored
+Then nothing else is scored

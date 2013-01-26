@@ -146,11 +146,11 @@ package object mahjong {
     /* TILES */
     lazy val allTiles: List[Tile] = allFigures.map(_.toTiles).flatten
 
+    lazy val hasHonors : Boolean = allTiles.exists(_.isHonor)
+
     lazy val allTileset: TileSet = TileSet(allTiles)
 
-
     lazy val allClosedTiles: List[Tile] = closed.map(_.toTiles).flatten
-
 
     lazy val numberOfStraightFamily = numberOfStraightFamilyIn(allTiles)
 
@@ -199,6 +199,10 @@ package object mahjong {
 
     def hasCombination(combinationName: String): Boolean =
       hasCombination(toCombination(combinationName))
+
+    def hasCombinationOnce(combination:Combination): Boolean = {
+      detailedPoints.count(_._2 == combination) == 1
+    }
 
     /**
      * Convert a combination name to a domain Combination object

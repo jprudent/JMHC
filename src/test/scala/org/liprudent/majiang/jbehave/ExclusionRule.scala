@@ -6,7 +6,7 @@ import collection.convert.Wrappers.MutableBufferWrapper
 
 class ExclusionRule extends AbstractJbehaveBoilerPlate {
 
-  override val storyPaths = MutableBufferWrapper(ListBuffer("org/liprudent/majiang/jbehave/greenbook_scenario"))
+  override val storyPaths = MutableBufferWrapper(ListBuffer("org/liprudent/majiang/jbehave/exclusion_scenario"))
 
 
 }

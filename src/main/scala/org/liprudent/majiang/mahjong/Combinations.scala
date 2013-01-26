@@ -526,7 +526,7 @@ object AllChows extends Combination {
 
   def find(m: HuLe): Result =
     SomeResult(m.allChows) {
-      m.allDuis.size == 1 && m.allChows.size == 4
+      m.allDuis.size == 1 && m.allChows.size == 4 && ! m.hasHonors
     }
 }
 

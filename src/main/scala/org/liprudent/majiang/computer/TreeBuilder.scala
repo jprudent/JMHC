@@ -5,6 +5,7 @@ import org.liprudent.majiang.figures._
 import scala.Some
 import org.liprudent.majiang.figures.SingleTile
 import org.liprudent.majiang.figures.Dui
+import java.io.FileWriter
 
 case class GraphBuilder(filename: String) {
 
