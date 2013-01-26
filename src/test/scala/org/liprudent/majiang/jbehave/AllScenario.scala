@@ -1,4 +1,4 @@
-package org.liprudent.majiang.greenbook
+package org.liprudent.majiang.jbehave
 
 import org.jbehave.core.junit.JUnitStories
 import collection.mutable.ListBuffer
@@ -23,7 +23,7 @@ class AllScenario extends JUnitStories {
 
 
   override val stepsFactory = new ScalaStepsFactory(configuration(),
-    new ScalaContext("org.liprudent.majiang.greenbook.MahjongSteps")
+    new ScalaContext("org.liprudent.majiang.jbehave.MahjongSteps")
   )
 
   override def configuration =
@@ -40,7 +40,7 @@ class AllScenario extends JUnitStories {
       .useStepMonitor(xref.getStepMonitor)
 
 
-  override val storyPaths = MutableBufferWrapper(ListBuffer("org/liprudent/majiang/greenbook/greenbook_scenario"))
+  override val storyPaths = MutableBufferWrapper(ListBuffer("org/liprudent/majiang/jbehave/greenbook_scenario"))
 
 
 }

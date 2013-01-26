@@ -1,4 +1,4 @@
-package org.liprudent.majiang.greenbook
+package org.liprudent.majiang.jbehave
 
 import org.jbehave.core.steps.Steps
 import org.jbehave.core.annotations._
