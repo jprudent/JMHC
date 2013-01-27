@@ -146,7 +146,7 @@ package object mahjong {
     /* TILES */
     lazy val allTiles: List[Tile] = allFigures.map(_.toTiles).flatten
 
-    lazy val hasHonors : Boolean = allTiles.exists(_.isHonor)
+    lazy val hasHonors: Boolean = allTiles.exists(_.isHonor)
 
     lazy val allTileset: TileSet = TileSet(allTiles)
 
@@ -200,9 +200,14 @@ package object mahjong {
     def hasCombination(combinationName: String): Boolean =
       hasCombination(toCombination(combinationName))
 
-    def hasCombinationOnce(combination:Combination): Boolean = {
-      detailedPoints.count(_._2 == combination) == 1
-    }
+    def hasCombinationOnce(combination: Combination): Boolean =
+      hasCombinationNthce(combination,1)
+
+    def hasCombinationTwice(combination: Combination): Boolean =
+      hasCombinationNthce(combination,2)
+
+    private def hasCombinationNthce(combination:Combination,n:Int) =
+      detailedPoints.count(_._2 == combination) == n
 
     /**
      * Convert a combination name to a domain Combination object
@@ -292,24 +297,70 @@ package object mahjong {
 
       }._1.sorted(OrdDetailedPoint)
 
-      val filteredDetailedPoints = applyExclusion(allDetailedPoints)
+      val filteredDetailedPoints = applyExclusion(allDetailedPoints, Map().withDefaultValue(0))
 
       DetailedPoints(huLe, filteredDetailedPoints)
     }
 
 
-    private def applyExclusion(allDetailedPoints: List[(Figures, Combination)]): List[(Figures, Combination)] = {
+    private def applyExclusion(allDetailedPoints: List[(Figures, Combination)], used: Map[Figures, Int]): List[(Figures, Combination)] = {
+
+//      println("-----")
+//      println(allDetailedPoints)
+//      println(used)
+
       allDetailedPoints match {
+
         case Nil => Nil
+
         case head :: tail => {
-          val filteredTail = tail.filterNot {
-            case tailElem => isExcluded(head, tailElem)
+
+          if (isExclusionPrincipleApplied(head._1, used)) {
+
+            applyExclusion(tail, used)
+
+          } else {
+
+            val filteredTail = tail.filterNot {
+              case tailElem => isExcluded(head, tailElem)
+            }
+
+            val usedUpdated =
+              if(isHandPropertyCombination(head._1)) used
+              else updateUsedFigures(head._1,used)
+
+            head :: applyExclusion(filteredTail, usedUpdated)
+
           }
-          head :: applyExclusion(filteredTail)
         }
       }
     }
 
+    private def updateUsedFigures(figures:Figures,used:Map[Figures,Int]): Map[Figures,Int] = {
+
+      val updatedUsedFigure = used.find{ case (k,v)=> k.intersect(figures).size > 0 } match {
+        case Some((fs,i)) => used.updated(fs,i+1)
+          // in that case, it means it's the initial usage of figures
+        case None => used
+      }
+
+      updatedUsedFigure.updated(figures,1)
+    }
+
+    private def isExclusionPrincipleApplied(figures: Figures, used: Map[Figures, Int]): Boolean =
+    // if the combination use all tiles
+    // then it's about hand property, not figure usage
+      ! isHandPropertyCombination(figures) && hasFigureUsedMoreThanTwice(figures, used)
+
+    private def isHandPropertyCombination(figures: Figures) =
+      figures.foldLeft(0)((tot, f) => tot + f.toTiles.size) == 14
+
+    private def hasFigureUsedMoreThanTwice(figures: Figures, used: Map[Figures, Int]) =
+      used.find{ case (k,v)=> k.intersect(figures).size > 0 }
+       match {
+        case Some((fs,i)) if i >= 2 => true
+        case _ => false
+      }
 
     protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
       def mutuallyExcludes() = ref._2.excludes(toExclude._2)

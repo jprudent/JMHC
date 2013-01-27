@@ -520,12 +520,12 @@ object AllChows extends Combination {
   val id = 63
   val points = 2
   val name = "All Chows"
-  val description = "All Chows but one Pair"
+  val description = "All Chows and no honors"
 
   override val excluded = List(NoHonors, ChickenHand)
 
   def find(m: HuLe): Result =
-    SomeResult(m.allChows) {
+    SomeResult(m.allFigures) {
       m.allDuis.size == 1 && m.allChows.size == 4 && ! m.hasHonors
     }
 }

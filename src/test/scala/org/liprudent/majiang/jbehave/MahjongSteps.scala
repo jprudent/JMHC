@@ -182,11 +182,21 @@ class MahjongSteps extends Steps {
   }
 
   @Then( """"$combinationName" is scored only once""")
+  @Alias( """"$combinationName" is scored once""")
   def thenCombinationOnce(combinationName: String) {
     checkHasResult
     val combination = result(0).toCombination(combinationName)
     track(combination)
     assert(result(0).hasCombinationOnce(combination),
+      combinationName + " not found in result. Result is" + result)
+  }
+
+  @Then( """"$combinationName" is scored twice""")
+  def thenCombinationTwice(combinationName: String) {
+    checkHasResult
+    val combination = result(0).toCombination(combinationName)
+    track(combination)
+    assert(result(0).hasCombinationTwice(combination),
       combinationName + " not found in result. Result is" + result)
   }
 

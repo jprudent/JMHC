@@ -15,7 +15,7 @@ class CombinationsSuite extends FunSuite {
     val hule = HuLe(List(Dui(b3)), List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)),
       ContextualTile(b3, Discarded, NotLastTile), PlayerContext(WestWind, EastWind), Nil)
     val actual = AllChows.find(hule)
-    val expected = Result(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)))
+    val expected = Result(List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)))
     assert(actual === expected)
   }
 

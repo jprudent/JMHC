@@ -70,7 +70,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed = List(Dui(b3))
     val thenCombinations = List(
       (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), MeldedHand),
-      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9)), AllChows),
+      (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), AllChows),
       (List(Chow(b5, b6, b7), Chow(c5, c6, c7)), MixedDoubleChows),
       (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), OneVoidedSuit)
       //implied by MeldedHand (List(Dui(b3)), SingleWait)
@@ -87,9 +87,9 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val givenContext = PlayerContext(WestWind, EastWind)
 
     val thenClosed: List[Figure with Product] = List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9))
-    val thenCombinations: List[(List[Chow], Combination)] = List(
+    val thenCombinations: List[(List[Figure], Combination)] = List(
       (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChows),
-      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8)), AllChows)
+      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8),Dui(s9)), AllChows)
     )
 
     test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
@@ -266,7 +266,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
         (List(Chow(s3, s4, s5), Chow(b4, b5, b6), Chow(c5, c6, c7)), MixedShiftedChow),
-        (List(Chow(s3, s4, s5), Chow(b1, b2, b3), Chow(b4, b5, b6), Chow(c5, c6, c7)), AllChows),
+        (List(Chow(s3, s4, s5), Chow(b1, b2, b3), Chow(b4, b5, b6), Chow(c5, c6, c7), Dui(b2)), AllChows),
         (List(Chow(b1, b2, b3), Chow(b4, b5, b6)), ShortStraight),
         (List(Chow(b1, b2, b3)), ClosedWait),
         (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
@@ -293,7 +293,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
         (List(Chow(s4, s5, s6), Chow(b6, b7, b8), Chow(c5, c6, c7)), MixedShiftedChow),
-        (List(Chow(s4, s5, s6), Chow(b1, b2, b3), Chow(b6, b7, b8), Chow(c5, c6, c7)), AllChows),
+        (List(Chow(s4, s5, s6), Chow(b1, b2, b3), Chow(b6, b7, b8), Chow(c5, c6, c7), Dui(b3)), AllChows),
         (List(Chow(b1, b2, b3)), EdgeWait),
         (List(Bonus(List(fp, fo, ss, sw))), FlowerTiles)
       )
@@ -365,7 +365,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
         (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6)), MixedShiftedChow),
-        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8)), AllChows),
+        (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8), Dui(c2)), AllChows),
         (List(Chow(b2, b3, b4), Chow(c3, c4, c5), Chow(s4, s5, s6), Chow(s6, s7, s8), Dui(c2)), AllSimples),
         //(List(Dui(c2)), SingleWait),
         (List(Dui(c2)), SelfDrawnComb),
@@ -551,7 +551,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), FullFlush),
         (List(Chow(c3), Chow(c4), Chow(c5)), PureShiftedChow),
         (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), MeldedHand),
-        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5)), AllChows),
+        (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), AllChows),
         (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5)), TileHog),
         (List(Chow(c3), Chow(c3), Chow(c4), Chow(c5), Dui(c8)), AllSimples),
         (List(Chow(c3), Chow(c3)), PureDoubleChows)
@@ -688,7 +688,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       List(
         (List(SingleTile(s8)), LastTile),
         (allFigures, ConcealedHand),
-        (List(Chow(b3), Chow(b6), Chow(c6), Chow(s7)), AllChows),
+        (List(Chow(b3), Chow(b6), Chow(c6), Chow(s7), Dui(c5)), AllChows),
         (List(Chow(b6), Chow(c6)), MixedDoubleChows),
         (List(Chow(b3), Chow(b6)), ShortStraight),
         (List(Chow(s7)), ClosedWait)
@@ -829,7 +829,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       List(
         (List(Chow(b7), Chow(c1), Chow(s4)), MixedStraight),
         (List(SingleTile(c2)), LastTileClaimComb),
-        (List(Chow(b1), Chow(b7), Chow(c1), Chow(s4)), AllChows),
+        (allFigures, AllChows),
         (List(Chow(b1), Chow(c1)), MixedDoubleChows),
         (List(Chow(b1), Chow(b7)), TwoTerminalChows),
         (List(Chow(c1)), ClosedWait)
@@ -1136,7 +1136,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       List(
         (allFigures, FullFlush),
         (List(Chow(b1), Chow(b4), Chow(b7)), PureStraight),
-        (List(Chow(b1), Chow(b4), Chow(b6), Chow(b7)), AllChows),
+        (allFigures, AllChows),
         (List(Chow(b6), Chow(b7), Dui(b8)), TileHog),
         (List(Chow(b6)), SelfDrawnComb)
       )
@@ -1198,7 +1198,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
         (allFigures, UpperTiles),
         (allFigures, MeldedHand),
         (allFigures, OutsideHand),
-        (List(Chow(b7), Chow(b7), Chow(b7), Chow(s7)), AllChows),
+        (allFigures, AllChows),
         (List(Chow(b7), Chow(s7)), MixedDoubleChows)
       )
 
