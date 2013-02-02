@@ -116,12 +116,29 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
   //TODO optimization: it's useless to try all combinations for a given Figure type
   //List(Chow(b1,b2,b3), Chow(b2,b3,b4)) == List(Chow(b2,b3,b4), Chow(b1,b2,b3))
   protected def findFigures(figuresComputer: FindAllAndReduce): Set[Figures] = {
+
+    def oneOfEachKind: Set[Figure] = {
+      Set(
+        figuresComputer.pungs,
+        figuresComputer.chows,
+        figuresComputer.duis,
+        figuresComputer.knitted,
+        figuresComputer.someKnittedSomeDragons,
+        figuresComputer.thirteenOrphans
+      )
+        .filterNot(_.isEmpty)
+        .map(_.head)
+    }
+
+
     figuresComputer.allFigures match {
       case Nil => Set()
-      case all => {
-        all.toSet[Figure].par.map {
+      case _ => {
+        oneOfEachKind.par.map {
           figure => {
-            val next: Set[Figures] = findFigures(FindAllAndReduce(figuresComputer.tileSet.removed(figure.toTiles)))
+            val next: Set[Figures] = findFigures(
+              FindAllAndReduce(figuresComputer.tileSet.removed(figure.toTiles))
+            )
             next match {
               case s if s.isEmpty => Set(List(figure))
               case _ => next.map(figures => (figure :: figures))
