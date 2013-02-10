@@ -6,7 +6,7 @@ import net.liftweb.json.JsonAST.JValue
 import org.liprudent.majiang.ui.StringMapper
 import org.liprudent.majiang.HuFinder
 import org.liprudent.majiang.tiles._
-import org.liprudent.majiang.figures.{Figure, Kong}
+import org.liprudent.majiang.figures.Kong
 import net.liftweb.json.{JsonAST, Extraction, Printer}
 import org.liprudent.majiang.mahjong.PlayerContext
 import scala.Some
@@ -115,7 +115,7 @@ object MainWeb {
   )
 
   /**
-   * Representation of the JSON object in Scala
+   * Representation of the JSON object in Scala. Used to deserialising JSON request
    * @param concealed
    * @param concealed_kong
    * @param melded
@@ -160,29 +160,21 @@ object MainWeb {
 
   }
 
-  private sealed trait Result
-
-  private case class CombinationResult(figures: Seq[String], combination: String)
-
-  private case class SomeResult(total: Int, combinations: List[CombinationResult]) extends Result
-
-  private case object EmptyResult extends Result
-
   private object Result {
     def apply(res: List[DetailedPoints]) = {
       res match {
-        case Nil => EmptyResult
+        case Nil => Map(("message", "no mahjong found"))
         case h :: t => {
-          val combinations = h.detailedPoints.map {
-            case (figures, combination) => CombinationResult(toUiString(figures), combination.name)
-          }
-          SomeResult(h.total, combinations)
+          Map(("total", h.total),
+            ("combinations", h.detailedPoints.map {
+              case (figures, combination) =>
+                Map(("figures", figures.map(_.toTiles.mkString("-"))),
+                  ("combination", Map(("name", combination.name),
+                    ("points", combination.points))))
+            }))
         }
       }
     }
-
-    private def toUiString(figures: List[Figure]) =
-      figures.map(_.toString)
   }
 
 
