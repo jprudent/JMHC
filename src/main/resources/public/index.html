@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>Jérome's mahjong hand calculator</title>
+
+    <script src="js/vendor/underscore.js"></script>
+    <script src="js/vendor/backbone.js"></script>
+    <script src="js/vendor/zepto.js"></script>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jmhc.css"/>
+
+</head>
+
+<body>
+
+<div id="tile_selector"></div>
+<div id="concealed"></div>
+
+<script type="text/template" id="tile-template">
+    <a href="#tile_selector/select/<%= tile %>"><img src="images/<%= tile %>.png" class="tile"></img></a>
+</script>
+
+</body>
+
+<script src="js/jmhc.js"></script>
+
+</html>
