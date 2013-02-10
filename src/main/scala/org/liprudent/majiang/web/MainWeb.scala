@@ -6,12 +6,14 @@ import net.liftweb.json.JsonAST.JValue
 import org.liprudent.majiang.ui.StringMapper
 import org.liprudent.majiang.HuFinder
 import org.liprudent.majiang.tiles._
+import org.liprudent.majiang.figures.{Figure, Kong}
+import net.liftweb.json.{JsonAST, Extraction, Printer}
 import org.liprudent.majiang.mahjong.PlayerContext
-import org.liprudent.majiang.mahjong.PlayerTiles
-import org.liprudent.majiang.tiles.ContextualTile
 import scala.Some
+import org.liprudent.majiang.mahjong.PlayerTiles
+import org.liprudent.majiang.mahjong.DetailedPoints
+import org.liprudent.majiang.tiles.ContextualTile
 import unfiltered.response.ResponseString
-import org.liprudent.majiang.figures.Kong
 
 object MainWeb {
   val api = unfiltered.filter.Intent {
@@ -99,49 +101,89 @@ object MainWeb {
   }
 
   private def handleCompute(json: JValue) = {
-    case class Request(concealed: String,
-                       concealed_kong: Option[String],
-                       melded: Option[String],
-                       winning_tile: String,
-                       winning_tile_origin: String,
-                       last_tile_situation: Option[String],
-                       prevalent_wind: Option[String],
-                       player_wind: Option[String])
 
     implicit val formats = net.liftweb.json.DefaultFormats
     val req = json.extractOpt[Request]
-    req.map {
-      r =>
-
-        def toFigures(figures: Option[String]) =
-          figures.map(s => StringMapper.toFigures(StringMapper.splitFigures(s))).getOrElse(Nil)
-
-        val concealed = StringMapper.toTiles(StringMapper.splitTiles(r.concealed))
-        val winningTile = Tile(r.winning_tile)
-        val winningTileOrigin = TileOrigin(r.winning_tile_origin)
-        val lastTileSituation = r.last_tile_situation.map(LastTileSituation(_)).getOrElse(NotLastTile)
-        val concealedTiles = ConcealedTiles(concealed, ContextualTile(winningTile, winningTileOrigin, lastTileSituation))
-
-        val concealedKong = toFigures(r.concealed_kong).asInstanceOf[List[Kong]]
-        val melded = toFigures(r.melded)
-        val ptiles: PlayerTiles = PlayerTiles(concealedTiles, melded, concealedKong)
-
-        def toWind(wop: Option[String]) = wop.map(WindFamily(_)).getOrElse(EastWind)
-        val prevalentW = toWind(r.prevalent_wind)
-        val playerW = toWind(r.player_wind)
-        val pcontext: PlayerContext = PlayerContext(playerW, prevalentW)
-
-        val res = HuFinder(ptiles, pcontext).find
-        ResponseString(res.toString)
-
-
-    }
-
+    req.map(r => {
+      val decompose = Extraction.decompose(Result(r.compute))
+      ResponseString(Printer.pretty(JsonAST.render(decompose)))
+    })
   }
 
   val all = unfiltered.filter.Planify(
     api onPass compute
   )
+
+  /**
+   * Representation of the JSON object in Scala
+   * @param concealed
+   * @param concealed_kong
+   * @param melded
+   * @param winning_tile
+   * @param winning_tile_origin
+   * @param last_tile_situation
+   * @param prevalent_wind
+   * @param player_wind
+   */
+  private case class Request(concealed: String,
+                             concealed_kong: Option[String],
+                             melded: Option[String],
+                             winning_tile: String,
+                             winning_tile_origin: String,
+                             last_tile_situation: Option[String],
+                             prevalent_wind: Option[String],
+                             player_wind: Option[String]) {
+
+    //todo handle conversion exceptions
+    def compute: List[DetailedPoints] = {
+
+      def toFigures(figures: Option[String]) =
+        figures.map(s => StringMapper.toFigures(StringMapper.splitFigures(s))).getOrElse(Nil)
+
+      val concealed_tiles = StringMapper.toTiles(StringMapper.splitTiles(concealed))
+      val winningTile = Tile(winning_tile)
+      val winningTileOrigin = TileOrigin(winning_tile_origin)
+      val lastTileSituation = last_tile_situation.map(LastTileSituation(_)).getOrElse(NotLastTile)
+      val concealedTiles = ConcealedTiles(concealed_tiles, ContextualTile(winningTile, winningTileOrigin, lastTileSituation))
+
+      val concealedKong = toFigures(concealed_kong).asInstanceOf[List[Kong]]
+      val melded_figures = toFigures(melded)
+      val ptiles: PlayerTiles = PlayerTiles(concealedTiles, melded_figures, concealedKong)
+
+      def toWind(wop: Option[String]) = wop.map(WindFamily(_)).getOrElse(EastWind)
+      val prevalentW = toWind(prevalent_wind)
+      val playerW = toWind(player_wind)
+      val pcontext: PlayerContext = PlayerContext(playerW, prevalentW)
+
+      HuFinder(ptiles, pcontext).find
+    }
+
+  }
+
+  private sealed trait Result
+
+  private case class CombinationResult(figures: Seq[String], combination: String)
+
+  private case class SomeResult(total: Int, combinations: List[CombinationResult]) extends Result
+
+  private case object EmptyResult extends Result
+
+  private object Result {
+    def apply(res: List[DetailedPoints]) = {
+      res match {
+        case Nil => EmptyResult
+        case h :: t => {
+          val combinations = h.detailedPoints.map {
+            case (figures, combination) => CombinationResult(toUiString(figures), combination.name)
+          }
+          SomeResult(h.total, combinations)
+        }
+      }
+    }
+
+    private def toUiString(figures: List[Figure]) =
+      figures.map(_.toString)
+  }
 
 
   def main(args: Array[String]) {
