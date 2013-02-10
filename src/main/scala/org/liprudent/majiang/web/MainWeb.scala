@@ -1,10 +1,12 @@
 package org.liprudent.majiang.web
 
-import unfiltered.response.ResponseString
+import unfiltered.request._
+import unfiltered.response._
+import net.liftweb.json.JsonAST.JValue
 
 object MainWeb {
-  val api = unfiltered.filter.Planify {
-    case _ => ResponseString(
+  val api = unfiltered.filter.Intent {
+    case GET(Path("/api")) => ResponseString(
       """
         | -- TILES --
         | there is a 2 characters length string available to describe any tile
@@ -39,10 +41,10 @@ object MainWeb {
         |      /* Mandatory. At least two tiles. Not tied. Winning tile should be in that list.             */
         |      "concealed" : "b1 b3 b2 b2 b2 b3 b1 b1 b3",
         |
-        |      /* Optional if empty. A list of kongs.                                                      */
+        |      /* Optional if empty. A list of kongs.                                                       */
         |      "concealed_kong" : "dr-dr-dr-dr b1-b1-b1-b1",
         |
-        |      /* Optional if empty. A list of figures.                                                     */                                                                         */
+        |      /* Optional if empty. A list of figures.                                                     */
         |      "discarded" : "b1-b2-b3 b1-b2-b3 b1-b2-b3",
         |
         |      /* Mandatory should be in "concealed"                                                        */
@@ -55,7 +57,7 @@ object MainWeb {
         |      /*    - "KongRobbed"   : Origin of the tile when a foe declare a melded kong and the         */
         |      /*                       very tile that transforms the pung to a kong is robbed.             */
         |      /*    - "ReplacedTile" : Origin of the tile when player declared a kong and need a           */
-        |      /*                       replacement tile. That replacement tile is used to declare Hu.      */                                                   */
+        |      /*                       replacement tile. That replacement tile is used to declare Hu.      */
         |      "winning_tile_origin" : "KongRobbed",
         |
         |      /* Optional. Default is "NotLastTile". Possible values are :                                 */
@@ -74,13 +76,41 @@ object MainWeb {
       """.stripMargin)
   }
 
+  val compute = unfiltered.filter.Intent {
+    case req@POST(Path("/compute")) =>
+      JsonBody(req) match {
+        case Some(json) =>
+          handleCompute(json).getOrElse(BadRequestWithBody("invalid json format, please consult /api"))
+        case _ => BadRequestWithBody("not a valid Json")
+      }
+  }
+
+  private object BadRequestWithBody {
+    def apply(s: String) = BadRequest ~> ResponseString(s)
+  }
+
+  private def handleCompute(json: JValue) = {
+    case class Request(concealed: String,
+                       concealed_kong: Option[String],
+                       discarded: Option[String],
+                       winning_tile: String,
+                       winning_tile_origin: String,
+                       last_tile_situation: Option[String],
+                       prevalent_wind: Option[String],
+                       player_wind: Option[String])
+
+    implicit val formats = net.liftweb.json.DefaultFormats
+    json.extractOpt[Request]
+      .map(r => ResponseString(r.toString))
+
+  }
+
+  val all = unfiltered.filter.Planify(
+    api onPass compute
+  )
+
 
   def main(args: Array[String]) {
-    unfiltered.jetty.Http(80).plan(api).run {
-      s =>
-        unfiltered.util.Browser.open(
-          "http://127.0.0.1:%d/".format(s.port)
-        )
-    }
+    unfiltered.jetty.Http(8080).plan(all).run
   }
 }
