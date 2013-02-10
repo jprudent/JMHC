@@ -65,7 +65,8 @@ sealed abstract class WindFamily extends HonorFamily {
 
 object WindFamily {
   def apply(windName: String): WindFamily = {
-    List(EastWind, NorthWind, WestWind, SouthWind).find(_.windName == windName).get
+    List(EastWind, NorthWind, WestWind, SouthWind)
+      .find(_.windName.toUpperCase == windName.toUpperCase).get
   }
 }
 
@@ -360,6 +361,15 @@ case object ReplacedTile extends TileOrigin
  */
 sealed trait LastTileSituation
 
+object LastTileSituation {
+  def apply(s: String) = s.toUpperCase match {
+    case "NOT LAST TILE" => NotLastTile
+    case "LAST TILE OF KIND" => LastTileOfKind
+    case "LAST TILE CLAIM" => LastTileClaim
+    case "LAST TILE DRAW" => LastTileDraw
+  }
+}
+
 /**
  * This is not a last tile situation
  */
@@ -523,12 +533,12 @@ case class TileSet(private val tocs: List[TileOccurence]) {
   /**
    * @return All honor tiles
    */
-  lazy val allHonors:List[Tile] = toTiles.filter(_.isHonor)
+  lazy val allHonors: List[Tile] = toTiles.filter(_.isHonor)
 
   /**
    * @return All straight tiles
    */
-  lazy val allStraights:List[Tile] = toTiles.filter(_.isStraight)
+  lazy val allStraights: List[Tile] = toTiles.filter(_.isStraight)
 
   /**
    *

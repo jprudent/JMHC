@@ -1,10 +1,9 @@
 {
-  "concealed" : "b1 b3 b2 b2 b2 b3 b1 b1 b3",
-  "concealed_kong" : "dr-dr-dr-dr b1-b1-b1-b1",
-  "discarded" : "b1-b2-b3 b1-b2-b3 b1-b2-b3",
+  "concealed" : "b1 b3 b2 dr dr",
+  "melded" : "b1-b2-b3 b1-b2-b3 b1-b2-b3",
   "winning_tile" : "b1",
-  "winning_tile_origin" : "KongRobbed",
-  "last_tile_situation" : "LastTileOfKind",
+  "winning_tile_origin" : "Kong Robbed",
+  "last_tile_situation" : "Last Tile Of Kind",
   "prevalent_wind" : "WEST",
   "player_wind" : "WEST"
 }

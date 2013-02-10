@@ -3,6 +3,15 @@ package org.liprudent.majiang.web
 import unfiltered.request._
 import unfiltered.response._
 import net.liftweb.json.JsonAST.JValue
+import org.liprudent.majiang.ui.StringMapper
+import org.liprudent.majiang.HuFinder
+import org.liprudent.majiang.tiles._
+import org.liprudent.majiang.mahjong.PlayerContext
+import org.liprudent.majiang.mahjong.PlayerTiles
+import org.liprudent.majiang.tiles.ContextualTile
+import scala.Some
+import unfiltered.response.ResponseString
+import org.liprudent.majiang.figures.Kong
 
 object MainWeb {
   val api = unfiltered.filter.Intent {
@@ -45,25 +54,25 @@ object MainWeb {
         |      "concealed_kong" : "dr-dr-dr-dr b1-b1-b1-b1",
         |
         |      /* Optional if empty. A list of figures.                                                     */
-        |      "discarded" : "b1-b2-b3 b1-b2-b3 b1-b2-b3",
+        |      "melded" : "b1-b2-b3 b1-b2-b3 b1-b2-b3",
         |
         |      /* Mandatory should be in "concealed"                                                        */
         |      "winning_tile" : "b1",
         |
         |      /* Mandatory. Possible values are:                                                           */
-        |      /*    - "SelfDrawn"    : Origin of the tile when the player self drawn the tile.             */
+        |      /*    - "Self Drawn"    : Origin of the tile when the player self drawn the tile.            */
         |      /*    - "Discarded"    : Origin of the tile when a foe discarded a tile and player use it to */
         |      /*                       declare Hu.                         "                               */
-        |      /*    - "KongRobbed"   : Origin of the tile when a foe declare a melded kong and the         */
+        |      /*    - "Kong Robbed"   : Origin of the tile when a foe declare a melded kong and the        */
         |      /*                       very tile that transforms the pung to a kong is robbed.             */
-        |      /*    - "ReplacedTile" : Origin of the tile when player declared a kong and need a           */
+        |      /*    - "Replaced Tile" : Origin of the tile when player declared a kong and need a          */
         |      /*                       replacement tile. That replacement tile is used to declare Hu.      */
         |      "winning_tile_origin" : "KongRobbed",
         |
         |      /* Optional. Default is "NotLastTile". Possible values are :                                 */
-        |      /*    - "NotLastTile"    : This is not a last tile situation                                 */
-        |      /*    - "LastTileOfKind" : 3 tiles of a kind are visible and player finished with the fourth */
-        |      /*    - "LastTileClaim"  : Player declares Hu with the last discarded tile of the game       */
+        |      /*    - "Not Last Tile"    : This is not a last tile situation                               */
+        |      /*    - "Last Tile Of Kind" : 3 tiles of a kind are visible and player finished with the 4th */
+        |      /*    - "Last Tile Claim"  : Player declares Hu with the last discarded tile of the game     */
         |      "last_tile_situation" : "LastTileOfKind",
         |
         |      /* Optional. "EAST" | "NORTH" | "WEST" | "SOUTH". Default to "EAST".                         */
@@ -92,7 +101,7 @@ object MainWeb {
   private def handleCompute(json: JValue) = {
     case class Request(concealed: String,
                        concealed_kong: Option[String],
-                       discarded: Option[String],
+                       melded: Option[String],
                        winning_tile: String,
                        winning_tile_origin: String,
                        last_tile_situation: Option[String],
@@ -100,8 +109,33 @@ object MainWeb {
                        player_wind: Option[String])
 
     implicit val formats = net.liftweb.json.DefaultFormats
-    json.extractOpt[Request]
-      .map(r => ResponseString(r.toString))
+    val req = json.extractOpt[Request]
+    req.map {
+      r =>
+
+        def toFigures(figures: Option[String]) =
+          figures.map(s => StringMapper.toFigures(StringMapper.splitFigures(s))).getOrElse(Nil)
+
+        val concealed = StringMapper.toTiles(StringMapper.splitTiles(r.concealed))
+        val winningTile = Tile(r.winning_tile)
+        val winningTileOrigin = TileOrigin(r.winning_tile_origin)
+        val lastTileSituation = r.last_tile_situation.map(LastTileSituation(_)).getOrElse(NotLastTile)
+        val concealedTiles = ConcealedTiles(concealed, ContextualTile(winningTile, winningTileOrigin, lastTileSituation))
+
+        val concealedKong = toFigures(r.concealed_kong).asInstanceOf[List[Kong]]
+        val melded = toFigures(r.melded)
+        val ptiles: PlayerTiles = PlayerTiles(concealedTiles, melded, concealedKong)
+
+        def toWind(wop: Option[String]) = wop.map(WindFamily(_)).getOrElse(EastWind)
+        val prevalentW = toWind(r.prevalent_wind)
+        val playerW = toWind(r.player_wind)
+        val pcontext: PlayerContext = PlayerContext(playerW, prevalentW)
+
+        val res = HuFinder(ptiles, pcontext).find
+        ResponseString(res.toString)
+
+
+    }
 
   }
 
