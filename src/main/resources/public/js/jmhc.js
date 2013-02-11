@@ -32,59 +32,16 @@ window.RequestModel = Backbone.Model.extend({
 });
 
 window.TileSelectorModel = Backbone.Model.extend({
+
    defaults: {
-    b1: 4,
-    b2: 4,
-    b3: 4,
-    b4: 4,
-    b5: 4,
-    b6: 4,
-    b7: 4,
-    b8: 4,
-    b9: 4,
-
-    c1: 4,
-    c2: 4,
-    c3: 4,
-    c4: 4,
-    c5: 4,
-    c6: 4,
-    c7: 4,
-    c8: 4,
-    c9: 4,
-
-    s1: 4,
-    s2: 4,
-    s3: 4,
-    s4: 4,
-    s5: 4,
-    s6: 4,
-    s7: 4,
-    s8: 4,
-    s9: 4,
-
-    dr:4,
-    dg:4,
-    dw:4,
-
-    we:4,
-    wn:4,
-    ww:4,
-    ws:4,
-
-    ss:1,
-    su:1,
-    sa:1,
-    sw:1,
-
-    fp:1,
-    fc:1,
-    fb:1,
-    fo:1
-
+    b1: 4, b2: 4, b3: 4, b4: 4, b5: 4, b6: 4, b7: 4, b8: 4, b9: 4,
+    c1: 4, c2: 4, c3: 4, c4: 4, c5: 4, c6: 4, c7: 4, c8: 4, c9: 4,
+    s1: 4, s2: 4, s3: 4, s4: 4, s5: 4, s6: 4, s7: 4, s8: 4, s9: 4,
+    dr: 4, dg: 4, dw: 4, we: 4, wn: 4, ww: 4, ws: 4,
+    ss: 1, su: 1, sa: 1, sw: 1, fp: 1, fc: 1, fb: 1, fo: 1
    },
 
-   use : function(tile){
+   used : function(tile){
         var cpt = this.get(tile);
         if(cpt > 0) {
             this.set(tile,cpt -1)
@@ -93,7 +50,13 @@ window.TileSelectorModel = Backbone.Model.extend({
         else {
             this.trigger("error","tile has been used four times");
         }
+   },
+
+   unused : function(tile){
+    var cpt = this.get(tile);
+    this.set(tile,cpt+1);
    }
+
 
 
 });
@@ -120,7 +83,7 @@ window.TileSelectorView = Backbone.View.extend({
         var outer = this;
 
         $.each(this.model.attributes,function(tile,cpt){
-            outer.$el.append(outer.tile_template({tile:tile, cpt:cpt}));
+            outer.$el.append(outer.tile_template({tile:tile, route:"tile_selector/select"}));
         });
 
         return this;
@@ -133,9 +96,14 @@ window.ConcealedModel = Backbone.Model.extend({
     tiles:[]
    },
 
-   add : function(tile){
+   added : function(tile){
      this.get("tiles").push(tile);
      this.trigger("change");
+   },
+
+   removed : function(index){
+    this.get("tiles").splice(index,1);
+    this.trigger("change");
    }
 });
 
@@ -165,14 +133,14 @@ window.ConcealedView = Backbone.View.extend({
         var outer = this;
 
         $.each(this.model.get("tiles"),function(index,tile){
-            outer.$el.append(outer.tile_template({tile:tile}));
+            outer.$el.append(outer.tile_template({tile:tile, route:"concealed/remove/"+index}));
         });
 
         return this;
     },
 
     addTile : function(tile){
-        this.model.add(tile);
+        this.model.added(tile);
     }
 
 });
@@ -192,12 +160,21 @@ var App = Backbone.Router.extend({
     },
 
     routes: {
-        "tile_selector/select/:tile": "selectedTile"
+        "tile_selector/select/:tile": "selectedTile",
+        "concealed/remove/:index/:tile": "removedFromConcealed"
     },
 
     selectedTile : function(tile){
         console.log("selectedTile : " + tile);
-        this.tileSelectorModel.use(tile);
+        this.tileSelectorModel.used(tile);
+        //replace the route so that user can click again
+        this.navigate("", {trigger: true, replace: true});
+    },
+
+    removedFromConcealed : function(index,tile){
+        console.log("removedFromConcealed : " + index);
+        this.concealedModel.removed(index);
+        this.tileSelectorModel.unused(tile);
         //replace the route so that user can click again
         this.navigate("", {trigger: true, replace: true});
     }
