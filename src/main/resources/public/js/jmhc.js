@@ -198,6 +198,8 @@ var App = Backbone.Router.extend({
     selectedTile : function(tile){
         console.log("selectedTile : " + tile);
         this.tileSelectorModel.use(tile);
+        //replace the route so that user can click again
+        this.navigate("", {trigger: true, replace: true});
     }
 
 });
