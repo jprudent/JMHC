@@ -18,6 +18,7 @@ as I know nobody does.
 
 Licence
 -------
+Mahjong icons is the work of Martin Persson - http://www.martinpersson.org
 
-AGPL v3
+Every thing else is licenced under AGPL v3
 http://www.gnu.org/licenses/agpl.html

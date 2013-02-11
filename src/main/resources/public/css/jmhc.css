@@ -1,5 +1,9 @@
-img.tile {
-    margin:0;
+.tile {
+    margin:-7px;
     padding:0;
     border:0;
+}
+
+img.tile {
+    width:64px;
 }
