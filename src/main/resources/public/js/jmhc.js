@@ -88,6 +88,7 @@ window.TileSelectorModel = Backbone.Model.extend({
         var cpt = this.get(tile);
         if(cpt > 0) {
             this.set(tile,cpt -1)
+            this.trigger("tileselector:used",tile)
         }
         else {
             this.trigger("error","tile has been used four times");
@@ -127,20 +128,51 @@ window.TileSelectorView = Backbone.View.extend({
 
 });
 
+window.ConcealedModel = Backbone.Model.extend({
+   defaults: {
+    tiles:[]
+   },
+
+   add : function(tile){
+     this.get("tiles").push(tile);
+     this.trigger("change");
+   }
+});
+
 window.ConcealedView = Backbone.View.extend({
     id: "concealed",
 
     initialize: function() {
-        this.tile_template = _.template($("#tile-template").html());
+
+        this.tileSelectorModel = this.options.tileSelectorModel;
+
         this.$el = $("#"+this.id);
 
-        this.listenTo(this.tileSelectorModel,"change",this.render);
+        this.tile_template = _.template($("#tile-template").html());
+
+        this.listenTo(this.tileSelectorModel,"tileselector:used",this.addTile);
+        this.listenTo(this.model,"change",this.render);
+
         this.render();
     },
 
     render : function(){
         console.log("rendering ConcealedView");
+
+        this.$el.html("");
+
+        //scoping in closure
+        var outer = this;
+
+        $.each(this.model.get("tiles"),function(index,tile){
+            outer.$el.append(outer.tile_template({tile:tile}));
+        });
+
         return this;
+    },
+
+    addTile : function(tile){
+        this.model.add(tile);
     }
 
 });
@@ -151,7 +183,11 @@ var App = Backbone.Router.extend({
       this.tileSelectorModel = new TileSelectorModel();
       this.tileSelectorView = new TileSelectorView({model: this.tileSelectorModel});
 
-      this.concealedView = new ConcealedView({tileSelectorModel:this.tileSelectorModel});
+      this.concealedModel = new ConcealedModel();
+      this.concealedView = new ConcealedView({
+        model: this.concealedModel,
+        tileSelectorModel:this.tileSelectorModel
+      });
 
     },
 
