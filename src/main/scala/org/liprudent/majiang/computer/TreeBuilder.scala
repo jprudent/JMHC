@@ -1,3 +1,5 @@
+//This file is pure crap, don't read it !
+
 package org.liprudent.majiang.computer
 
 import org.liprudent.majiang.tiles._
@@ -6,6 +8,7 @@ import scala.Some
 import org.liprudent.majiang.figures.SingleTile
 import org.liprudent.majiang.figures.Dui
 import java.io.FileWriter
+
 
 case class GraphBuilder(filename: String) {
 
