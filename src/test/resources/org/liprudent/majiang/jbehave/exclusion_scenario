@@ -82,4 +82,5 @@ Then "Mixed Double Chows" is scored twice
 Then "Two Terminal Chows" is scored only once
 Then "Outside Hand" is scored
 Then "Edge Wait" is scored
+Then "One Voided Suit" is scored
 Then nothing else is scored

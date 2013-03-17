@@ -813,7 +813,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   test(
     """use case : Last Tile Claim
       |verif : My Head
-      |tricky part:
+      |tricky part:  MixedDoubleChows xor TwoTerminalChows (exclusionary rule)
     """.stripMargin) {
     val givenClosed = TileSet(List(s4, s5, s6, c1, c2, c3, b7, b7))
     val givenMelded: List[Figure] = List(Chow(b1), Chow(b7))
@@ -824,14 +824,14 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
     val thenClosed = List(Chow(c1), Chow(s4), Dui(b7))
     val allFigures = (thenClosed ::: givenMelded ::: givenConcealedKongs).sorted(OrdFigure)
-    val thenPoints = 21
+    val thenPoints = 20
     val thenCombinations: List[(List[Figure], Combination)] =
       List(
         (List(Chow(b7), Chow(c1), Chow(s4)), MixedStraight),
         (List(SingleTile(c2)), LastTileClaimComb),
         (allFigures, AllChows),
         (List(Chow(b1), Chow(c1)), MixedDoubleChows),
-        (List(Chow(b1), Chow(b7)), TwoTerminalChows),
+        //(List(Chow(b1), Chow(b7)), TwoTerminalChows), EXCLUSIONARY RULE APPLY
         (List(Chow(c1)), ClosedWait)
       )
 

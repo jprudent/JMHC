@@ -75,7 +75,6 @@ case class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
   private def discoverBranch(t: Tile, remainingTile: List[Tile], result: Types.Figures): Seq[Types.Figures] = {
 
     cpt = cpt + 1
-    //println("---\ncpt=%d\ntile=%s\nremaining=%s\nresult=%s".format(cpt,t,remainingTile,result))
     val newResult = addLeaf(t, result)
 
     newResult match {
@@ -124,7 +123,6 @@ case class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
         val enhancement: Types.Figures = enhanceFigure(tile, leaf, validBranch)
         enhancement match {
           case Nil => {
-            //println("abandoning tile = %s , result = %s".format(tile,result))
             Nil
           }
           case enhanced :: Nil => enhanced :: validBranch

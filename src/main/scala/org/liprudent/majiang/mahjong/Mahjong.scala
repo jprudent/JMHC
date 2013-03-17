@@ -201,12 +201,12 @@ package object mahjong {
       hasCombination(toCombination(combinationName))
 
     def hasCombinationOnce(combination: Combination): Boolean =
-      hasCombinationNthce(combination,1)
+      hasCombinationNthce(combination, 1)
 
     def hasCombinationTwice(combination: Combination): Boolean =
-      hasCombinationNthce(combination,2)
+      hasCombinationNthce(combination, 2)
 
-    private def hasCombinationNthce(combination:Combination,n:Int) =
+    private def hasCombinationNthce(combination: Combination, n: Int) =
       detailedPoints.count(_._2 == combination) == n
 
     /**
@@ -297,87 +297,124 @@ package object mahjong {
 
       }._1.sorted(OrdDetailedPoint)
 
-      val filteredDetailedPoints = applyExclusion(allDetailedPoints, Map().withDefaultValue(0))
+      val filteredDetailedPoints = ExclusionPrinciples.exclude(allDetailedPoints)
 
       DetailedPoints(huLe, filteredDetailedPoints)
     }
 
 
-    private def applyExclusion(allDetailedPoints: List[(Figures, Combination)], used: Map[Figures, Int]): List[(Figures, Combination)] = {
+  }
 
-//      println("-----")
-//      println(allDetailedPoints)
-//      println(used)
+}
 
-      allDetailedPoints match {
+/**
+ *
+ * This object apply all rules that prevents a combination to be accounted.
+ * 1. Non identical principle
+ * 2. Implication principle
+ * 3. Exclusion principle
+ *
+ * Whereas the first two rules are quite straight forward, the latter has a lot of controversy.
+ * Here is the best rule I could ever find on internet: http://www.sloperama.com/mjfaq/mjfaq22.html
+ * "Once two or three numerical sets have been combined for a sequential-number-based scoring pattern, any other
+ * remaining numerical sets in the hand may be combined only once with an already-scored numerical set,
+ * when creating additional two- or three-set sequential-number-based scoring patterns, such as straights or "shifted"
+ * scoring patterns."
+ *
+ *
+ */
+object ExclusionPrinciples {
 
-        case Nil => Nil
+  /**
+   * @param allDetailedPoints what to filter out.
+   * @return detailed points where some combinations has been filtered out by rules
+   */
+  def exclude(allDetailedPoints: List[(Figures, Combination)]): List[(Figures, Combination)] = {
+    exclude(allDetailedPoints, Map().withDefaultValue(0))
+  }
 
-        case head :: tail => {
+  private def exclude(allDetailedPoints: List[(Figures, Combination)], used: Map[Figures, Int]): List[(Figures, Combination)] = {
 
-          if (isExclusionPrincipleApplied(head._1, used)) {
+    allDetailedPoints match {
 
-            applyExclusion(tail, used)
+      case Nil => Nil
 
-          } else {
+      case head :: tail => {
 
-            val filteredTail = tail.filterNot {
-              case tailElem => isExcluded(head, tailElem)
-            }
+        if (isExclusionPrincipleApplied(head, used)) {
+          exclude(tail, used)
+        } else {
 
-            val usedUpdated =
-              if(isHandPropertyCombination(head._1)) used
-              else updateUsedFigures(head._1,used)
-
-            head :: applyExclusion(filteredTail, usedUpdated)
-
+          val filteredTail = tail.filterNot {
+            tailElem => applyOtherRules(head, tailElem)
           }
+
+          val usedUpdated =
+            if (isHandPropertyCombination(head._1) || !head._2.shifted) used //TODO dry isCandidateExclusionRule
+            else updateUsedFigures(head._1, used)
+
+          head :: exclude(filteredTail, usedUpdated)
+
         }
       }
     }
+  }
 
-    private def updateUsedFigures(figures:Figures,used:Map[Figures,Int]): Map[Figures,Int] = {
+  private def isExclusionPrincipleApplied(points: (Figures, Combination), used: Map[Figures, Int]): Boolean = {
+    // if the combination use all tile then it's about hand property, not figure usage
+    // if the figures contains any honor then exclusionary principle doesn't apply
+    // if the figures are not shifted, then exclusionary principle doesn't apply
+    val (figures, combinations) = points
+    !figures.exists(_.toTiles.exists(_.isHonor)) &&
+      combinations.shifted &&
+      !isHandPropertyCombination(figures) &&
+      hasFigureUsedMoreThanTwice(figures, used)
 
-      val updatedUsedFigure = used.find{ case (k,v)=> k.intersect(figures).size > 0 } match {
-        case Some((fs,i)) => used.updated(fs,i+1)
-          // in that case, it means it's the initial usage of figures
-        case None => used
-      }
+  }
 
-      updatedUsedFigure.updated(figures,1)
+  //TODO narrow visibility to protected or private
+  def applyOtherRules(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
+    def mutuallyExcludes() = ref._2.excludes(toExclude._2)
+
+    def implies() = ref._2.implies(toExclude._2)
+
+    def same() = ref._2 == toExclude._2
+
+    def toExcludeContainedInRef() = toExclude._1.forall(fig => ref._1.contains(fig))
+
+
+    mutuallyExcludes() ||
+      ((implies() || same()) && toExcludeContainedInRef())
+
+
+  }
+
+  private def updateUsedFigures(figures: Figures, used: Map[Figures, Int]): Map[Figures, Int] = {
+
+    val updatedUsedFigure = used.find {
+      case (k, v) => k.intersect(figures).size > 0
+    } match {
+      case Some((fs, i)) => used.updated(fs, i + 1)
+      // in that case, it means it's the initial usage of figures
+      case None => used
     }
 
-    private def isExclusionPrincipleApplied(figures: Figures, used: Map[Figures, Int]): Boolean =
-    // if the combination use all tiles
-    // then it's about hand property, not figure usage
-      ! isHandPropertyCombination(figures) && hasFigureUsedMoreThanTwice(figures, used)
+    updatedUsedFigure.updated(figures, 1)
+  }
 
-    private def isHandPropertyCombination(figures: Figures) =
-      figures.foldLeft(0)((tot, f) => tot + f.toTiles.size) == 14
+  private def isHandPropertyCombination(figures: Figures) =
+    figures.foldLeft(0)((tot, f) => tot + f.toTiles.size) == 14
 
-    private def hasFigureUsedMoreThanTwice(figures: Figures, used: Map[Figures, Int]) =
-      used.find{ case (k,v)=> k.intersect(figures).size > 0 }
-       match {
-        case Some((fs,i)) if i >= 2 => true
-        case _ => false
-      }
-
-    protected[mahjong] def isExcluded(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
-      def mutuallyExcludes() = ref._2.excludes(toExclude._2)
-
-      def implies() = ref._2.implies(toExclude._2)
-
-      def same() = ref._2 == toExclude._2
-
-      def toExcludeContainedInRef() = toExclude._1.forall(fig => ref._1.contains(fig))
-
-
-      mutuallyExcludes() ||
-        ((implies() || same()) && toExcludeContainedInRef())
-
-
+  private def hasFigureUsedMoreThanTwice(figures: Figures, used: Map[Figures, Int]) = {
+    used.find {
+      case (k, v) => k.intersect(figures).size > 0
+    }
+    match {
+      case Some((fs, i)) if i >= 2 => true
+      case _ => false
     }
   }
+
 
 }
 

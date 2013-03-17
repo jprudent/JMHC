@@ -9,7 +9,7 @@ import org.liprudent.majiang.figures._
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.tiles.ContextualTile
-import org.liprudent.majiang.{HuFinder, UniqueWait}
+import org.liprudent.majiang.{ExclusionPrinciples, HuFinder, UniqueWait}
 
 @RunWith(classOf[JUnitRunner])
 class MahjongSuite extends FunSuite {
@@ -248,7 +248,7 @@ class MahjongSuite extends FunSuite {
     val excl = (List(SomeKnittedWithSomeDragons(List(b1, b4, b7, c9, s2, s5, s8), List(we, wn, ww, ws, dr, dg, dw))),
       LesserHonorsAndKnittedTiles)
 
-    assert(HulePointsComputer.isExcluded(ref, excl))
+    assert(ExclusionPrinciples.applyOtherRules(ref, excl))
 
   }
 
@@ -256,7 +256,7 @@ class MahjongSuite extends FunSuite {
     val ref = (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
     val excl = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChows)
 
-    assert(!HulePointsComputer.isExcluded(ref, excl))
+    assert(!ExclusionPrinciples.applyOtherRules(ref, excl))
 
   }
 
@@ -264,7 +264,7 @@ class MahjongSuite extends FunSuite {
     val ref = (List(Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), MixedTripleChows)
     val excl = (List(Chow(b7, b8, b9), Chow(c7, c8, c9)), MixedDoubleChows)
 
-    assert(HulePointsComputer.isExcluded(ref, excl))
+    assert(ExclusionPrinciples.applyOtherRules(ref, excl))
   }
 
 
@@ -272,14 +272,14 @@ class MahjongSuite extends FunSuite {
     val ref = (List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9), Dui(b3)), MeldedHand)
     val excl = (List(Chow(b1, b2, b3), Chow(b7, b8, b9), Chow(c7, c8, c9), Chow(s7, s8, s9)), AllChows)
 
-    assert(!HulePointsComputer.isExcluded(ref, excl))
+    assert(!ExclusionPrinciples.applyOtherRules(ref, excl))
   }
 
   test("is excluded : Seat Wind - Pung of honor or terminal") {
     val ref = (List(Pung(ww)), SeatWind)
     val excl = (List(Pung(ww)), PungOfTerminalsOrHonors)
 
-    assert(HulePointsComputer.isExcluded(ref, excl))
+    assert(ExclusionPrinciples.applyOtherRules(ref, excl))
   }
 
   test("allConcealedPungLike - finish on pung") {

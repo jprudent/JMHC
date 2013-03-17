@@ -85,6 +85,11 @@ sealed trait Combination {
   val excluded = List[Combination]()
 
   /**
+   * A flag that evals to true if the combination is a set of shifted (by 0, 1, 2) pungs or chows.
+   */
+  val shifted = false
+
+  /**
    * Check wether this combination implies y recursively.
    *
    * @param y the other combination
@@ -388,6 +393,7 @@ object TwoTerminalChows extends Combination {
   val name = "Two terminal chows"
   val description = "1, 2, 3 and 7, 8, 9 in one family"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result =
@@ -400,6 +406,7 @@ object ShortStraight extends Combination {
   val name = "Short Straight"
   val description = "2 consequitives chows in same family"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result =
@@ -414,6 +421,7 @@ object MixedDoubleChows extends Combination {
   val name = "Mixed Double Chows"
   val description = "2 identical chows in two families"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result =
@@ -428,6 +436,7 @@ object PureDoubleChows extends Combination {
   val name = "Pure Double Chows"
   val description = "Two identical chows in the same family"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result = {
@@ -487,6 +496,7 @@ object DoublePung extends Combination {
   val name = "Double Pung"
   val description = "Two identical pung in two families"
 
+  override val shifted = true // shifted by 0
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result =
@@ -709,6 +719,7 @@ object MixedShiftedChow extends Combination {
   val name = "Mixed Shifted Chow"
   val description = "3 chows in 3 families shifted by 2 tiles"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result =
@@ -851,6 +862,7 @@ object MixedShiftedPung extends Combination {
   val name = "Mixed Shifted Pung"
   val description = "Three consecutive pungs in three families"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result =
@@ -864,6 +876,7 @@ object MixedTripleChows extends Combination {
   val name = "Mixed Triple Chows"
   val description = "Three identical chows in three families"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   override val implied = List(MixedDoubleChows)
@@ -895,6 +908,7 @@ object MixedStraight extends Combination {
   val name = "Mixed Straight"
   val description = "Three consecutive chows in three family"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result =
@@ -992,6 +1006,7 @@ object TriplePungs extends Combination {
   val name = "Triple Pungs"
   val description = "Three identical pungs in three family"
 
+  override val shifted = true
   override val excluded = List(DoublePung, ChickenHand)
 
   def find(m: HuLe): Result =
@@ -1019,6 +1034,7 @@ object PureShiftedChow extends Combination {
   val name = "Pure shifted chows"
   val description = "3 chows shifted by one or two tiles in the same family"
 
+  override val shifted = true
   override val excluded = List(ChickenHand)
 
   def find(m: HuLe): Result = {
@@ -1053,6 +1069,7 @@ object PureStraight extends Combination {
   val name = "Pure Straight"
   val description = "1-2-3, 4-5-6, 7-8-9 in the same family"
 
+  override val shifted = true
   override val excluded = List(ShortStraight, TwoTerminalChows, ChickenHand)
 
   def find(m: HuLe): Result =
@@ -1108,6 +1125,7 @@ object PureShiftedPungs extends Combination {
   val name = "Pure Shifted Pungs"
   val description = "Three consecutive pungs in the same family"
 
+  override val shifted = true
   override val excluded = List(UpperFour, ChickenHand)
 
   def find(m: HuLe): Result =
@@ -1121,6 +1139,7 @@ object PureTripleChows extends Combination {
   val name = "Pure Triple Chows"
   val description = "Three identical chows"
 
+  override val shifted = true
   override val excluded = List(PureDoubleChows, ChickenHand)
 
   def find(m: HuLe): Result = {
@@ -1230,6 +1249,7 @@ object FourShiftedChows extends Combination {
   val name = "Quadruple Chows"
   val description = "Four shifted chows by 1 or 2 tiles in the same family"
 
+  override val shifted = true
   override val excluded = List(PureShiftedChow, AllChows, ChickenHand)
 
   def find(m: HuLe): Result =
@@ -1245,6 +1265,7 @@ object FourPureShiftedPungs extends Combination {
   val name = "Four Pure Shifted Pungs"
   val description = "Four pure consecutive pungs in one family"
 
+  override val shifted = true
   override val excluded = List(PureShiftedPungs, AllPungs, ChickenHand)
 
   def find(m: HuLe): Result =
@@ -1260,6 +1281,7 @@ object QuadrupleChows extends Combination {
   val name = "Quadruple Chows"
   val description = "Four identical chows"
 
+  override val shifted = true
   override val excluded = List(PureTripleChows, TileHog, AllChows, ChickenHand)
 
   def find(m: HuLe): Result =
