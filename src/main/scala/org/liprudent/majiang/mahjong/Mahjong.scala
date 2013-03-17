@@ -341,34 +341,33 @@ object ExclusionPrinciples {
 
       case head :: tail => {
 
-        if (isExclusionPrincipleApplied(head, used)) {
-          exclude(tail, used)
-        } else {
+        def filteredTail = tail.filterNot(applyOtherRules(head,_))
 
-          val filteredTail = tail.filterNot {
-            tailElem => applyOtherRules(head, tailElem)
+        if (isCandidateExclusionRule(head)) {
+          if (hasFigureUsedMoreThanTwice(head._1, used)) {
+            exclude(tail, used)
+          } else {
+            head :: exclude(filteredTail, updateUsedFigures(head._1, used))
           }
-
-          val usedUpdated =
-            if (isHandPropertyCombination(head._1) || !head._2.shifted) used //TODO dry isCandidateExclusionRule
-            else updateUsedFigures(head._1, used)
-
-          head :: exclude(filteredTail, usedUpdated)
-
+        } else {
+          head :: exclude(filteredTail, used)
         }
       }
     }
   }
 
-  private def isExclusionPrincipleApplied(points: (Figures, Combination), used: Map[Figures, Int]): Boolean = {
-    // if the combination use all tile then it's about hand property, not figure usage
-    // if the figures contains any honor then exclusionary principle doesn't apply
-    // if the figures are not shifted, then exclusionary principle doesn't apply
+  private def isCandidateExclusionRule(points: (Figures, Combination)) = {
     val (figures, combinations) = points
     !figures.exists(_.toTiles.exists(_.isHonor)) &&
       combinations.shifted &&
-      !isHandPropertyCombination(figures) &&
-      hasFigureUsedMoreThanTwice(figures, used)
+      !isHandPropertyCombination(figures)
+  }
+
+  private def applyExclusionRule(points: (Figures, Combination), used: Map[Figures, Int]): Boolean = {
+    // if the combination use all tile then it's about hand property, not figure usage
+    // if the figures contains any honor then exclusionary principle doesn't apply
+    // if the figures are not shifted, then exclusionary principle doesn't apply
+    hasFigureUsedMoreThanTwice(points._1, used)
 
   }
 
