@@ -363,14 +363,6 @@ object ExclusionPrinciples {
       !isHandPropertyCombination(figures)
   }
 
-  private def applyExclusionRule(points: (Figures, Combination), used: Map[Figures, Int]): Boolean = {
-    // if the combination use all tile then it's about hand property, not figure usage
-    // if the figures contains any honor then exclusionary principle doesn't apply
-    // if the figures are not shifted, then exclusionary principle doesn't apply
-    hasFigureUsedMoreThanTwice(points._1, used)
-
-  }
-
   //TODO narrow visibility to protected or private
   def applyOtherRules(ref: (Figures, Combination), toExclude: (Figures, Combination)): Boolean = {
     def mutuallyExcludes() = ref._2.excludes(toExclude._2)

@@ -1,7 +1,7 @@
 {
-  "concealed" : "b1 b3 b2 dr dr",
-  "concealed_kong" : "dr-dr-dr-dr b1-b1-b1-b1",
-  "melded" : "b1-b2-b3 b1-b2-b3 b1-b2-b3",
+  "concealed" : "b1 b3 b2 b4 b5 b6 dr dr",
+  "concealed_kong" : "c1-c1-c1-c1",
+  "melded" : "b7-b8-b9",
   "winning_tile" : "b1",
   "winning_tile_origin" : "Kong Robbed",
   "last_tile_situation" : "Last Tile Of Kind",
