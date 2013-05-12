@@ -11,28 +11,28 @@ import org.liprudent.majiang.tiles.Types._
 class TileSetSuite extends FunSuite {
 
   test("remove when multiple") {
-    val hand = TileSet(List(b1, b2, b3, b1, b2, b2, b2))
+    val hand = TocTileSet(List(b1, b2, b3, b1, b2, b2, b2))
     val actual = hand removed (b1)
-    val expected = TileSet(List(/*X*/ b2, b3, b1, b2, b2, b2))
+    val expected = TocTileSet(List(/*X*/ b2, b3, b1, b2, b2, b2))
     assert(actual === expected)
   }
 
   test("remove when single") {
-    val hand = TileSet(List(b1, b2, b3, b1, b2, b2, b2))
+    val hand = TocTileSet(List(b1, b2, b3, b1, b2, b2, b2))
     val actual = hand removed (b3)
-    val expected = TileSet(List(b1, b2, /*X*/ b1, b2, b2, b2))
+    val expected = TocTileSet(List(b1, b2, /*X*/ b1, b2, b2, b2))
     assert(actual === expected)
   }
 
   test("remove several") {
-    val hand = TileSet(List(b1, b2, b2, b2, b2, b3))
+    val hand = TocTileSet(List(b1, b2, b2, b2, b2, b3))
     val actual = hand removed (List(b1, b3))
-    val expected = TileSet(List(b2, b2, b2, b2))
+    val expected = TocTileSet(List(b2, b2, b2, b2))
     assert(actual === expected)
   }
 
   test("Split by family") {
-    val hand = TileSet(List(b2, c1, b1, s1, c2, dr, dr, we, ww))
+    val hand = TocTileSet(List(b2, c1, b1, s1, c2, dr, dr, we, ww))
 
     val families: List[List[TileOccurence]] = hand.splitByFamily
     assert(families === List(

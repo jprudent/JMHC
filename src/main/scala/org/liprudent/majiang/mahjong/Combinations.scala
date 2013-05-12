@@ -514,7 +514,7 @@ object TileHog extends Combination {
 
   def find(m: HuLe): Result = {
     //get all the tiles except those from kongs
-    val allTilesButKong = TileSet(m.allButKongs.map(f => f.toTiles).flatten)
+    val allTilesButKong = TocTileSet(m.allButKongs.map(f => f.toTiles).flatten)
 
     //and find all figures where a tile that has 4 occurences appear
     val allTileHogs = allTilesButKong.allQuadruplets.map {
@@ -1464,7 +1464,7 @@ object NineGates extends Combination {
             t(1, 3), t(2, 1), t(3, 1), t(4, 1), t(5, 1), t(6, 1), t(7, 1), t(8, 1), t(9, 3)
           )
 
-          TileSet(pattern).isSubsetOf(m.allTileset)
+          TocTileSet(pattern).isSubsetOf(m.allTileset)
         }
       }
 

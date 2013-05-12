@@ -440,7 +440,7 @@ object OrdListTileOccurence extends Ordering[List[TileOccurence]] {
  * @param tileSet The tiles the hand is made of.
  * @param lastTileContext The context of the last tile
  */
-case class ConcealedTiles(tileSet: TileSet, lastTileContext: ContextualTile) {
+case class ConcealedTiles(tileSet: TocTileSet, lastTileContext: ContextualTile) {
 
   /**
    * add a new tile and remove one
@@ -475,7 +475,7 @@ case class ConcealedTiles(tileSet: TileSet, lastTileContext: ContextualTile) {
 object ConcealedTiles {
 
   def apply(tiles: List[Tile], lastTileContext: ContextualTile)(implicit notUsed: DummyImplicit): ConcealedTiles = {
-    new ConcealedTiles(TileSet(tiles), lastTileContext)
+    new ConcealedTiles(TocTileSet(tiles), lastTileContext)
   }
 
 }

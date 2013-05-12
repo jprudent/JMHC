@@ -15,7 +15,7 @@ import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
  *
  * @param tileSet
  */
-case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
+case class FindAllAndReduce(tileSet: TocTileSet) extends TilesToFiguresService {
 
   /**
    * @return All possible combinations of figures. Each element of the set is a valid ordered list of figures.
@@ -69,11 +69,11 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
     //quick fail
     if (condition) Nil
     else {
-      val knitted = TileSet(tileSet.allStraights)
+      val knitted = TocTileSet(tileSet.allStraights)
       val tiles147 = knitted.filter(tile => tile.value == 1 || tile.value == 4 || tile.value == 7)
       val tiles258 = knitted.filter(tile => tile.value == 2 || tile.value == 5 || tile.value == 8)
       val tiles369 = knitted.filter(tile => tile.value == 3 || tile.value == 6 || tile.value == 9)
-      val knitteds: List[TileSet] = List(tiles147, tiles258, tiles369)
+      val knitteds: List[TocTileSet] = List(tiles147, tiles258, tiles369)
 
       //all tiles should be the same family
       if (knitteds.forall(tileSet => tileSet.isSingleFamily)) {
@@ -155,12 +155,12 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
   protected lazy val allSuits: List[Suit] = {
     tileSet.splitByFamily.map {
       tilesSameFamily =>
-        FindAllAndReduce.findSuits(TileSet(tilesSameFamily))
+        FindAllAndReduce.findSuits(TocTileSet(tilesSameFamily))
     }.flatten
   }
 
 
-  private def hasTwins(tileSet: TileSet) =
+  private def hasTwins(tileSet: TocTileSet) =
     !tileSet.allPairs.isEmpty
 
   private def hasChowsOrTwins(computer: FindAllAndReduce) =
@@ -174,14 +174,14 @@ object FindAllAndReduce {
    * @param tiles list of tiles to compute
    * @return a FigureComputer
    */
-  def apply(tiles: List[Tile]): FindAllAndReduce = FindAllAndReduce(TileSet(tiles))
+  def apply(tiles: List[Tile]): FindAllAndReduce = FindAllAndReduce(TocTileSet(tiles))
 
   /**
    * Search for the longest suits.
    * @param tiles where to find suits.
    * @return the list of the longest suits
    */
-  def findSuits(tiles: TileSet): List[Suit] = {
+  def findSuits(tiles: TocTileSet): List[Suit] = {
 
     def findSuit(tiles: List[TileOccurence], prev: Tile): Suit = {
       tiles match {
@@ -191,8 +191,8 @@ object FindAllAndReduce {
     }
 
     tiles match {
-      case TileSet(Nil) => Nil
-      case TileSet(h :: t) => {
+      case TocTileSet(Nil) => Nil
+      case TocTileSet(h :: t) => {
         val suit = findSuit(t, h._1)
         suit :: findSuits(tiles.removed(suit))
       }

@@ -118,7 +118,7 @@ class TreeBuilderSuite extends FunSuite {
   }
 
   test("treebuilder") {
-    val actual = TreeBuilder(TileSet(List(b1, b1, b1, b1, b2, b2, b2, b2, b3, b3, b3, b3, b4,
+    val actual = TreeBuilder(TocTileSet(List(b1, b1, b1, b1, b2, b2, b2, b2, b3, b3, b3, b3, b4,
       b4))).allFiguresCombinations
     val expected = Set(List(Pung(b1), Pung(b2), Pung(b3), Chow(b1), Dui(b4)), List(Chow(b1), Chow(b1), Chow(b1),
       Chow(b1), Dui(b4)), List(Chow(b1), Chow(b1), Chow(b2), Chow(b2), Dui(b1)))
@@ -126,19 +126,19 @@ class TreeBuilderSuite extends FunSuite {
   }
 
   test("treebuilder - only pair") {
-    val actual = TreeBuilder(TileSet(List(b1, b1))).allFiguresCombinations
+    val actual = TreeBuilder(TocTileSet(List(b1, b1))).allFiguresCombinations
     val expected = Set(List(Dui(b1)))
     assert(actual === expected)
   }
 
   test("treebuilder - pair and chow") {
-    val actual = TreeBuilder(TileSet(List(b1, b1, b1, b2, b3))).allFiguresCombinations
+    val actual = TreeBuilder(TocTileSet(List(b1, b1, b1, b2, b3))).allFiguresCombinations
     val expected = Set(List(Chow(b1), Dui(b1)))
     assert(actual === expected)
   }
 
   test("treebuilder - pair and 2 chows") {
-    val actual = TreeBuilder(TileSet(List(b1, b1, b1, b2, b2, b3, b3, b4))).allFiguresCombinations
+    val actual = TreeBuilder(TocTileSet(List(b1, b1, b1, b2, b2, b3, b3, b4))).allFiguresCombinations
     val expected = Set(List(Chow(b1), Chow(b2), Dui(b1)))
     assert(actual === expected)
   }

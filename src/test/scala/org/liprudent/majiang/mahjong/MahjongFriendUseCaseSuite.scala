@@ -22,7 +22,7 @@ import org.scalatest.junit.JUnitRunner
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List())
+    val givenClosed = TocTileSet(List())
     val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -62,7 +62,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """"case MeldedHand AllChows MixedDoubleChows
       |verif: dubious on One Voided Suit
     """.stripMargin) {
-    val givenClosed = TileSet(List(b3, b3))
+    val givenClosed = TocTileSet(List(b3, b3))
     val givenMelded = List(Chow(b1, b2, b3), Chow(b5, b6, b7), Chow(c5, c6, c7), Chow(c7, c8, c9))
     val givenContextualTile = ContextualTile(b3, Discarded, NotLastTile)
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -81,7 +81,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   }
 
   test("case Mixed Triple Chows - All Chows") {
-    val givenClosed = TileSet(List(s2, s3, s4, s6, s7, s8, s9, s9))
+    val givenClosed = TocTileSet(List(s2, s3, s4, s6, s7, s8, s9, s9))
     val givenContextualTile = ContextualTile(s9, Discarded, NotLastTile)
     val givenMelded = List(Chow(b6, b7, b8), Chow(c6, c7, c8))
     val givenContext = PlayerContext(WestWind, EastWind)
@@ -99,7 +99,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   test("case Upper Four - Flowers - Double Chow - Closed Wait") {
 
-    val givenClosed = TileSet(List(s6, s6, s6, s7, s8, s9, c6, c6))
+    val givenClosed = TocTileSet(List(s6, s6, s6, s7, s8, s9, c6, c6))
     val givenMelded: List[Chow] = List(Chow(b6, b7, b8), Chow(c7, c8, c9))
     val givenContextualTile: ContextualTile = ContextualTile(s8, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fb, ss, sa))
@@ -120,7 +120,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   test("case All Types - SeatWind - Flower - Single Wait") {
 
-    val givenClosed = TileSet(List(b2, b2, b2, c1, c2, c3, dg, dg))
+    val givenClosed = TocTileSet(List(b2, b2, b2, c1, c2, c3, dg, dg))
     val givenMelded = List(Pung(ww), Chow(s3, s4, s5))
     val givenContextualTile: ContextualTile = ContextualTile(dg, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fo))
@@ -140,7 +140,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   }
 
   test("case Knitted Straight - Fully Concealed Hand") {
-    val givenClosed = TileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, c8, c8, c8, dr, dr))
+    val givenClosed = TocTileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, c8, c8, c8, dr, dr))
     val givenMelded = Nil
     val givenContextualTile: ContextualTile = ContextualTile(b1, SelfDrawn, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fo))
@@ -161,7 +161,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
   test("case Knitted Straight - All Types") {
 
-    val givenClosed = TileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, dr, dr))
+    val givenClosed = TocTileSet(List(b1, b4, b7, c2, c5, c8, s3, s6, s9, dr, dr))
     val givenMelded = List(Pung(ww))
     val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fo))
@@ -184,7 +184,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """case Mixed Triple Chow - Fully Concealed Hand, All Chows
       |verif: dubious on OutsideHand
     """.stripMargin) {
-    val givenClosed = TileSet(List(b1, b2, b3, b7, b8, b9, c7, c8, c9, s7, s8, s9, dr, dr))
+    val givenClosed = TocTileSet(List(b1, b2, b3, b7, b8, b9, c7, c8, c9, s7, s8, s9, dr, dr))
     val givenMelded = Nil
     val givenContextualTile: ContextualTile = ContextualTile(b1, SelfDrawn, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -208,7 +208,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : pymcr m 111d 888d h d33356WeWe w d4 self_draw
       |verif : mahjong friends
     """.stripMargin) {
-    val givenClosed = TileSet(List(s2, s2, s2, s5, s6, s4, we, we))
+    val givenClosed = TocTileSet(List(s2, s2, s2, s5, s6, s4, we, we))
     val givenMelded: List[Figure] = List(Pung(s1), Pung(s8))
     val givenContextualTile: ContextualTile = ContextualTile(s4, SelfDrawn, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fp, fo, sw))
@@ -231,7 +231,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """case All Terminal And Honors - 7 pairs - All Types - Fully Concealed Hand
       |verif : http://mahjong.forum2jeux.com/t265-livre-sur-les-regles-officielles-chinoises-v2
     """.stripMargin) {
-    val givenClosed = TileSet(List(we, we, dr, dr, dg, dg, b1, b1, b9, b9, c1, c1, s9, s9))
+    val givenClosed = TocTileSet(List(we, we, dr, dr, dg, dg, b1, b1, b9, b9, c1, c1, s9, s9))
     val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(s9, SelfDrawn, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -256,7 +256,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |tricky part: winning tile b2 can be used to form Chow(b1,b2,b3) or Dui(b2).
       |             So single wait is scored or closed wait is scored, not both.
     """.stripMargin) {
-    val givenClosed = TileSet(List(s3, s4, s5, b1, b2, b3, b4, b5, b6, b2, b2))
+    val givenClosed = TocTileSet(List(s3, s4, s5, b1, b2, b3, b4, b5, b6, b2, b2))
     val givenMelded: List[Figure] = List(Chow(c5, c6, c7))
     val givenContextualTile: ContextualTile = ContextualTile(b2, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fp, fo, ss, sw))
@@ -283,7 +283,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |tricky part: winning tile b3 can be used to form Chow(b1,b2,b3) or Dui(b3).
       |             So single wait is scored or edge wait is scored, not both.
     """.stripMargin) {
-    val givenClosed = TileSet(List(s4, s5, s6, b1, b2, b3, b6, b7, b8, b3, b3))
+    val givenClosed = TocTileSet(List(s4, s5, s6, b1, b2, b3, b6, b7, b8, b3, b3))
     val givenMelded: List[Figure] = List(Chow(c5, c6, c7))
     val givenContextualTile: ContextualTile = ContextualTile(b3, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fp, fo, ss, sw))
@@ -307,7 +307,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : mahjong and friends
       |tricky part: Dragon Pung implies Pung Of Terminal Or Honor but only on a different pung
     """.stripMargin) {
-    val givenClosed = TileSet(List(c1, c2, c3, ww, ww, ws, ws, ww))
+    val givenClosed = TocTileSet(List(c1, c2, c3, ww, ww, ws, ws, ww))
     val givenMelded: List[Figure] = List(Pung(dr), Pung(b9))
     val givenContextualTile: ContextualTile = ContextualTile(ww, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(List(sa))
@@ -333,7 +333,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part: Pung of Terminals or Honor is scored twice (Pung(c9) and Pung(ww))
     """.stripMargin) {
-    val givenClosed = TileSet(List(c9, c9, c9, ww, ww, ww, b2, b2))
+    val givenClosed = TocTileSet(List(c9, c9, c9, ww, ww, ww, b2, b2))
     val givenMelded: List[Figure] = List(Pung(c8), Chow(b1, b2, b3))
     val givenContextualTile: ContextualTile = ContextualTile(ww, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -355,7 +355,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """|verif : Mahjong Friends
       |Note: Mahjong and Friends scored single wait here but I'm not agree because both c2 and c5 are waited
     """.stripMargin) {
-    val givenClosed = TileSet(List(s6, s7, s8, c3, c4, c5, c2, c2))
+    val givenClosed = TocTileSet(List(s6, s7, s8, c3, c4, c5, c2, c2))
     val givenMelded: List[Figure] = List(Chow(b2, b3, b4), Chow(s4, s5, s6))
     val givenContextualTile: ContextualTile = ContextualTile(c2, SelfDrawn, NotLastTile)
     val givenBonus: Bonus = Bonus(List(fp, fo, fc))
@@ -380,7 +380,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     """No Honors
       |verif : Mahjong Friends
     """.stripMargin) {
-    val givenClosed = TileSet(List(s9, s9))
+    val givenClosed = TocTileSet(List(s9, s9))
     val givenMelded: List[Figure] = List(Pung(s1), Chow(b1, b2, b3), Chow(b1, b2, b3), Chow(c7, c8, c9))
     val givenContextualTile: ContextualTile = ContextualTile(s9, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -405,7 +405,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s3, s4, s5, s3, s3))
+    val givenClosed = TocTileSet(List(s3, s4, s5, s3, s3))
     val givenMelded: List[Figure] = List(Kong(c5), Kong(dg), Kong(wn))
     val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -431,7 +431,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s1, s1, s1, s2, s2))
+    val givenClosed = TocTileSet(List(s1, s1, s1, s2, s2))
     val givenMelded: List[Figure] = List(Kong(b3), Pung(c2), Pung(ws))
     val givenContextualTile: ContextualTile = ContextualTile(s1, SelfDrawn, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -458,7 +458,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s4, s4))
+    val givenClosed = TocTileSet(List(s4, s4))
     val givenMelded: List[Figure] = List(Pung(s6), Chow(b2), Chow(s1), Chow(s7))
     val givenContextualTile: ContextualTile = ContextualTile(s4, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -483,7 +483,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b6, b6, c8, c8, c8))
+    val givenClosed = TocTileSet(List(b6, b6, c8, c8, c8))
     val givenMelded: List[Figure] = List(Kong(s8), Pung(s9))
     val givenConcealedKong = List(Kong(c6))
     val givenContextualTile: ContextualTile = ContextualTile(c8, Discarded, NotLastTile)
@@ -512,7 +512,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b1, b1, b1, b4, b4, b4, b7, b7, b7, dw, dw))
+    val givenClosed = TocTileSet(List(b1, b1, b1, b4, b4, b4, b7, b7, b7, dw, dw))
     val givenMelded: List[Figure] = List(Pung(dg))
     val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -538,7 +538,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part: Non identical principal
     """.stripMargin) {
-    val givenClosed = TileSet(List(c8, c8))
+    val givenClosed = TocTileSet(List(c8, c8))
     val givenMelded: List[Figure] = List(Chow(c3), Chow(c3), Chow(c4), Chow(c5))
     val givenContextualTile: ContextualTile = ContextualTile(c8, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -566,7 +566,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c1, c1, c1, s4, s5, s2, s2, s3))
+    val givenClosed = TocTileSet(List(c1, c1, c1, s4, s5, s2, s2, s3))
     val givenMelded: List[Figure] = List(Kong(c9), Pung(s3))
     val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, LastTileOfKind)
     val givenBonus: Bonus = Bonus(Nil)
@@ -595,7 +595,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s1, s1))
+    val givenClosed = TocTileSet(List(s1, s1))
     val givenMelded: List[Figure] = List(Pung(dr), Pung(dg), Chow(c1), Chow(c4))
     val givenContextualTile: ContextualTile = ContextualTile(s1, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -620,7 +620,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part: Two concealed pungs and a third with discarded tile
     """.stripMargin) {
-    val givenClosed = TileSet(List(s7, s7, s7, c1, c1, c1, dr, dr, dr, ws, ws))
+    val givenClosed = TocTileSet(List(s7, s7, s7, c1, c1, c1, dr, dr, dr, ws, ws))
     val givenMelded: List[Figure] = List(Pung(s4))
     val givenContextualTile: ContextualTile = ContextualTile(s7, Discarded, NotLastTile)
     val givenBonus: Bonus = Bonus(Nil)
@@ -646,7 +646,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part: One of concealed pung is actually a concealed kong
     """.stripMargin) {
-    val givenClosed = TileSet(List(s4, s4, s4, c2, c3, c4, s2, s2))
+    val givenClosed = TocTileSet(List(s4, s4, s4, c2, c3, c4, s2, s2))
     val givenMelded: List[Figure] = List(Chow(s1))
     val givenConcealedKong = List(Kong(c1))
     val givenContextualTile: ContextualTile = ContextualTile(c4, SelfDrawn, NotLastTile)
@@ -674,7 +674,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s7, s9, b3, b4, b5, b6, b7, b8, c6, c7, c8, c5, c5, s8))
+    val givenClosed = TocTileSet(List(s7, s9, b3, b4, b5, b6, b7, b8, c6, c7, c8, c5, c5, s8))
     val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(s8, Discarded, LastTileOfKind)
     val givenConcealedKongs = List()
@@ -703,7 +703,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c1, c1))
+    val givenClosed = TocTileSet(List(c1, c1))
     val givenMelded: List[Figure] = List(Chow(b2), Chow(s7))
     val givenContextualTile: ContextualTile = ContextualTile(c1, Discarded, NotLastTile)
     val givenConcealedKongs = List(Kong(b2), Kong(c3))
@@ -730,7 +730,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b3, b4, c2, c3, c4, c6, c6, b5))
+    val givenClosed = TocTileSet(List(b3, b4, c2, c3, c4, c6, c6, b5))
     val givenMelded: List[Figure] = List(Pung(dw), Chow(c6))
     val givenContextualTile: ContextualTile = ContextualTile(b5, KongRobbed, NotLastTile)
     val givenConcealedKongs = List()
@@ -756,7 +756,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c1, c2, c3, c4, c4))
+    val givenClosed = TocTileSet(List(c1, c2, c3, c4, c4))
     val givenMelded: List[Figure] = List(Chow(c6), Chow(s2))
     val givenContextualTile: ContextualTile = ContextualTile(c4, ReplacedTile, NotLastTile)
     val givenConcealedKongs = List(Kong(b2))
@@ -785,7 +785,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |dubious : Mahjong Friends scores 2 x 1 concealed kong (4pts), not 2 concealed kongs (8pts)
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c1, c1, c1, dr, dr))
+    val givenClosed = TocTileSet(List(c1, c1, c1, dr, dr))
     val givenMelded: List[Figure] = List(Chow(c5))
     val givenContextualTile: ContextualTile = ContextualTile(dr, Discarded, NotLastTile)
     val givenConcealedKongs = List(Kong(c4), Kong(c9))
@@ -815,7 +815,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My Head
       |tricky part:  MixedDoubleChows xor TwoTerminalChows (exclusionary rule)
     """.stripMargin) {
-    val givenClosed = TileSet(List(s4, s5, s6, c1, c2, c3, b7, b7))
+    val givenClosed = TocTileSet(List(s4, s5, s6, c1, c2, c3, b7, b7))
     val givenMelded: List[Figure] = List(Chow(b1), Chow(b7))
     val givenContextualTile: ContextualTile = ContextualTile(c2, Discarded, LastTileClaim)
     val givenConcealedKongs = List()
@@ -845,7 +845,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |dubious: I didn't score Self Drawn because of LastTileDraw. It seems common sense to me
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(ws, ws))
+    val givenClosed = TocTileSet(List(ws, ws))
     val givenMelded: List[Figure] = List(Kong(dr), Pung(ww), Pung(dg), Pung(dw))
     val givenContextualTile: ContextualTile = ContextualTile(ws, SelfDrawn, LastTileDraw)
     val givenConcealedKongs = List()
@@ -873,7 +873,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s4, s5, s7, s7, s7, b1, b2, b3, we, we, s3))
+    val givenClosed = TocTileSet(List(s4, s5, s7, s7, s7, b1, b2, b3, we, we, s3))
     val givenMelded: List[Figure] = List(Chow(c7))
     val givenContextualTile: ContextualTile = ContextualTile(s3, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -898,7 +898,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b6, b7, c4, c5, c6, ww, ww, b5))
+    val givenClosed = TocTileSet(List(b6, b7, c4, c5, c6, ww, ww, b5))
     val givenMelded: List[Figure] = List(Pung(c7), Chow(s1))
     val givenContextualTile: ContextualTile = ContextualTile(b5, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -924,7 +924,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s1, s1))
+    val givenClosed = TocTileSet(List(s1, s1))
     val givenMelded: List[Figure] = List(Kong(dw), Pung(b5), Pung(b8), Pung(s8))
     val givenContextualTile: ContextualTile = ContextualTile(s1, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -954,7 +954,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b5, b5, b5, c9, c9))
+    val givenClosed = TocTileSet(List(b5, b5, b5, c9, c9))
     val givenMelded: List[Figure] = List(Pung(wn), Pung(ww), Pung(ws))
     val givenContextualTile: ContextualTile = ContextualTile(b5, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -983,7 +983,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b5, b5, c9, c9, c9))
+    val givenClosed = TocTileSet(List(b5, b5, c9, c9, c9))
     val givenMelded: List[Figure] = List(Pung(wn), Pung(ww), Pung(ws))
     val givenContextualTile: ContextualTile = ContextualTile(b5, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1014,7 +1014,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My Head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b2, b3, b4, b4, b4))
+    val givenClosed = TocTileSet(List(b2, b3, b4, b4, b4))
     val givenMelded: List[Figure] = List(Pung(b5), Pung(c5), Pung(s5))
     val givenContextualTile: ContextualTile = ContextualTile(b4, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1040,7 +1040,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My Head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s5, s5, c4, c5, c6))
+    val givenClosed = TocTileSet(List(s5, s5, c4, c5, c6))
     val givenMelded: List[Figure] = List(Pung(b5), Pung(c5), Chow(s5))
     val givenContextualTile: ContextualTile = ContextualTile(c5, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1068,7 +1068,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(s5, s5))
+    val givenClosed = TocTileSet(List(s5, s5))
     val givenMelded: List[Figure] = List(Chow(b1), Chow(b7), Chow(c1), Chow(c7))
     val givenContextualTile: ContextualTile = ContextualTile(s5, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1094,7 +1094,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My Head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b2, b2))
+    val givenClosed = TocTileSet(List(b2, b2))
     val givenMelded: List[Figure] = List(Pung(b3), Pung(b7), Chow(b3), Chow(b7))
     val givenContextualTile: ContextualTile = ContextualTile(b2, SelfDrawn, NotLastTile)
     val givenConcealedKongs = List()
@@ -1122,7 +1122,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b1, b2, b3, b6, b7, b8, b8, b8))
+    val givenClosed = TocTileSet(List(b1, b2, b3, b6, b7, b8, b8, b8))
     val givenMelded: List[Figure] = List(Chow(b4), Chow(b7))
     val givenContextualTile: ContextualTile = ContextualTile(b7, SelfDrawn, NotLastTile)
     val givenConcealedKongs = List()
@@ -1152,7 +1152,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |dubious : Outside hand implied by Lower Tiles
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c1, c1))
+    val givenClosed = TocTileSet(List(c1, c1))
     val givenMelded: List[Figure] = List(Chow(b1), Chow(b1), Chow(b1), Chow(b1))
     val givenContextualTile: ContextualTile = ContextualTile(c1, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1182,7 +1182,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |dubious : Outside hand implied by Lower Tiles
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c9, c9))
+    val givenClosed = TocTileSet(List(c9, c9))
     val givenMelded: List[Figure] = List(Chow(b7), Chow(b7), Chow(b7), Chow(s7))
     val givenContextualTile: ContextualTile = ContextualTile(c9, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1212,7 +1212,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : Mahjong Friends
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b2, b2, b2, b4, b4, b4, c6, c6, c6, s8, s8, s8, b6, b6))
+    val givenClosed = TocTileSet(List(b2, b2, b2, b4, b4, b4, c6, c6, c6, s8, s8, s8, b6, b6))
     val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(s8, SelfDrawn, NotLastTile)
     val givenConcealedKongs = List()
@@ -1240,7 +1240,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c5, c5))
+    val givenClosed = TocTileSet(List(c5, c5))
     val givenMelded: List[Figure] = List(Pung(b4), Pung(b5), Pung(b6), Pung(s4))
     val givenContextualTile: ContextualTile = ContextualTile(c5, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1270,7 +1270,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |dubious: Short straight
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(dr, dr))
+    val givenClosed = TocTileSet(List(dr, dr))
     val givenMelded: List[Figure] = List(Chow(b1), Chow(b2), Chow(b3), Chow(b4))
     val givenContextualTile: ContextualTile = ContextualTile(dr, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1299,7 +1299,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |dubious : Two Terminal Chows
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(dr, dr))
+    val givenClosed = TocTileSet(List(dr, dr))
     val givenMelded: List[Figure] = List(Chow(b1), Chow(b3), Chow(b5), Chow(b7))
     val givenContextualTile: ContextualTile = ContextualTile(dr, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1328,7 +1328,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b1, b1))
+    val givenClosed = TocTileSet(List(b1, b1))
     val givenMelded: List[Figure] = List(Pung(s6), Pung(s7), Pung(s8), Pung(s9))
     val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1356,7 +1356,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b1, b2, b3, b5, b5))
+    val givenClosed = TocTileSet(List(b1, b2, b3, b5, b5))
     val givenMelded: List[Figure] = List(Chow(b1), Chow(b7), Chow(b7))
     val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1381,7 +1381,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(dr, dr, c4, c5, c6))
+    val givenClosed = TocTileSet(List(dr, dr, c4, c5, c6))
     val givenMelded: List[Figure] = List(Pung(dg), Pung(dw), Chow(b2))
     val givenContextualTile: ContextualTile = ContextualTile(c4, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1407,7 +1407,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(we, we, c1, c1, c1))
+    val givenClosed = TocTileSet(List(we, we, c1, c1, c1))
     val givenMelded: List[Figure] = List(Pung(wn), Pung(ww), Pung(ws))
     val givenContextualTile: ContextualTile = ContextualTile(c1, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1436,7 +1436,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(c1, c1))
+    val givenClosed = TocTileSet(List(c1, c1))
     val givenMelded: List[Figure] = List(Pung(b1), Pung(b9), Pung(s1), Pung(s9))
     val givenContextualTile: ContextualTile = ContextualTile(c1, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1464,7 +1464,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : My head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b2, b2, b3, b3, b4, b4, b5, b5, b6, b6, b7, b7, b8, b8))
+    val givenClosed = TocTileSet(List(b2, b2, b3, b3, b4, b4, b5, b5, b6, b6, b7, b7, b8, b8))
     val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(b2, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1495,7 +1495,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b1, b1))
+    val givenClosed = TocTileSet(List(b1, b1))
     val givenMelded: List[Figure] = List(Kong(dr))
     val givenContextualTile: ContextualTile = ContextualTile(b1, Discarded, NotLastTile)
     val givenConcealedKongs = List(Kong(c1), Kong(c2), Kong(c3))
@@ -1526,7 +1526,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : my head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b6, b6, b8, b8, b8))
+    val givenClosed = TocTileSet(List(b6, b6, b8, b8, b8))
     val givenMelded: List[Figure] = List(Pung(b3), Chow(b2))
     val givenContextualTile: ContextualTile = ContextualTile(b8, Discarded, NotLastTile)
     val givenConcealedKongs = List(Kong(dg))
@@ -1555,7 +1555,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : my head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(b5, b6, b7, b8, b8))
+    val givenClosed = TocTileSet(List(b5, b6, b7, b8, b8))
     val givenMelded: List[Figure] = List(Pung(b1), Pung(b9), Chow(b2))
     val givenContextualTile: ContextualTile = ContextualTile(b8, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1581,7 +1581,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
       |verif : my head
       |tricky part:
     """.stripMargin) {
-    val givenClosed = TileSet(List(we, we, we, wn, wn, wn, ww, ww, ww, ws, ws, ws, dr, dr))
+    val givenClosed = TocTileSet(List(we, we, we, wn, wn, wn, ww, ww, ww, ws, ws, ws, dr, dr))
     val givenMelded: List[Figure] = List()
     val givenContextualTile: ContextualTile = ContextualTile(dr, Discarded, NotLastTile)
     val givenConcealedKongs = List()
@@ -1606,7 +1606,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   }
 
   private def test(
-                    givenClosed: TileSet,
+                    givenClosed: TocTileSet,
                     givenMelded: List[Figure],
                     givenContextualTile: ContextualTile,
                     givenBonus: Bonus,
@@ -1620,7 +1620,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
 
 
   private def test(
-                    givenClosed: TileSet,
+                    givenClosed: TocTileSet,
                     givenMelded: List[Figure],
                     givenContextualTile: ContextualTile,
                     givenContext: PlayerContext,
@@ -1632,7 +1632,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
   }
 
   private def test(
-                    givenClosed: TileSet,
+                    givenClosed: TocTileSet,
                     givenMelded: List[Figure],
                     givenConcealedKongs: List[Kong],
                     givenContextualTile: ContextualTile,

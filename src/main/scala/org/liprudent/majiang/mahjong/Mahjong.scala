@@ -148,7 +148,7 @@ package object mahjong {
 
     lazy val hasHonors: Boolean = allTiles.exists(_.isHonor)
 
-    lazy val allTileset: TileSet = TileSet(allTiles)
+    lazy val allTileset: TocTileSet = TocTileSet(allTiles)
 
     lazy val allClosedTiles: List[Tile] = closed.map(_.toTiles).flatten
 
@@ -510,11 +510,11 @@ object UniqueWait {
    *                Default is `Nil`
    * @return the list of waiting tiles
    */
-  def waitingTiles(concealed: TileSet, melded: List[Figure], concealedKongs: List[Kong], exclude: Seq[Tile] = Nil): List[Tile] = {
+  def waitingTiles(concealed: TocTileSet, melded: List[Figure], concealedKongs: List[Kong], exclude: Seq[Tile] = Nil): List[Tile] = {
 
 
     def satisfy(tile: Tile): Boolean = {
-      val added: TileSet = concealed.added(tile)
+      val added: TocTileSet = concealed.added(tile)
       val allCombinations = computer.FindAllAndReduce(added).allFiguresCombinations
       allCombinations.filter(possibleClosed => HuFinder.isWellFormedMahjong(possibleClosed, melded,
         concealedKongs)).size > 0

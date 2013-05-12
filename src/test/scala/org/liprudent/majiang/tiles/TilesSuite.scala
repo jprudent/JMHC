@@ -33,7 +33,7 @@ class TilesSuite extends FunSuite {
   }
 
   test("TileSet method exists") {
-    val ts = TileSet(List(c1, c4, c7, b2, b5, b8, s3, s6, s9))
+    val ts = TocTileSet(List(c1, c4, c7, b2, b5, b8, s3, s6, s9))
     assert(ts.exists(_ == c1))
     assert(ts.exists(_ == c4))
     assert(ts.exists(_ == s3))

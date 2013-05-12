@@ -10,13 +10,13 @@ import org.liprudent.majiang.figures.Knitted
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
-import org.liprudent.majiang.tiles.{TileSet, Stone, Bamboo, Character}
+import org.liprudent.majiang.tiles.{TocTileSet, Stone, Bamboo, Character}
 
 @RunWith(classOf[JUnitRunner])
 class FindAllAndReduceSuite extends FunSuite {
 
   test("Find suits") {
-    val hand1 = TileSet(List(b1, b2, b3, b1, b2, b2, b2, we, wn, dg, dg))
+    val hand1 = TocTileSet(List(b1, b2, b3, b1, b2, b2, b2, we, wn, dg, dg))
     val actual: List[Suit] = FindAllAndReduce.findSuits(hand1)
     val expected = List(List(b1, b2, b3), List(b1, b2), List(b2), List(b2), List(we), List(wn), List(dg), List(dg))
     assert(actual == expected, actual)

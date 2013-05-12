@@ -53,7 +53,7 @@ case class GraphBuilder(filename: String) {
 }
 
 //TODO créer un objet
-case class TreeBuilder(tileset: TileSet) extends TilesToFiguresService {
+case class TreeBuilder(tileset: TocTileSet) extends TilesToFiguresService {
 
   val graph = GraphBuilder("/tmp/foo")
 
@@ -244,7 +244,7 @@ object PartialKnitted extends PartialNature {
     //only straight
     tiles.forall(_.isStraight) &&
       //all unique
-      TileSet(tiles).isAllUnique &&
+      TocTileSet(tiles).isAllUnique &&
       //shifted by 3
       byFamily.forall {
         case (family, tiles) => arePurelyShifed(tiles)
@@ -302,7 +302,7 @@ object PartialSomeKnittedWithSomeDragons extends PartialNature {
     val (straights, honors) = splitStaightDragons(tiles)
     PartialKnitted.isValid(straights) &&
       honors != Nil &&
-      TileSet(honors).isAllUnique
+      TocTileSet(honors).isAllUnique
   }
 
   protected def optionalConcrete(tiles: List[Tile]) =
@@ -330,7 +330,7 @@ object PartialThirteenOrphans extends PartialNature {
   protected def optionalConcrete(tiles: List[Tile]) = {
     tiles.size == 14 match {
       case true => {
-        val extraTile = TileSet(tiles).allPairs.head //I know this will be found
+        val extraTile = TocTileSet(tiles).allPairs.head //I know this will be found
         Some(ThirteenOrphans(extraTile))
       }
       case false => None

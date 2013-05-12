@@ -9,10 +9,7 @@ import scala.Some
  * Methods are provided to add and remove tiles
  * @param tocs The list of tiles this class handles
  */
-//TODO tocs is a way of representing tiles internally in TileSet. So this implementation detail should be masked from
-// API
-//TODO action => tocs should be private
-case class TileSet(private val tocs: List[TileOccurence]) {
+case class TocTileSet(private val tocs: List[TileOccurence]) {
 
   require(tocs.forall {
     to => to._2 >= 1 && to._2 <= 4
@@ -28,9 +25,9 @@ case class TileSet(private val tocs: List[TileOccurence]) {
    * @param tile the tile to remove
    * @return a new TileSet with the tile removed
    */
-  def removed(tile: Tile): TileSet = {
+  def removed(tile: Tile): TocTileSet = {
     val removed: List[TileOccurence] = remove(tile, tocs)
-    TileSet(removed)
+    TocTileSet(removed)
   }
 
   /**
@@ -38,13 +35,13 @@ case class TileSet(private val tocs: List[TileOccurence]) {
    * @param tiles
    * @return a new TileSet with the tiles removed
    */
-  def removed(tiles: List[Tile]): TileSet = {
+  def removed(tiles: List[Tile]): TocTileSet = {
     tiles.foldLeft(this)((handAcc, tile) => handAcc.removed(tile))
   }
 
-  def added(tile: Tile): TileSet = {
+  def added(tile: Tile): TocTileSet = {
     val added = add(tile, tocs)
-    TileSet(added)
+    TocTileSet(added)
   }
 
   /**
@@ -55,7 +52,7 @@ case class TileSet(private val tocs: List[TileOccurence]) {
    */
   def exists(p: (Tile) => Boolean) = toTiles.exists(p)
 
-  def filter(p: (Tile) => Boolean): TileSet = TileSet(toTiles.filter(p))
+  def filter(p: (Tile) => Boolean): TocTileSet = TocTileSet(toTiles.filter(p))
 
   lazy val isAllUnique = !exists((tile: Tile) => occurence(tile) > 1)
 
@@ -120,7 +117,7 @@ case class TileSet(private val tocs: List[TileOccurence]) {
    * @param other
    * @return true if `this` is subset of of other
    */
-  def isSubsetOf(other: TileSet): Boolean =
+  def isSubsetOf(other: TocTileSet): Boolean =
     toTiles.intersect(other.toTiles) == toTiles
 
   /**
@@ -167,13 +164,13 @@ case class TileSet(private val tocs: List[TileOccurence]) {
 
 }
 
-object TileSet {
-  def apply(tiles: Iterable[Tile])(implicit dummy: DummyImplicit): TileSet = {
+object TocTileSet {
+  def apply(tiles: Iterable[Tile])(implicit dummy: DummyImplicit): TocTileSet = {
     val tocs = tiles.groupBy(t => t).map {
       case (k, v) => (k, v.size)
     }.toList.sorted
 
-    TileSet(tocs)
+    TocTileSet(tocs)
   }
 
 }
