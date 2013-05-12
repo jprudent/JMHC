@@ -32,4 +32,12 @@ class BitTileSetSuite extends FunSuite {
 
   }
 
+  test("is allUnique") {
+    val notUnique = BitTileSet(Integer.parseInt("432101234", 8))
+    assert(!notUnique.isAllUnique)
+
+    val unique = BitTileSet(Integer.parseInt("010101010", 8))
+    assert(unique.isAllUnique)
+  }
+
 }

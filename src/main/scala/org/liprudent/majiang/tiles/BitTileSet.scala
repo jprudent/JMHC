@@ -21,6 +21,8 @@ case class BitTileSet(bamboos: BitTileSet.BitFamily) extends TileSet {
     this.copy(bamboos = newFamily)
   }
 
+  def isAllUnique =  (oneOfEach | bamboos) == oneOfEach
+
   private def changeOccurrence(family: BitFamily, tile:Tile, occModificator: (Int) => Int, requireCheck: (Int) => Boolean) = {
 
     val tileOccurence = occurenceOf(bamboos, tile.value)
@@ -81,5 +83,7 @@ object BitTileSet {
     Integer.parseInt("000000007", 8))
 
   val inversedMaskForValue = maskForValue.map(_ ^ Integer.parseInt("777777777", 8))
+
+  val oneOfEach = Integer.parseInt("111111111",8)
 
 }

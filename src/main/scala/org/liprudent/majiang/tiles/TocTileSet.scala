@@ -9,7 +9,7 @@ import scala.Some
  * Methods are provided to add and remove tiles
  * @param tocs The list of tiles this class handles
  */
-case class TocTileSet(private val tocs: List[TileOccurence]) {
+case class TocTileSet(private val tocs: List[TileOccurence]) extends TileSet{
 
   require(tocs.forall {
     to => to._2 >= 1 && to._2 <= 4

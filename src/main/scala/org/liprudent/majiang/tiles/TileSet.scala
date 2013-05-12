@@ -39,5 +39,11 @@ trait TileSet {
    */
   def added(tile: Tile): TileSet
 
+  /**
+   *
+   * @return true if all occurence of each tile in this set is 1
+   */
+  def isAllUnique : Boolean
+
 
 }
