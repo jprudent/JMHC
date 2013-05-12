@@ -10,33 +10,33 @@ import org.liprudent.majiang.tiles.Tile._
 class BitTileSetSuite extends FunSuite {
 
   test("size") {
-    val ts = BitTileSet(Integer.parseInt("432101234", 8))
+    val ts = BitTileSet(bamboos = Integer.parseInt("432101234", 8))
     assert(ts.size === 20)
   }
 
   test("removed when occurrence is 1") {
-    val ts = BitTileSet(Integer.parseInt("432101234", 8))
+    val ts = BitTileSet(characters = Integer.parseInt("432101234", 8))
 
-    val expectedRemovedB4 = BitTileSet(Integer.parseInt("432001234", 8))
-    val actualRemovedB4 = ts.removed(b4)
-    assert(actualRemovedB4 === expectedRemovedB4)
+    val expectedRemoved = BitTileSet(characters = Integer.parseInt("432001234", 8))
+    val actualRemoved = ts.removed(c4)
+    assert(actualRemoved === expectedRemoved)
 
   }
 
   test("add when occurrence is 3") {
-    val ts = BitTileSet(Integer.parseInt("432101234", 8))
+    val ts = BitTileSet(stones = Integer.parseInt("432101234", 8))
 
-    val expectedAddedB2 = BitTileSet(Integer.parseInt("442101234", 8))
-    val actualAddedB2 = ts.added(b2)
-    assert(actualAddedB2 === expectedAddedB2)
+    val expectedAdded = BitTileSet(stones = Integer.parseInt("442101234", 8))
+    val actualAdded = ts.added(s2)
+    assert(actualAdded === expectedAdded)
 
   }
 
   test("is allUnique") {
-    val notUnique = BitTileSet(Integer.parseInt("432101234", 8))
+    val notUnique = BitTileSet(honors = Integer.parseInt("432101234", 8))
     assert(!notUnique.isAllUnique)
 
-    val unique = BitTileSet(Integer.parseInt("010101010", 8))
+    val unique = BitTileSet(honors = Integer.parseInt("0101010", 8))
     assert(unique.isAllUnique)
   }
 
