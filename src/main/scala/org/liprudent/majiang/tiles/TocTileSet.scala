@@ -44,17 +44,9 @@ case class TocTileSet(private val tocs: List[TileOccurence]) {
     TocTileSet(added)
   }
 
-  /**
-   *
-   * @param p the predicate used to test elements.
-   * @return true if the given predicate p holds for some of the elements, otherwise false.
-   *
-   */
-  def exists(p: (Tile) => Boolean) = toTiles.exists(p)
-
   def filter(p: (Tile) => Boolean): TocTileSet = TocTileSet(toTiles.filter(p))
 
-  lazy val isAllUnique = !exists((tile: Tile) => occurence(tile) > 1)
+  lazy val isAllUnique = ! toTiles.exists((tile: Tile) => occurence(tile) > 1)
 
   /**
    * a list of tilesets where tiles are all the sameof the same family

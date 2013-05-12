@@ -55,7 +55,7 @@ case class FindAllAndReduce(tileSet: TocTileSet) extends TilesToFiguresService {
     else {
       Knitted.allPossible
         // where each knitted tile exists in tileSet
-        .filter(knitted => knitted.toTiles.forall(tile => tileSet.exists(t => t == tile)))
+        .filter(knitted => knitted.toTiles.forall(tile => tileSet.toTiles.contains(tile)))
     }
   }
 
@@ -92,7 +92,7 @@ case class FindAllAndReduce(tileSet: TocTileSet) extends TilesToFiguresService {
    * An ordered list of possible thirteen orphans
    */
   protected[computer] lazy val thirteenOrphans: List[ThirteenOrphans] = {
-    val containsFixed = ThirteenOrphans.fixedTiles.forall(tile => tileSet.exists(_ == tile))
+    val containsFixed = ThirteenOrphans.fixedTiles.forall(tile => tileSet.toTiles.contains(tile))
     if (containsFixed) {
       val extra = tileSet.allPairs
       extra match {

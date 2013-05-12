@@ -32,14 +32,6 @@ class TilesSuite extends FunSuite {
     assert(actual === expected)
   }
 
-  test("TileSet method exists") {
-    val ts = TocTileSet(List(c1, c4, c7, b2, b5, b8, s3, s6, s9))
-    assert(ts.exists(_ == c1))
-    assert(ts.exists(_ == c4))
-    assert(ts.exists(_ == s3))
-
-  }
-
   test("Tile matching by short name") {
     assert(Tile("we") === we)
     assert(Tile("wn") === wn)
