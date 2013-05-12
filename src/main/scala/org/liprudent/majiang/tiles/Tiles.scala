@@ -173,7 +173,7 @@ case object WinterSeason extends BonusFamily {
   override val shortName = "sw"
 }
 
-case class Tile(family: Family, value: Int) {
+case class Tile(family: Family, value: Tile.TileValue) {
 
   // a tile value should be between 1 and 9
   require(family.validValue(value))
@@ -229,6 +229,8 @@ case class Tile(family: Family, value: Int) {
 }
 
 object Tile {
+
+  type TileValue = Int
 
   def apply(family: StraightFamily, value: Int) = new Tile(family, value)
 
