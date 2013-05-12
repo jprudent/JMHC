@@ -10,27 +10,25 @@ import org.liprudent.majiang.tiles.Tile._
 class BitTileSetSuite extends FunSuite {
 
   test("size") {
-    val ts = BitSetTileSet(Integer.parseInt("432101234", 8))
+    val ts = BitTileSet(Integer.parseInt("432101234", 8))
     assert(ts.size === 20)
   }
 
   test("removed when occurrence is 1") {
-    val ts = BitSetTileSet(Integer.parseInt("432101234", 8))
+    val ts = BitTileSet(Integer.parseInt("432101234", 8))
 
-    val expectedRemovedB4 = BitSetTileSet(Integer.parseInt("432001234", 8))
+    val expectedRemovedB4 = BitTileSet(Integer.parseInt("432001234", 8))
     val actualRemovedB4 = ts.removed(b4)
     assert(actualRemovedB4 === expectedRemovedB4)
 
-
   }
 
-  test("removed when occurrence is 0") {
-    val ts = BitSetTileSet(Integer.parseInt("432101234", 8))
+  test("add when occurrence is 3") {
+    val ts = BitTileSet(Integer.parseInt("432101234", 8))
 
-    val expectedRemovedB5 = BitSetTileSet(Integer.parseInt("432101234", 8))
-    val actualRemovedB5 = ts.removed(b5)
-    assert(actualRemovedB5 === expectedRemovedB5)
-
+    val expectedAddedB2 = BitTileSet(Integer.parseInt("442101234", 8))
+    val actualAddedB2 = ts.added(b2)
+    assert(actualAddedB2 === expectedAddedB2)
 
   }
 
