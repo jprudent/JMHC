@@ -69,10 +69,10 @@ case class FindAllAndReduce(tileSet: TocTileSet) extends TilesToFiguresService {
     //quick fail
     if (condition) Nil
     else {
-      val knitted = TocTileSet(tileSet.allStraights)
-      val tiles147 = knitted.filter(tile => tile.value == 1 || tile.value == 4 || tile.value == 7)
-      val tiles258 = knitted.filter(tile => tile.value == 2 || tile.value == 5 || tile.value == 8)
-      val tiles369 = knitted.filter(tile => tile.value == 3 || tile.value == 6 || tile.value == 9)
+      val allStraight = tileSet.allStraights
+      val tiles147 = TocTileSet(allStraight.filter(tile => tile.value == 1 || tile.value == 4 || tile.value == 7))
+      val tiles258 = TocTileSet(allStraight.filter(tile => tile.value == 2 || tile.value == 5 || tile.value == 8))
+      val tiles369 = TocTileSet(allStraight.filter(tile => tile.value == 3 || tile.value == 6 || tile.value == 9))
       val knitteds: List[TocTileSet] = List(tiles147, tiles258, tiles369)
 
       //all tiles should be the same family

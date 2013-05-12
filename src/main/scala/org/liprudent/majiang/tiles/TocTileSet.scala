@@ -44,8 +44,6 @@ case class TocTileSet(private val tocs: List[TileOccurence]) {
     TocTileSet(added)
   }
 
-  def filter(p: (Tile) => Boolean): TocTileSet = TocTileSet(toTiles.filter(p))
-
   lazy val isAllUnique = ! toTiles.exists((tile: Tile) => occurence(tile) > 1)
 
   /**
