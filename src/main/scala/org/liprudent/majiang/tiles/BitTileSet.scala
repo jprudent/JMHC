@@ -15,7 +15,7 @@ case class BitTileSet(bamboos: BitTileSet.BitFamily = 0, characters: BitTileSet.
 
   private type Occurrence = Int
 
-  val size = sizeOf(bamboos);
+  val size = sizeOf(bamboos)
 
   def removed(tile: Tile): BitTileSet = {
     changeOccurrence(tile, _ - 1, _ > 0)
@@ -69,9 +69,6 @@ case class BitTileSet(bamboos: BitTileSet.BitFamily = 0, characters: BitTileSet.
     case f: HonorFamily => honors
   }
 
-
-  private val straightFamilies = Array(bamboos, characters, stones)
-  private val allFamilies = Array(bamboos, characters, stones, honors)
 
   /**
    *
