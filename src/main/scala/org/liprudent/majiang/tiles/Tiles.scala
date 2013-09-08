@@ -434,9 +434,6 @@ object OrdListTileOccurence extends Ordering[List[TileOccurence]] {
  * Methods are provided to add and remove tiles
  * @param tocs The list of tiles this class handles
  */
-//TODO tocs is a way of representing tiles internally in TileSet. So this implementation detail should be masked from
-// API
-//TODO action => tocs should be private
 case class TileSet(private val tocs: List[TileOccurence]) {
 
   require(tocs.forall {
