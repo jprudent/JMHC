@@ -27,3 +27,9 @@ libraryDependencies ++= Seq(
 resolvers ++= Seq(
   "java m2" at "http://download.java.net/maven/2"
 )
+
+publishMavenStyle := true
+
+publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
+
+

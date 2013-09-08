@@ -89,7 +89,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
     val thenClosed: List[Figure with Product] = List(Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9))
     val thenCombinations: List[(List[Figure], Combination)] = List(
       (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s6, s7, s8)), MixedTripleChows),
-      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8),Dui(s9)), AllChows)
+      (List(Chow(b6, b7, b8), Chow(c6, c7, c8), Chow(s2, s3, s4), Chow(s6, s7, s8), Dui(s9)), AllChows)
     )
 
     test(givenClosed, givenMelded, givenContextualTile, givenContext, thenClosed, thenCombinations, 10)
@@ -1615,6 +1615,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     thenCombinations: List[(List[Figure], Combination)],
                     thenTotal: Int
                     ) {
+    val noKongs = Nil
     test(givenClosed, givenMelded, noKongs, givenContextualTile, givenBonus, givenContext, thenClosed, thenCombinations, thenTotal)
   }
 
@@ -1628,6 +1629,7 @@ class MahjongFriendUseCaseSuite extends FunSuite {
                     thenCombinations: List[(List[Figure], Combination)],
                     thenTotal: Int
                     ) {
+    val noKongs = Nil
     test(givenClosed, givenMelded, noKongs, givenContextualTile, Bonus(Nil), givenContext, thenClosed, thenCombinations, thenTotal)
   }
 

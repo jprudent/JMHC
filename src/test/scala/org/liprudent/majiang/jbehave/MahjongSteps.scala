@@ -4,7 +4,7 @@ import org.jbehave.core.steps.Steps
 import org.jbehave.core.annotations._
 import org.liprudent.majiang.tiles._
 import org.liprudent.majiang.HuFinder
-import org.liprudent.majiang.mahjong.{Combination, PlayerContext, PlayerTiles, DetailedPoints}
+import org.liprudent.majiang.mahjong.{Combination, DetailedPoints}
 import org.liprudent.majiang.figures.Kong
 import org.liprudent.majiang.tiles.ContextualTile
 import org.liprudent.majiang.ui.StringMapper

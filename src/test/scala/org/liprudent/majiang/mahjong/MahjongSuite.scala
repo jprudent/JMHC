@@ -9,7 +9,7 @@ import org.liprudent.majiang.figures._
 import org.liprudent.majiang.figures.Pung
 import org.liprudent.majiang.figures.Dui
 import org.liprudent.majiang.tiles.ContextualTile
-import org.liprudent.majiang.{ExclusionPrinciples, HuFinder, UniqueWait}
+import org.liprudent.majiang.{HuFinder, UniqueWait}
 
 @RunWith(classOf[JUnitRunner])
 class MahjongSuite extends FunSuite {

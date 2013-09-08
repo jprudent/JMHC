@@ -8,9 +8,7 @@ import org.liprudent.majiang.HuFinder
 import org.liprudent.majiang.tiles._
 import org.liprudent.majiang.figures.Kong
 import net.liftweb.json.{JsonAST, Extraction, Printer}
-import org.liprudent.majiang.mahjong.PlayerContext
 import scala.Some
-import org.liprudent.majiang.mahjong.PlayerTiles
 import org.liprudent.majiang.mahjong.DetailedPoints
 import org.liprudent.majiang.tiles.ContextualTile
 import unfiltered.response.ResponseString

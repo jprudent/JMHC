@@ -6,14 +6,13 @@ Jérôme's Mahjong Hand Calculator
 About
 -----
 
-A scoring program for mahjong chinese rules (aka chinese official).
+A scoring program for mahjong chinese rules (aka chinese official, MCR, MCO).
 
 Status
 ------
 
 Don't (yet) blindly trust results :)
-I didn't implement the execlusionary rule yet because I don't fully understand it yet and as far
-as I know nobody does.
+But I think I covered all the cases I could think of.
 
 
 Licence
