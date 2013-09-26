@@ -284,7 +284,7 @@ object SingleWait extends Combination with WaitCombination {
 
   def matchingWait(figure: Figure, waitingTile: Tile): Boolean = {
     figure match {
-      case Dui(tile) if tile == waitingTile => true
+      case Dui(tile) if (tile == waitingTile) => true
       case _ => false
     }
   }

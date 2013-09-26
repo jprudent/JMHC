@@ -27,7 +27,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
    */
   protected[computer] val pungs: List[Pung] = {
     tileSet.allTripletsOrQuadruplets.map {
-      Pung(_)
+      new Pung(_)
     }
   }
 
@@ -42,7 +42,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
    * an ordered list of possible duis
    */
   protected[computer] lazy val duis: List[Dui] = {
-    tileSet.allPairs.map(Dui(_))
+    tileSet.allPairs.map(new Dui(_))
   }
 
   /**
@@ -79,7 +79,7 @@ case class FindAllAndReduce(tileSet: TileSet) extends TilesToFiguresService {
       if (knitteds.forall(tileSet => tileSet.isSingleFamily)) {
         val allKnitted: List[Tile] = knitteds.map(_.toTiles).flatten.sorted
         assert(allKnitted.size == 14 - tileSet.allHonors.size)
-        List(SomeKnittedWithSomeDragons(allKnitted, tileSet.allHonors))
+        List(new SomeKnittedWithSomeDragons(allKnitted, tileSet.allHonors))
       } else {
         Nil
       }

@@ -94,7 +94,7 @@ package object figures {
     val fixedTiles = List(Tile.b1, Tile.b9, Tile.c1, Tile.c9, Tile.s1, Tile.s9, Tile.we, Tile.wn, Tile.ww, Tile.ws,
       Tile.dr, Tile.dg, Tile.dw).sorted
 
-    val allPossible = Tile.allTerminalsOrHonors.map(t => ThirteenOrphans(t))
+    val allPossible = Tile.allTerminalsOrHonors.map(t => new ThirteenOrphans(t))
 
   }
 
@@ -179,7 +179,7 @@ package object figures {
     //6 values
     val allPossible = StraightFamily.all.permutations.toList.map {
       comb =>
-        Knitted(comb(0), comb(1), comb(2))
+        new Knitted(comb(0), comb(1), comb(2))
     }
 
   }
@@ -220,7 +220,7 @@ package object figures {
 
     val order = 30
 
-    val allPossible = Tile.allButBonus.map(Kong(_))
+    val allPossible = Tile.allButBonus.map(new Kong(_))
 
     def compare(kong1: Figure, kong2: Figure) =
       Tile.ord.compare(kong1.asInstanceOf[Kong].tile, kong2.asInstanceOf[Kong].tile)
@@ -250,7 +250,7 @@ package object figures {
     def compare(pung1: Figure, pung2: Figure) =
       Tile.ord.compare(pung1.asInstanceOf[Pung].tile, pung2.asInstanceOf[Pung].tile)
 
-    val allPossible = Tile.allButBonus.map(Pung(_))
+    val allPossible = Tile.allButBonus.map(new Pung(_))
   }
 
 
