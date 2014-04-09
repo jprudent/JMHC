@@ -60,9 +60,9 @@ object MainWeb {
         |      "winning_tile" : "b1",
         |
         |      /* Mandatory. Possible values are:                                                           */
-        |      /*    - "Self Drawn"    : Origin of the tile when the player self drawn the tile.            */
-        |      /*    - "Discarded"    : Origin of the tile when a foe discarded a tile and player use it to */
-        |      /*                       declare Hu.                         "                               */
+        |      /*    - "Self Drawn"    : Origin of the tile when the player self drawn the tile.   1        */
+        |      /*    - "Discarded"     : Origin of the tile when a foe discarded a tile and player use it   */
+        |      /*                       to declare Hu.                                                      */
         |      /*    - "Kong Robbed"   : Origin of the tile when a foe declare a melded kong and the        */
         |      /*                       very tile that transforms the pung to a kong is robbed.             */
         |      /*    - "Replaced Tile" : Origin of the tile when player declared a kong and need a          */
