@@ -15,6 +15,12 @@ Don't (yet) blindly trust results :)
 But I think I covered all the cases I could think of.
 
 
+Build
+------
+ 
+???
+
+
 Licence
 -------
 Mahjong icons is the work of Martin Persson - http://www.martinpersson.org

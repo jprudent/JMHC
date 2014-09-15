@@ -1,17 +1,8 @@
 package org.liprudent.majiang.mahjong
 
-import org.liprudent.majiang.figures._
+import org.liprudent.majiang.figures.{Bonus, Dui, Knitted, Kong, PungLike, SomeKnittedWithSomeDragons, ThirteenOrphans, _}
 import org.liprudent.majiang.tiles.Types._
-import org.liprudent.majiang.figures.Knitted
-import org.liprudent.majiang.figures.Kong
-import org.liprudent.majiang.figures.PungLike
-import org.liprudent.majiang.figures.SomeKnittedWithSomeDragons
-import org.liprudent.majiang.figures.ThirteenOrphans
-import org.liprudent.majiang.tiles._
-import scala.Some
-import org.liprudent.majiang.figures.Bonus
-import org.liprudent.majiang.figures.Dui
-import org.liprudent.majiang.tiles.ContextualTile
+import org.liprudent.majiang.tiles.{ContextualTile, _}
 
 
 /**
@@ -37,6 +28,7 @@ case class HuLe(closed: Figures, melded: Figures, lastTileContext: ContextualTil
     case _ => true
   }), "melded figures can only be kong, chow or pung")
 
+  require(14 <= (closed ::: melded ::: concealedKongs).foldLeft(0) { (acc, x) => x.toTiles.size + acc})
 
   /* ANY FIGURES */
   lazy val allFigures = (closed ::: melded ::: concealedKongs).sorted(OrdFigure)

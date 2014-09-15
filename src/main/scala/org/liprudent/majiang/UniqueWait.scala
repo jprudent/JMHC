@@ -8,7 +8,7 @@ object UniqueWait {
 
   /**
    *
-   * @param concealed tiles before winning
+   * @param concealed tiles before winning.
    * @param melded figures
    * @param concealedKongs
    * @param exclude A collection of tiles to exclude from result.
