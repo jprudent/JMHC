@@ -15,10 +15,10 @@ Don't (yet) blindly trust results :)
 But I think I covered all the cases I could think of.
 
 
-Build
-------
+Build & deploy
+--------------
  
-???
+    sbt publish
 
 
 Licence

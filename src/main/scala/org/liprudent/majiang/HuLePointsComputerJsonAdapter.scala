@@ -1,7 +1,7 @@
 package org.liprudent.majiang
 
-import net.liftweb.json.JsonAST.JValue
-import net.liftweb.json.{Extraction, JsonAST, JsonParser, Printer}
+import org.json4s._
+import org.json4s.native.{JsonMethods, Printer, JsonParser}
 import org.liprudent.majiang.figures.Kong
 import org.liprudent.majiang.mahjong.{DetailedPoints, HuLe, HulePointsComputer}
 import org.liprudent.majiang.tiles.{ContextualTile, PlayerContext, _}
@@ -21,11 +21,11 @@ object HuLePointsComputerJsonAdapter {
 
   def wrap(json: JValue): Option[String] = {
 
-    implicit val formats = net.liftweb.json.DefaultFormats
+    implicit val formats = DefaultFormats
     val req = json.extractOpt[Request]
     req.map(r => {
       val decompose = Extraction.decompose(CommonWrapper.toMap(r.compute))
-      Printer.pretty(JsonAST.render(decompose))
+      Printer.pretty(JsonMethods.render(decompose))
     })
   }
 

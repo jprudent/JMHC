@@ -2,15 +2,7 @@ package org.liprudent.majiang.web
 
 import unfiltered.request._
 import unfiltered.response._
-import net.liftweb.json.JsonAST.JValue
-import org.liprudent.majiang.ui.StringMapper
-import org.liprudent.majiang.{HuFinderWrapper, HuFinder}
-import org.liprudent.majiang.tiles._
-import org.liprudent.majiang.figures.Kong
-import net.liftweb.json.{JsonAST, Extraction, Printer}
-import scala.Some
-import org.liprudent.majiang.mahjong.DetailedPoints
-import org.liprudent.majiang.tiles.ContextualTile
+import org.liprudent.majiang.HuFinderWrapper
 import unfiltered.response.ResponseString
 
 object MainWeb {
@@ -109,6 +101,6 @@ object MainWeb {
 
 
   def main(args: Array[String]) {
-    unfiltered.jetty.Http(8080).plan(all).run
+    unfiltered.jetty.Http(8080).plan(all).run()
   }
 }
